@@ -10,7 +10,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.location.Address;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -21,8 +23,11 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -32,6 +37,10 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
 
 public class Choose extends AppCompatActivity implements View.OnClickListener {
 
@@ -40,6 +49,7 @@ public class Choose extends AppCompatActivity implements View.OnClickListener {
     private Button btnGetLocation;
     private double lon;
     private double lat;
+    private TextView textViewSuburb;
 
     // Two components used to get user Location
     private LocationManager locationManager;
@@ -47,6 +57,8 @@ public class Choose extends AppCompatActivity implements View.OnClickListener {
 
     // Firebase Authentication
     private FirebaseAuth fireBaseAuth;
+
+    private RequestQueue requestQueue;
 
 
 
@@ -56,10 +68,12 @@ public class Choose extends AppCompatActivity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose);
 
+        requestQueue = Volley.newRequestQueue(this);
 
         // Bind simple variables
         btnGetLocation = (Button) findViewById(R.id.btnGetLocation);
         logOutBtn = (Button) findViewById(R.id.logOutBtn);
+        textViewSuburb = findViewById(R.id.textViewSuburb);
 
 
         // Setup the Location Manager and Listener
@@ -73,7 +87,14 @@ public class Choose extends AppCompatActivity implements View.OnClickListener {
                 lon = location.getLongitude();
                 lat = location.getLatitude();
 
+                String coordinates = "Long: " + lon + "Lat: " + lat;
+
                 Log.d("LOCATION", "Long: " + lon + "Lat: " + lat );
+
+
+                String suburb = getSuburb(lon, lat);
+
+                textViewSuburb.setText(suburb);
 
             }
 
@@ -125,6 +146,29 @@ public class Choose extends AppCompatActivity implements View.OnClickListener {
 
 
 
+    }
+
+    private String getSuburb(double lon, double lat) {
+
+
+        String suburb = "NO SUBURB FOUND";
+        Geocoder geocoder = new Geocoder(Choose.this, Locale.getDefault());
+
+
+        try {
+            List<Address> addresses = geocoder.getFromLocation(lat, lon, 1);
+
+//            suburb = addresses.get(0).getAddressLine(0);
+
+            suburb = addresses.get(0).getLocality();
+
+                    Log.d("LOCATION", suburb);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return suburb;
     }
 
     @Override
