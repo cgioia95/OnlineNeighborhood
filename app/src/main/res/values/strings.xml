@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Online Neighborhood</string>
+    <string name="title_activity_register">RegisterActivity</string>
+
+    <string-array name="preferences">
+        <item>Sports</item>
+        <item>Gigs</item>
+        <item>Dating</item>
+        <item>Misc.</item>
+    </string-array>
+
+    <string-array name="suburbs">
+        <item>Brunswick</item>
+        <item>Kew</item>
+        <item>Footscray</item>
+        <item>Altona</item>
+        <item>Collingwood</item>
+    </string-array>
+
+
+</resources>
