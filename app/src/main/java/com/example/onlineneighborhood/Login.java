@@ -186,7 +186,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             return;
         }
 
-        progressDialog.setMessage("Logging in User User");
+        progressDialog.setMessage("Logging in User");
         progressDialog.show();
 
         firebaseAuth.signInWithEmailAndPassword(email, password)
@@ -249,7 +249,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     }
 
     // Once the Location Button is pressed, the location manager will start returning user's location
-    private void configureButton() {
+    public void configureButton() {
 
                 Log.d("LOCATION", "FETCHING LOCATION UPDATES");
 

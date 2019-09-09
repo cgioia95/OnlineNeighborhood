@@ -17,5 +17,16 @@
         <item>Collingwood</item>
     </string-array>
 
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="create_an_event">Create an Event!</string>
+    <string name="event_name">Event Name</string>
+    <string name="description">Description</string>
+    <string name="time">Tap to Set Time</string>
+    <string name="date">Tap to Set Date</string>
+    <string name="address">Address</string>
+    <string name="or">OR</string>
+    <string name="get_location">get Location</string>
+
 
 </resources>
