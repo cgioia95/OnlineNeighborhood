@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class Event {
     private String id;
-    private FirebaseUser host;
+    private UserInformation host;
     private String suburb;
     private String address;
     private String name;
@@ -14,7 +14,7 @@ public class Event {
     private String time;
     private String date;
 
-    private ArrayList<FirebaseUser> attendees;
+    private ArrayList<UserInformation> attendees;
 
 
 
@@ -24,7 +24,7 @@ public class Event {
 
     }
 
-    public Event(String id, FirebaseUser host, String suburb, String address, String name, String description, String time, String date, ArrayList<FirebaseUser> attendees) {
+    public Event(String id, UserInformation host, String suburb, String address, String name, String description, String time, String date, ArrayList<UserInformation> attendees) {
         this.id = id;
         this.host = host;
         this.suburb = suburb;
@@ -50,14 +50,6 @@ public class Event {
 
     public void setDate(String date) {
         this.date = date;
-    }
-
-    public FirebaseUser getHost() {
-        return host;
-    }
-
-    public void setHost(FirebaseUser host) {
-        this.host = host;
     }
 
     public String getSuburb() {
@@ -92,11 +84,27 @@ public class Event {
         this.description = description;
     }
 
-    public ArrayList<FirebaseUser> getAttendees() {
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public UserInformation getHost() {
+        return host;
+    }
+
+    public void setHost(UserInformation host) {
+        this.host = host;
+    }
+
+    public ArrayList<UserInformation> getAttendees() {
         return attendees;
     }
 
-    public void setAttendees(ArrayList<FirebaseUser> attendees) {
+    public void setAttendees(ArrayList<UserInformation> attendees) {
         this.attendees = attendees;
     }
 }

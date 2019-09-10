@@ -1,5 +1,6 @@
 package com.example.onlineneighborhood;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
@@ -34,8 +35,11 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -51,6 +55,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     private double lat;
     //bool check to ensure get location has been requested
     private boolean clicked = false;
+    UserInformation host;
 
 
     //firebase variables
@@ -74,6 +79,28 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     // Two components used to get user Location
     private LocationManager locationManager;
     private LocationListener locationListener;
+
+    @Override
+    protected void onStart() {
+
+        super.onStart();
+
+        databaseEvents.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot userSnapshot: dataSnapshot.getChildren()){
+                    UserInformation user = userSnapshot.getValue(UserInformation.class);
+
+                    host = user;
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -245,9 +272,6 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
         String eventAddress = evAddress.getText().toString().trim();
 
-        firebaseAuth = FirebaseAuth.getInstance();
-        FirebaseUser user = firebaseAuth.getCurrentUser();
-
 
         //checks all the fields are filled
         if(!TextUtils.isEmpty(eventName) && !TextUtils.isEmpty(eventDesc) && !eventTime.contains("Time")
@@ -270,9 +294,9 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
             else if(clicked && TextUtils.isEmpty(eventAddress) && (!locat.equals(DEFAULT_LOCAL))) {
                 eventAddress = locat;
                 String id = databaseEvents.push().getKey();
-                ArrayList<FirebaseUser> attendees = new ArrayList<FirebaseUser>();
-                attendees.add(user);
-                Event event = new Event(id, user, suburb, eventAddress, eventName, eventDesc, eventTime, eventDate, attendees);
+                ArrayList<UserInformation> attendees = new ArrayList<UserInformation>();
+                attendees.add(host);
+                Event event = new Event(id, host, suburb, eventAddress, eventName, eventDesc, eventTime, eventDate, attendees);
                 databaseEvents.child(id).setValue(event);
                 Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
 
@@ -282,9 +306,9 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
             else {
                 eventAddress = evAddress.getText().toString().trim();
                 String id = databaseEvents.push().getKey();
-                ArrayList<FirebaseUser> attendees = new ArrayList<>();
-                attendees.add(user);
-                Event event = new Event(id, user, suburb, eventAddress, eventName, eventDesc, eventTime, eventDate, attendees);
+                ArrayList<UserInformation> attendees = new ArrayList<UserInformation>();
+                attendees.add(host);
+                Event event = new Event(id, host, suburb, eventAddress, eventName, eventDesc, eventTime, eventDate, attendees);
                 databaseEvents.child(id).setValue(event);
                 Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
             }
