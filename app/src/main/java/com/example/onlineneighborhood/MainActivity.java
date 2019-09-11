@@ -1,17 +1,11 @@
 package com.example.onlineneighborhood;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 // MAIN activity where user chooses to Register or Login
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -19,6 +13,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // Declare simple variables
     private Button registerBtn;
     private Button loginBtn;
+    private Button profileBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (view == loginBtn){
             startActivity(new Intent(this, Login.class));
         }
+
 
     }
 }

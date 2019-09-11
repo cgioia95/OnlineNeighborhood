@@ -13,7 +13,6 @@ import com.google.firebase.auth.FirebaseAuth;
 public class HomeScreen extends AppCompatActivity {
 
     TextView suburbTextView;
-
     Button logoutBtn;
 
     private FirebaseAuth fireBaseAuth;
@@ -24,11 +23,13 @@ public class HomeScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_screen);
 
+
+
         fireBaseAuth = FirebaseAuth.getInstance();
 
         suburbTextView = findViewById(R.id.textViewSuburb);
 
-        Button logoutBtn = findViewById(R.id.logOutBtn);
+        final Button logoutBtn = findViewById(R.id.logOutBtn);
 
         logoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -38,6 +39,7 @@ public class HomeScreen extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(), Login.class));            }
         });
 
+
         Intent i = getIntent();
         String suburb = i.getStringExtra("SUBURB");
 
@@ -45,4 +47,5 @@ public class HomeScreen extends AppCompatActivity {
 
 
     }
+
 }
