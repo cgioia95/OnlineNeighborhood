@@ -253,7 +253,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         Log.d("LOCATION", "FETCHING LOCATION UPDATES");
 
 
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 5, locationListener);
 
     }
 
@@ -293,7 +293,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
             if(!clicked && TextUtils.isEmpty(eventAddress)){
                 Toast.makeText(this, "you have not entered an address", Toast.LENGTH_LONG).show();
             }
-            else if(clicked && TextUtils.isEmpty(eventAddress) && (!locat.equals(DEFAULT_LOCAL))) {
+            else if(clicked && TextUtils.isEmpty(eventAddress) && !locat.equals(DEFAULT_LOCAL) && !locat.isEmpty()) {
                 eventAddress = locat;
                 String id = databaseEvents.push().getKey();
                 ArrayList<UserInformation> attendees = new ArrayList<UserInformation>();
@@ -305,14 +305,8 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
             }
             //if anything is typed into the address box it will prioritize that as the address.
             //might need to change
-            else {
-                eventAddress = evAddress.getText().toString().trim();
-                String id = databaseEvents.push().getKey();
-                ArrayList<UserInformation> attendees = new ArrayList<UserInformation>();
-                attendees.add(host);
-                Event event = new Event(id, host, suburb, eventAddress, eventName, eventDesc, eventTime, eventDate, attendees);
-                databaseEvents.child(id).setValue(event);
-                Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
+            else{
+                Toast.makeText(this, "please enter all fields", Toast.LENGTH_LONG).show();
             }
         }
         else{
