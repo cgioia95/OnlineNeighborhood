@@ -100,7 +100,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         firebaseAuth = FirebaseAuth.getInstance();
 
         // Checks if the User's Logged in already, if so bypasses the Login Screen and takes them to Choose Screen
-        if (firebaseAuth.getCurrentUser() != null){
+        if (firebaseAuth.getCurrentUser() != null) {
             finish();
             startActivity(new Intent(getApplicationContext(), HomeScreen.class));
 
@@ -119,12 +119,12 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
                 String coordinates = "Long: " + lon + "Lat: " + lat;
 
-                Log.d("LOCATION", "Long: " + lon + "Lat: " + lat );
+                Log.d("LOCATION", "Long: " + lon + "Lat: " + lat);
 
 
                 localSuburb = getSuburb(lon, lat);
 
-                Log.d("LOCATION", localSuburb );
+                Log.d("LOCATION", localSuburb);
 
 
             }
@@ -168,18 +168,18 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     // Parses user information from EditTexts, checks all fields are filled
     // If all fields filled, attempts user Login
     // If successful, takes user to Choose Screen
-    private void userLogin(){
+    private void userLogin() {
         String email = editTextEmail.getText().toString().trim();
         String password = editTextPassword.getText().toString().trim();
 
-        if (TextUtils.isEmpty(email)){
+        if (TextUtils.isEmpty(email)) {
             Toast.makeText(this, "Please enter email", Toast.LENGTH_SHORT).show();
             // Stopping this function executive further
             return;
             // email is empty
         }
 
-        if (TextUtils.isEmpty(password)){
+        if (TextUtils.isEmpty(password)) {
             // password  is empty
             Toast.makeText(this, "Please enter password", Toast.LENGTH_SHORT).show();
             // Stopping this function executive further
@@ -195,15 +195,13 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         progressDialog.dismiss();
 
-                        if (task.isSuccessful()){
+                        if (task.isSuccessful()) {
                             //start the profile activity
                             finish();
                             Intent i = new Intent(getApplicationContext(), HomeScreen.class);
                             i.putExtra("SUBURB", textViewSuburb.getText().toString());
                             startActivity(i);
-                        }
-
-                        else {
+                        } else {
                             Toast.makeText(Login.this, "Could not login ... please try again", Toast.LENGTH_SHORT).show();
 
                         }
@@ -240,9 +238,9 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        switch (requestCode){
+        switch (requestCode) {
             case 10:
-                if(grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                     configureButton();
                 return;
         }
@@ -251,9 +249,19 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     // Once the Location Button is pressed, the location manager will start returning user's location
     public void configureButton() {
 
-                Log.d("LOCATION", "FETCHING LOCATION UPDATES");
+        Log.d("LOCATION", "FETCHING LOCATION UPDATES");
 
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5, locationListener);
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    Activity#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for Activity#requestPermissions for more details.
+            return;
+        }
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 5, locationListener);
 
     }
 
