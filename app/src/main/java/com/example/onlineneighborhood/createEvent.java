@@ -20,6 +20,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.CalendarContract;
 import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.text.TextUtils;
@@ -45,6 +46,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import static android.provider.CalendarContract.*;
 
 public class createEvent extends AppCompatActivity implements View.OnClickListener {
 
@@ -75,6 +78,8 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     EditText evName, evDesc, evAddress;
     private TextView eventTv;
     static TextView evTime, evDate;
+    static int year, day, month;
+    static int hour, minute;
 
     // Two components used to get user Location
     private LocationManager locationManager;
@@ -269,6 +274,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         String eventTime = evTime.getText().toString().trim();
         String eventDate = evDate.getText().toString().trim();
 
+
         Intent i = getIntent();
         String suburb = i.getStringExtra("SUBURB");
 
@@ -302,6 +308,9 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
                 databaseEvents.child(id).setValue(event);
                 Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
 
+                createCalenderEvent(eventName, eventDesc, eventAddress);
+
+
             }
             //if anything is typed into the address box it will prioritize that as the address.
             //might need to change
@@ -333,8 +342,8 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             // Use the current time as the default values for the picker
             final Calendar c = Calendar.getInstance();
-            int hour = c.get(Calendar.HOUR_OF_DAY);
-            int minute = c.get(Calendar.MINUTE);
+            hour = c.get(Calendar.HOUR_OF_DAY);
+            minute = c.get(Calendar.MINUTE);
 
             // Create a new instance of TimePickerDialog and return it
             return new TimePickerDialog(getActivity(), this, hour, minute,
@@ -362,9 +371,9 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             // Use the current date as the default date in the picker
             final Calendar c = Calendar.getInstance();
-            int year = c.get(Calendar.YEAR);
-            int month = c.get(Calendar.MONTH);
-            int day = c.get(Calendar.DAY_OF_MONTH);
+            year = c.get(Calendar.YEAR);
+            month = c.get(Calendar.MONTH);
+            day = c.get(Calendar.DAY_OF_MONTH);
 
             // Create a new instance of DatePickerDialog and return it
             return new DatePickerDialog(getActivity(), this, year, month, day);
@@ -384,6 +393,24 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     public void showTruitonDatePickerDialog(View v) {
         DialogFragment newFragment = new DatePickerFragment();
         newFragment.show(getSupportFragmentManager(), "datePicker");
+    }
+
+    // TODO: Need to add an end time to event creation
+    public void createCalenderEvent(String title, String description, String eventAddress){
+
+        java.util.Calendar beginTime = java.util.Calendar.getInstance();
+        beginTime.set(year, month, day, hour, minute);
+        java.util.Calendar endTime = java.util.Calendar.getInstance();
+        endTime.set(year, month, day, hour, minute + 5);
+
+        Intent intent = new Intent(Intent.ACTION_INSERT)
+                .setData(Events.CONTENT_URI)
+                .putExtra(EXTRA_EVENT_BEGIN_TIME, beginTime.getTimeInMillis())
+                .putExtra(EXTRA_EVENT_END_TIME, endTime.getTimeInMillis())
+                .putExtra(Events.TITLE, title)
+                .putExtra(Events.DESCRIPTION, description)
+                .putExtra(Events.EVENT_LOCATION, eventAddress);
+        startActivity(intent);
     }
 
 }
