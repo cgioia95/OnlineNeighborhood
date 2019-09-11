@@ -92,6 +92,8 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
                     UserInformation user = userSnapshot.getValue(UserInformation.class);
 
                     host = user;
+                    Log.d("user info: ", "onDataChange: " + host.name);
+
                 }
             }
 

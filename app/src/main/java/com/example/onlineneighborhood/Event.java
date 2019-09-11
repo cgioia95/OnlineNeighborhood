@@ -9,7 +9,7 @@ public class Event {
     private UserInformation host;
     private String suburb;
     private String address;
-    private String name;
+    private String eventName;
     private String description;
     private String time;
     private String date;
@@ -24,12 +24,12 @@ public class Event {
 
     }
 
-    public Event(String id, UserInformation host, String suburb, String address, String name, String description, String time, String date, ArrayList<UserInformation> attendees) {
+    public Event(String id, UserInformation host, String suburb, String address, String eventName, String description, String time, String date, ArrayList<UserInformation> attendees) {
         this.id = id;
         this.host = host;
         this.suburb = suburb;
         this.address = address;
-        this.name = name;
+        this.eventName = eventName;
         this.description = description;
         this.time = time;
         this.date = date;
@@ -69,11 +69,11 @@ public class Event {
     }
 
     public String getName() {
-        return name;
+        return eventName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setName(String eventName) {
+        this.eventName = eventName;
     }
 
     public String getDescription() {
