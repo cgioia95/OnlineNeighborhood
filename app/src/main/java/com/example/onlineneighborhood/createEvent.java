@@ -122,14 +122,14 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         databaseEvents = FirebaseDatabase.getInstance().getReference("events");
 
 
-        //Metrix of the popup window
+        //Metrics of the popup window
         DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
 
         int width = dm.widthPixels;
         int height = dm.heightPixels;
 
-        getWindow().setLayout((int)(width*.8), (int)(height*.9));
+        getWindow().setLayout((int)(width*.8), (int)(height*.8));
 
         // Bind Simple Variables
         eventTv = findViewById(R.id.eventTv);
