@@ -122,7 +122,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         databaseEvents = FirebaseDatabase.getInstance().getReference("events");
 
 
-        //Metrics of the popup window
+        //Metrics of the popup window. Currently setting it to 80% of screen width and height
         DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
 
