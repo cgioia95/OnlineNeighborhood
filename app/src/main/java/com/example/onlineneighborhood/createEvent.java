@@ -42,6 +42,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.w3c.dom.Text;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,10 +56,9 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
     //creating initialization variables
     //long and latitude
-    private double lon;
-    private double lat;
+
     //bool check to ensure get location has been requested
-    private boolean clicked = false;
+
     UserInformation host;
 
 
@@ -76,14 +77,10 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
     //XML variables
     EditText evName, evDesc, evAddress;
-    private TextView eventTv;
     static TextView evTime, evDate;
     static int year, day, month;
     static int hour, minute;
 
-    // Two components used to get user Location
-    private LocationManager locationManager;
-    private LocationListener locationListener;
 
     @Override
     protected void onStart() {
@@ -117,9 +114,8 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         databaseEvents = FirebaseDatabase.getInstance().getReference("events");
 
         // Bind Simple Variables
-        eventTv = findViewById(R.id.eventTv);
         createEvent = findViewById(R.id.createBtn);
-        getLocation = findViewById(R.id.btnGetLocation);
+
         evName = findViewById(R.id.eventName);
         evDesc = findViewById(R.id.eventDesc);
         evTime = findViewById(R.id.eventTime);
@@ -127,86 +123,19 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         evAddress = findViewById(R.id.eventAddress);
 
         // Bind On clicks
-        getLocation.setOnClickListener(this);
         createEvent.setOnClickListener(this);
         evDate.setOnClickListener(this);
         evTime.setOnClickListener(this);
 
         //getting authentication info to link the event to the user creating it
         firebaseAuth = FirebaseAuth.getInstance();
-
-        // Setup the Location Manager and Listener
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-        // just taking Gioias code and converting it to get a specific location
-        locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-
-                lon = location.getLongitude();
-                lat = location.getLatitude();
-
-                String coordinates = "Long: " + lon + "Lat: " + lat;
-
-                Log.d("LOCATION", "Long: " + lon + "Lat: " + lat );
-
-
-                //gets the specific location to the address
-                locat = getLocation(lon, lat);
-
-
-               Log.d("LOCATION", locat );
-
-
-            }
-
-            @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String s) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String s) {
-
-                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(intent);
-
-            }
-        };
-
-        // Checks if user has granted necessary location tracking permissions
-        // If they haven't, requests them from the user
-        // If they have, enables the location button to request location updates
-        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            requestPermissions(new String[]{
-                    Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.INTERNET}, 10
-            );
-
-            return;
-        } else {
-            //configure Button is the method which updates the location every 5 seconds
-            configureButton();
-        }
-
-        //sets the
-        eventTv.setText(locat);
+        
     }
 
 
     //adding functionality to the buttons
     @Override
     public void onClick(View view) {
-        if(view == getLocation){
-            eventTv.setText(locat);
-            //if this is true then location services has been requested and we are allowed to use it
-            clicked = true;
-        }
 
         if(view == createEvent){
             addEvent();
@@ -220,46 +149,6 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         if(view == evDate){
             showTruitonDatePickerDialog(view);
         }
-    }
-
-
-    /**
-     * This method takes the long and lat provided and converts it through googles API to
-     * an actual address
-     *
-     * @param lon longitude for geo location, param is provided by locationListener
-     * @param lat latitude for geo location, param is provided by locationListener
-     * @return returns specific address of the two long/lat co-ordinates
-     */
-    private String getLocation(double lon, double lat) {
-
-
-        String location = "NO LOCATION FOUND";
-        Geocoder geocoder = new Geocoder(createEvent.this, Locale.getDefault());
-
-
-        try {
-            List<Address> addresses = geocoder.getFromLocation(lat, lon, 1);
-            location = addresses.get(0).getAddressLine(0);
-
-            Log.d("LOCATION", location);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return location;
-    }
-
-
-    // Once the Location Button is pressed, the location manager will start returning user's location
-    public void configureButton() {
-
-        Log.d("LOCATION", "FETCHING LOCATION UPDATES");
-
-
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 5, locationListener);
-
     }
 
     /**
@@ -296,26 +185,17 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
             //this is just doing a couple of checks to ensure that a address is *actually* sent to firebase
             //TODO: this needs to be cleaned up/properly checked
-            if(!clicked && TextUtils.isEmpty(eventAddress)){
-                Toast.makeText(this, "you have not entered an address", Toast.LENGTH_LONG).show();
-            }
-            else if(clicked && TextUtils.isEmpty(eventAddress) && !locat.equals(DEFAULT_LOCAL) && !locat.isEmpty()) {
-                eventAddress = locat;
+            if(!TextUtils.isEmpty(eventAddress)){
                 String id = databaseEvents.push().getKey();
                 ArrayList<UserInformation> attendees = new ArrayList<UserInformation>();
                 attendees.add(host);
                 Event event = new Event(id, host, suburb, eventAddress, eventName, eventDesc, eventTime, eventDate, attendees);
                 databaseEvents.child(id).setValue(event);
                 Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
-
                 createCalenderEvent(eventName, eventDesc, eventAddress);
-
-
             }
-            //if anything is typed into the address box it will prioritize that as the address.
-            //might need to change
-            else{
-                Toast.makeText(this, "please enter all fields", Toast.LENGTH_LONG).show();
+            else if(TextUtils.isEmpty(eventAddress)){
+                Toast.makeText(this, "you have not entered an address", Toast.LENGTH_LONG).show();
             }
         }
         else{

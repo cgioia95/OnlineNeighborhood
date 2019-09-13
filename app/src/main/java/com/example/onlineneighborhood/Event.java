@@ -16,10 +16,6 @@ public class Event {
 
     private ArrayList<UserInformation> attendees;
 
-
-
-
-
     public Event(){
 
     }
