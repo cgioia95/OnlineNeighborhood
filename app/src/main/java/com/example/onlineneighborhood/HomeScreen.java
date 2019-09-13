@@ -14,6 +14,7 @@ public class HomeScreen extends AppCompatActivity {
 
     TextView suburbTextView;
     Button logoutBtn;
+    Button profileBtn;
 
     private FirebaseAuth fireBaseAuth;
 
@@ -30,6 +31,9 @@ public class HomeScreen extends AppCompatActivity {
         suburbTextView = findViewById(R.id.textViewSuburb);
 
         final Button logoutBtn = findViewById(R.id.logOutBtn);
+        profileBtn = findViewById(R.id.profileBtn);
+
+        profileBtn.setOnClickListener((View.OnClickListener) this);
 
         logoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
