@@ -311,8 +311,15 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
             //this is just doing a couple of checks to ensure that a address is *actually* sent to firebase
             //TODO: this needs to be cleaned up/properly checked
-            if(!clicked && TextUtils.isEmpty(eventAddress)){
-                Toast.makeText(this, "you have not entered an address", Toast.LENGTH_LONG).show();
+            if(!TextUtils.isEmpty(eventAddress)){
+                String id = databaseEvents.push().getKey();
+                ArrayList<UserInformation> attendees = new ArrayList<UserInformation>();
+                attendees.add(host);
+                Event event = new Event(id, host, suburb, eventAddress, eventName, eventDesc, eventTime, eventDate, attendees);
+                databaseEvents.child(id).setValue(event);
+                Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
+
+                createCalenderEvent(eventName, eventDesc, eventAddress);
             }
             else if(clicked && TextUtils.isEmpty(eventAddress) && !locat.equals(DEFAULT_LOCAL) && !locat.isEmpty()) {
                 eventAddress = locat;
@@ -324,13 +331,11 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
                 Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
 
                 createCalenderEvent(eventName, eventDesc, eventAddress);
-
-
             }
             //if anything is typed into the address box it will prioritize that as the address.
             //might need to change
-            else{
-                Toast.makeText(this, "please enter all fields", Toast.LENGTH_LONG).show();
+            else if(!clicked && TextUtils.isEmpty(eventAddress)){
+                Toast.makeText(this, "you have not entered an address", Toast.LENGTH_LONG).show();
             }
         }
         else{
