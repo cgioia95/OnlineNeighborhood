@@ -146,6 +146,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         setContentView(R.layout.activity_create_event);
 
         databaseEvents = FirebaseDatabase.getInstance().getReference("events");
+        databaseUsers = FirebaseDatabase.getInstance().getReference("Users"); 
 
 
         //Metrics of the popup window. Currently setting it to 80% of screen width and height
