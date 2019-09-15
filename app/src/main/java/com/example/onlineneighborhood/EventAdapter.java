@@ -1,6 +1,7 @@
 package com.example.onlineneighborhood;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,8 @@ import java.util.ArrayList;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
 
+    private static final String TAG = "Event Adapter";
+
     private ArrayList<Event> eventList;
     private Context mContext;
 
@@ -20,12 +23,14 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
         public TextView mEvent;
         public TextView mUserName;
+        public TextView mEventTime;
 
         public EventViewHolder(@NonNull View itemView) {
             super(itemView);
 
            mEvent = itemView.findViewById(R.id.eventName);
            mUserName = itemView.findViewById(R.id.userName);
+           mEventTime = itemView.findViewById(R.id.eventTime);
 
         }
     }
@@ -49,7 +54,11 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     public void onBindViewHolder(@NonNull EventViewHolder holder, int position) {
         Event currentItem = eventList.get(position);
         holder.mEvent.setText(currentItem.getName());
-        holder.mUserName.setText(currentItem.getDate()); //TODO: change this to username
+        holder.mUserName.setText(currentItem.getHost().getName()); //TODO: get the name of the host
+        holder.mEventTime.setText(currentItem.getTime());
+
+
+        Log.d(TAG, "onBindViewHolder: " + currentItem.getHost());
 
 
     }

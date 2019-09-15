@@ -13,4 +13,8 @@ public class UserInformation {
         this.name = name;
         this.preference = preference;
     }
+
+    public String getName() {
+        return name;
+    }
 }
