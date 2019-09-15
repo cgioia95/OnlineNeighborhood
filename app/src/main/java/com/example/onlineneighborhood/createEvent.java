@@ -26,8 +26,10 @@ import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -138,10 +140,23 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
         setContentView(R.layout.activity_create_event);
 
         databaseEvents = FirebaseDatabase.getInstance().getReference("events");
-        databaseUsers = FirebaseDatabase.getInstance().getReference("Users");
+
+
+        //Metrics of the popup window. Currently setting it to 80% of screen width and height
+        DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+        int width = dm.widthPixels;
+        int height = dm.heightPixels;
+
+        getWindow().setLayout((int)(width*.8), (int)(height*.8));
+
         // Bind Simple Variables
         users = new ArrayList<UserInformation>();
         eventTv = findViewById(R.id.eventTv);
@@ -324,8 +339,15 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
             //this is just doing a couple of checks to ensure that a address is *actually* sent to firebase
             //TODO: this needs to be cleaned up/properly checked
-            if(!clicked && TextUtils.isEmpty(eventAddress)){
-                Toast.makeText(this, "you have not entered an address", Toast.LENGTH_LONG).show();
+            if(!TextUtils.isEmpty(eventAddress)){
+                String id = databaseEvents.push().getKey();
+                ArrayList<UserInformation> attendees = new ArrayList<UserInformation>();
+                attendees.add(host);
+                Event event = new Event(id, host, suburb, eventAddress, eventName, eventDesc, eventTime, eventDate, attendees);
+                databaseEvents.child(id).setValue(event);
+                Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
+
+                createCalenderEvent(eventName, eventDesc, eventAddress);
             }
             else if(!TextUtils.isEmpty(eventAddress)){
                 String id = databaseEvents.push().getKey();
@@ -348,8 +370,6 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
                 Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
 
                 createCalenderEvent(eventName, eventDesc, eventAddress);
-
-
             }
         }
         else{
