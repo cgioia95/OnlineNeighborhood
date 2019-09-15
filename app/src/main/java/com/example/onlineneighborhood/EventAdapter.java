@@ -24,14 +24,15 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         public TextView mEvent;
         public TextView mUserName;
         public TextView mEventTime;
+        public TextView mEventAddress;
 
         public EventViewHolder(@NonNull View itemView) {
             super(itemView);
 
-           mEvent = itemView.findViewById(R.id.eventName);
-           mUserName = itemView.findViewById(R.id.userName);
-           mEventTime = itemView.findViewById(R.id.eventTime);
-
+            mEvent = itemView.findViewById(R.id.eventName);
+            mUserName = itemView.findViewById(R.id.userName);
+            mEventTime = itemView.findViewById(R.id.eventTime);
+            mEventAddress = itemView.findViewById(R.id.eventAddress);
         }
     }
 
@@ -54,8 +55,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     public void onBindViewHolder(@NonNull EventViewHolder holder, int position) {
         Event currentItem = eventList.get(position);
         holder.mEvent.setText(currentItem.getName());
-        holder.mUserName.setText(currentItem.getHost().getName()); //TODO: get the name of the host
+        //holder.mUserName.setText(currentItem.getHost().getName()); //TODO: get the name of the host
         holder.mEventTime.setText(currentItem.getTime());
+        holder.mEventAddress.setText(currentItem.getAddress());
 
 
         Log.d(TAG, "onBindViewHolder: " + currentItem.getHost());
