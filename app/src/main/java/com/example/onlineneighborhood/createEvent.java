@@ -1,6 +1,7 @@
 package com.example.onlineneighborhood;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
@@ -34,8 +35,10 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -64,6 +67,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     //firebase variables
     private FirebaseAuth firebaseAuth;
     DatabaseReference databaseEvents;
+    DatabaseReference databaseUsers;
 
     //location variables
     private final String DEFAULT_LOCAL = "please wait a few seconds while we get your location";
@@ -80,6 +84,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     static TextView evTime, evDate;
     static int year, day, month;
     static int hour, minute;
+    ArrayList<UserInformation> users;
 
     // Two components used to get user Location
     private LocationManager locationManager;
@@ -90,16 +95,36 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
         super.onStart();
 
-        databaseEvents.addValueEventListener(new ValueEventListener() {
+        databaseUsers.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot userSnapshot: dataSnapshot.getChildren()){
-                    UserInformation user = userSnapshot.getValue(UserInformation.class);
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                users.clear();
+                for(DataSnapshot hostSnapshot : dataSnapshot.getChildren()){
 
-                    host = user;
-                    Log.d("user info: ", "onDataChange: " + host.name);
-
+                    String checkCurUser = firebaseAuth.getCurrentUser().getUid();
+                    if(checkCurUser.equals(hostSnapshot.getKey())){
+                        UserInformation currentUser = hostSnapshot.getValue(UserInformation.class);
+                        host = currentUser;
+                        break;
+                    }
+                   // Log.d("HEY LISTEN: ", ""+hostSnapshot);
                 }
+
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
             }
 
             @Override
@@ -107,6 +132,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
             }
         });
+
     }
 
     @Override
@@ -115,8 +141,9 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         setContentView(R.layout.activity_create_event);
 
         databaseEvents = FirebaseDatabase.getInstance().getReference("events");
-
+        databaseUsers = FirebaseDatabase.getInstance().getReference("Users");
         // Bind Simple Variables
+        users = new ArrayList<UserInformation>();
         eventTv = findViewById(R.id.eventTv);
         createEvent = findViewById(R.id.createBtn);
         getLocation = findViewById(R.id.btnGetLocation);
@@ -268,6 +295,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
      *
      */
     public void addEvent(){
+
         //pass name, description, time, date, address, and user.
         String eventName = evName.getText().toString().trim();
         String eventDesc = evDesc.getText().toString().trim();
@@ -299,6 +327,17 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
             if(!clicked && TextUtils.isEmpty(eventAddress)){
                 Toast.makeText(this, "you have not entered an address", Toast.LENGTH_LONG).show();
             }
+            else if(!TextUtils.isEmpty(eventAddress)){
+                String id = databaseEvents.push().getKey();
+                ArrayList<UserInformation> attendees = new ArrayList<UserInformation>();
+                attendees.add(host);
+                Event event = new Event(id, host, suburb, eventAddress, eventName, eventDesc, eventTime, eventDate, attendees);
+                databaseEvents.child(id).setValue(event);
+                Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
+
+                createCalenderEvent(eventName, eventDesc, eventAddress);
+
+            }
             else if(clicked && TextUtils.isEmpty(eventAddress) && !locat.equals(DEFAULT_LOCAL) && !locat.isEmpty()) {
                 eventAddress = locat;
                 String id = databaseEvents.push().getKey();
@@ -311,11 +350,6 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
                 createCalenderEvent(eventName, eventDesc, eventAddress);
 
 
-            }
-            //if anything is typed into the address box it will prioritize that as the address.
-            //might need to change
-            else{
-                Toast.makeText(this, "please enter all fields", Toast.LENGTH_LONG).show();
             }
         }
         else{
