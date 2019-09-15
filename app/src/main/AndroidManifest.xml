@@ -15,7 +15,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".createEvent"></activity>
+        <activity android:name=".createEvent" android:theme="@style/AppTheme.PopUpTheme"></activity>
         <activity android:name=".HomeScreen" />
         <activity android:name=".Login" />
         <activity android:name=".Register" />
