@@ -53,7 +53,7 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
 
         // DatabaseReference pointing to a sub-reference Users where User Information is stored
         fireBaseAuth = FirebaseAuth.getInstance();
-        databaseReference = FirebaseDatabase.getInstance().getReference("Users").push();
+        databaseReference = FirebaseDatabase.getInstance().getReference("Users");
 
         // Bind all simple variables
 
