@@ -27,7 +27,7 @@
             android:layout_marginStart="41dp"
             android:layout_toEndOf="@id/imageView"
             android:text="EventName"
-            android:textSize="20sp"
+            android:textSize="18sp"
              />
 
         <TextView
