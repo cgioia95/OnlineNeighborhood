@@ -56,6 +56,7 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
         fireBaseAuth = FirebaseAuth.getInstance();
         addEvent = findViewById(R.id.addEvent);
 
+
         suburbTextView = findViewById(R.id.textViewSuburb);
 
         Button logoutBtn = findViewById(R.id.logOutBtn);
@@ -69,8 +70,7 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
                 startActivity(new Intent(getApplicationContext(), Login.class));            }
         });
 
-        Intent i = getIntent();
-        suburb = i.getStringExtra("SUBURB");
+
 
         suburbTextView.setText(suburb);
         addEvent.setOnClickListener(this);
@@ -117,6 +117,7 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
     @Override
     public void onClick(View view) {
         if (view == addEvent){
+            String suburb = getIntent().getStringExtra("SUBURB");
             Intent i = new Intent(getApplicationContext(), createEvent.class);
             i.putExtra("SUBURB", suburb);
             startActivity(i);

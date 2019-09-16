@@ -7,7 +7,6 @@ import java.util.ArrayList;
 public class Event {
     private String id;
     private UserInformation host;
-    private String suburb;
     private String address;
     private String eventName;
     private String description;
@@ -21,10 +20,9 @@ public class Event {
 
     }
 
-    public Event(String id, UserInformation host, String suburb, String address, String eventName, String description, String time, String date, ArrayList<UserInformation> attendees) {
+    public Event(String id, UserInformation host, String address, String eventName, String description, String time, String date, ArrayList<UserInformation> attendees) {
         this.id = id;
         this.host = host;
-        this.suburb = suburb;
         this.address = address;
         this.eventName = eventName;
         this.description = description;
@@ -49,13 +47,6 @@ public class Event {
         this.date = date;
     }
 
-    public String getSuburb() {
-        return suburb;
-    }
-
-    public void setSuburb(String suburb) {
-        this.suburb = suburb;
-    }
 
     public String getAddress() {
         return address;
