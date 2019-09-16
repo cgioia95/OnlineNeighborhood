@@ -124,7 +124,7 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
 
                             String Uid = task.getResult().getUser().getUid();
 
-                            UserInformation userInformation = new UserInformation(name, preference);
+                            UserInformation userInformation = new UserInformation(name, preference, "", "");
 
                             databaseReference.child(Uid).setValue(userInformation);
 
