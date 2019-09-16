@@ -15,6 +15,7 @@ public class UserInformation {
         this.preference = preference;
     }
 
+
     public UserInformation(String uid, String name, String preference) {
         this.uid = uid;
         this.name = name;
