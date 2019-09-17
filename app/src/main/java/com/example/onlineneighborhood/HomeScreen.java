@@ -110,8 +110,13 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
                 mAdapter.setOnEventClickListener(new EventAdapter.onEventClickListener() {
                     @Override
                     public void onEventClick(int position) {
-                        eventList.get(position);
-                        Log.d(TAG, "CLICKED EVENTCARD" + position);
+                        Event event = eventList.get(position);
+                        Log.d(TAG, "CLICKED EVENT" + eventList.get(position));
+                        Log.d(TAG, "CLICKED EVENT + name" + eventList.get(position).getName());
+
+                        Intent intent = new Intent(HomeScreen.this, EventScreen.class);
+                        intent.putExtra("eventObject",event);
+                        startActivity(intent);
                     }
                 });
 
