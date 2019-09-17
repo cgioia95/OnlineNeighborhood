@@ -24,11 +24,14 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
+import java.util.ArrayList;
+
 public class HomeScreen extends AppCompatActivity implements View.OnClickListener {
 
     TextView suburbTextView;
 
     Button logoutBtn;
+   // private Button profileBtn;
     ImageView addEvent;
     String suburb;
 
@@ -42,12 +45,10 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
     private ArrayList<Event> eventList = new ArrayList<>();
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         databaseEvents = FirebaseDatabase.getInstance().getReference("events");
-
 
 
         super.onCreate(savedInstanceState);
@@ -60,13 +61,16 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
 
         Button logoutBtn = findViewById(R.id.logOutBtn);
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+       // profileBtn = findViewById(R.id.profileBtn);
 
+       // profileBtn.setOnClickListener(this);
         logoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 fireBaseAuth.signOut();
                 finish();
-                startActivity(new Intent(getApplicationContext(), Login.class));            }
+                startActivity(new Intent(getApplicationContext(), Login.class));
+            }
         });
 
         Intent i = getIntent();
@@ -74,7 +78,6 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
 
         suburbTextView.setText(suburb);
         addEvent.setOnClickListener(this);
-
 
 
     }
@@ -88,7 +91,7 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 eventList.clear();
-                for(DataSnapshot eventSnapShot : dataSnapshot.getChildren()) {
+                for (DataSnapshot eventSnapShot : dataSnapshot.getChildren()) {
                     Event event = eventSnapShot.getValue(Event.class);
 
                     eventList.add(event);
@@ -114,12 +117,19 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
 
     }
 
+
     @Override
     public void onClick(View view) {
+
         if (view == addEvent){
             Intent i = new Intent(getApplicationContext(), createEvent.class);
             i.putExtra("SUBURB", suburb);
             startActivity(i);
         }
+
+//       if(view == profileBtn){
+//           startActivity(new Intent(this, ProfileScreen.class));
+//       }
+
     }
 }

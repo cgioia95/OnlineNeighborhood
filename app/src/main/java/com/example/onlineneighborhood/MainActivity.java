@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // Declare simple variables
     private Button registerBtn;
     private Button loginBtn;
+    private Button profileBtn;
     private FirebaseAuth firebaseAuth;
     DatabaseReference databaseEvents;
     final static String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/onlineNeighbourhood/melbourneSuburbs.csv" ;
@@ -46,10 +47,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Set on Click Listeners
         registerBtn.setOnClickListener(this);
         loginBtn.setOnClickListener(this);
-        databaseEvents = FirebaseDatabase.getInstance().getReference("suburbs");
-       // readSuburbData();
-
-
 
     }
 

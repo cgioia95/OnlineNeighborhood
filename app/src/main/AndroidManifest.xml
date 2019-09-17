@@ -8,16 +8,19 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />
 
-
     <application
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".createEvent" android:theme="@style/AppTheme.PopUpTheme"></activity>
+        <activity
+            android:name=".BottomNavigationActivity"
+            android:label="@string/title_activity_bottom_navigation"></activity>
+        <activity android:name=".createEvent" />
         <activity android:name=".HomeScreen" />
         <activity android:name=".Login" />
+        <activity android:name=".ProfileScreen" />
         <activity android:name=".Register" />
         <activity android:name=".MainActivity">
             <intent-filter>

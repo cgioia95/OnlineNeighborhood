@@ -101,15 +101,15 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 users.clear();
-                for(DataSnapshot hostSnapshot : dataSnapshot.getChildren()){
+                for (DataSnapshot hostSnapshot : dataSnapshot.getChildren()) {
 
                     String checkCurUser = firebaseAuth.getCurrentUser().getUid();
-                    if(checkCurUser.equals(hostSnapshot.getKey())){
+                    if (checkCurUser.equals(hostSnapshot.getKey())) {
                         UserInformation currentUser = hostSnapshot.getValue(UserInformation.class);
                         host = currentUser;
                         break;
                     }
-                   // Log.d("HEY LISTEN: ", ""+hostSnapshot);
+                    // Log.d("HEY LISTEN: ", ""+hostSnapshot);
                 }
 
             }
@@ -146,7 +146,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         setContentView(R.layout.activity_create_event);
 
         databaseEvents = FirebaseDatabase.getInstance().getReference("events");
-        databaseUsers = FirebaseDatabase.getInstance().getReference("Users"); 
+        databaseUsers = FirebaseDatabase.getInstance().getReference("Users");
 
 
         //Metrics of the popup window. Currently setting it to 80% of screen width and height
@@ -156,7 +156,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         int width = dm.widthPixels;
         int height = dm.heightPixels;
 
-        getWindow().setLayout((int)(width*.8), (int)(height*.8));
+        getWindow().setLayout((int) (width * .8), (int) (height * .8));
 
         // Bind Simple Variables
         users = new ArrayList<UserInformation>();
@@ -191,14 +191,14 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
                 String coordinates = "Long: " + lon + "Lat: " + lat;
 
-                Log.d("LOCATION", "Long: " + lon + "Lat: " + lat );
+                Log.d("LOCATION", "Long: " + lon + "Lat: " + lat);
 
 
                 //gets the specific location to the address
                 locat = getLocation(lon, lat);
 
 
-               Log.d("LOCATION", locat );
+                Log.d("LOCATION", locat);
 
 
             }
@@ -245,22 +245,22 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     //adding functionality to the buttons
     @Override
     public void onClick(View view) {
-        if(view == getLocation){
+        if (view == getLocation) {
             eventTv.setText(locat);
             //if this is true then location services has been requested and we are allowed to use it
             clicked = true;
         }
 
-        if(view == createEvent){
+        if (view == createEvent) {
             addEvent();
         }
 
-        if(view == evTime){
+        if (view == evTime) {
             showTruitonTimePickerDialog(view);
         }
 
 
-        if(view == evDate){
+        if (view == evDate) {
             showTruitonDatePickerDialog(view);
         }
     }
@@ -301,6 +301,16 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         Log.d("LOCATION", "FETCHING LOCATION UPDATES");
 
 
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    Activity#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for Activity#requestPermissions for more details.
+            return;
+        }
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 5, locationListener);
 
     }
