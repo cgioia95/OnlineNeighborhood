@@ -121,6 +121,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                     String title = event.getName();
                                     String address = event.getAddress();
+                                    String date = event.getDate();
+
+
                                     Log.d("MAPTEST", title);
                                     Log.d("MAPTEST", address);
 

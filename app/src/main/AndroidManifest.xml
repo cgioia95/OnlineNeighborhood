@@ -35,7 +35,6 @@
         <activity
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps"></activity>
-        <activity android:name=".MapScreenTest" />
         <activity
             android:name=".createEvent"
             android:theme="@style/AppTheme.PopUpTheme" />

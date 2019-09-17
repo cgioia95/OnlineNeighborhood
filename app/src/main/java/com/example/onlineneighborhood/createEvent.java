@@ -53,6 +53,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static android.provider.CalendarContract.*;
+import static java.util.Locale.getDefault;
 
 public class createEvent extends AppCompatActivity implements View.OnClickListener {
 
@@ -366,6 +367,50 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
         String eventAddress = evAddress.getText().toString().trim();
 
+        // Validates address
+        // 1. Exists at all
+        // 2. Exists within
+
+        // I: Convert the string address to a proper address
+        // II: Convert shose coordinates to an
+        String addressStatus = "VALID";
+        List<Address> addresses = null;
+        Geocoder geocoder = new Geocoder(getApplicationContext(), getDefault());
+        try {
+            addresses = geocoder.getFromLocationName(eventAddress, 1);
+            if (addresses.size() > 0) {
+
+                Address address = addresses.get(0);
+                String testedSuburb = address.getLocality();
+
+                Intent i = getIntent();
+                String intentSuburb = i.getStringExtra("SUBURB");
+
+                if (!intentSuburb.equals(testedSuburb)){
+                    Log.d("VALIDATOR" , "NOT IN SUBURB");
+                    Log.d("VALIDATOR" , "We are in " + intentSuburb + " You have entered: " + testedSuburb);
+                    addressStatus = "NOT_IN_SUBURB";
+                    Toast.makeText(this, "Address not in suburb", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+
+            }
+            else {
+                Log.d("VALIDATOR" , "2 - INVALID");
+                Toast.makeText(this, "Address not valid", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+        } catch (IOException e) {
+            addressStatus = "INVALID";
+            Toast.makeText(this, "Address not valid", Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+            return;
+
+        }
+
+
 
         //checks all the fields are filled
         if(!TextUtils.isEmpty(eventName) && !TextUtils.isEmpty(eventDesc) && !eventTime.contains("Time")
@@ -454,7 +499,20 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
                 createCalenderEvent(eventName, eventDesc, eventAddress);
             }
         }
+
+        else if (addressStatus.equals("INVALID")){
+
+            Toast.makeText(this, "Address not valid", Toast.LENGTH_LONG).show();
+
+        }
+
+        else if (addressStatus.equals("NOT_IN_SUBURB")){
+
+            Toast.makeText(this, "Address not in the current suburb", Toast.LENGTH_LONG).show();
+
+        }
         else{
+
             Toast.makeText(this, "please enter all fields", Toast.LENGTH_LONG).show();
         }
     }
