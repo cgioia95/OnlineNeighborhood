@@ -98,7 +98,8 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
                     Log.d("DISPLAY EVENT DATE", event.getDate());
 
                 }
-                //SET UP EVENTLIST
+
+                //SET UP EVENTLIST & ONLICK LISTENER
 
                 mRecyclerView = findViewById(R.id.recyclerView);
                 mLayoutManager = new LinearLayoutManager(HomeScreen.this);
@@ -111,8 +112,7 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
                     @Override
                     public void onEventClick(int position) {
                         Event event = eventList.get(position);
-                        Log.d(TAG, "CLICKED EVENT" + eventList.get(position));
-                        Log.d(TAG, "CLICKED EVENT + name" + eventList.get(position).getName());
+                        Log.d(TAG, "CLICKED EVENT" + eventList.get(position));;
 
                         Intent intent = new Intent(HomeScreen.this, EventScreen.class);
                         intent.putExtra("eventObject",event);
