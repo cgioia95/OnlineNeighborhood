@@ -153,6 +153,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
                         if (intentSuburb.equals(currentSuburb.getSubName())) {
                             suburb = currentSuburb;
+
                             Log.d("CHOSEN: ", "" + suburb + suburb.getSubName());
                             break;
                         }

@@ -28,7 +28,7 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
 
     TextView suburbTextView;
 
-    Button logoutBtn;
+    Button mapButton;
     ImageView addEvent;
     String suburb;
 
@@ -60,6 +60,8 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
         suburbTextView = findViewById(R.id.textViewSuburb);
 
         Button logoutBtn = findViewById(R.id.logOutBtn);
+        mapButton = findViewById(R.id.mapButton);
+
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
         logoutBtn.setOnClickListener(new View.OnClickListener() {
@@ -72,8 +74,10 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
 
 
 
+
         suburbTextView.setText(suburb);
         addEvent.setOnClickListener(this);
+        mapButton.setOnClickListener(this);
 
 
 
@@ -121,6 +125,16 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
             Intent i = new Intent(getApplicationContext(), createEvent.class);
             i.putExtra("SUBURB", suburb);
             startActivity(i);
+        }
+
+        else if (view == mapButton){
+
+            String suburb = getIntent().getStringExtra("SUBURB");
+            Intent i = new Intent(getApplicationContext(), MapsActivity.class);
+            i.putExtra("SUBURB", suburb);
+            startActivity(i);
+
+
         }
     }
 }

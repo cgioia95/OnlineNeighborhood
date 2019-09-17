@@ -27,6 +27,7 @@
     <string name="address">Address</string>
     <string name="or">OR</string>
     <string name="get_location">get Location</string>
+    <string name="title_activity_maps">Map</string>
 
 
 </resources>
