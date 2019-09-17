@@ -3,44 +3,80 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:cardCornerRadius="4dp"
-    android:layout_marginTop="4dp"
-    android:layout_marginHorizontal="4dp"
+    app:cardCornerRadius="14dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginHorizontal="14dp"
     >
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="4dp"
+        android:layout_margin="10dp"
         >
 
         <ImageView
             android:id="@+id/imageView"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:padding="2dp" />
+            android:layout_width="54dp"
+            android:layout_height="54dp"
+            android:src="@drawable/profile_image"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="24dp"/>
 
         <TextView
             android:id="@+id/eventName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="41dp"
             android:layout_toEndOf="@id/imageView"
             android:text="EventName"
-            android:textSize="20sp"
+            android:textSize="18sp"
              />
 
         <TextView
+            android:id="@+id/eventTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:text="EventTime"
+            android:textSize="10sp"
+            />
+
+        <TextView
             android:id="@+id/userName"
+            android:layout_marginTop="2dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/eventName"
-            android:layout_marginStart="41dp"
-            android:layout_marginTop="6dp"
+            android:textSize="12sp"
             android:layout_toEndOf="@id/imageView"
             android:text="UserName" />
 
+        <TextView
+            android:id="@+id/eventAddress"
+            android:layout_marginTop="12dp"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/userName"
+            android:layout_gravity="center"
+            android:layout_alignStart="@id/userName"
+            android:drawableLeft="@drawable/location_icon_18dp"
+            android:drawablePadding="4dip"
+            android:text="216 Kerr Street"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:textSize="12sp" />
 
+
+        <TextView
+            android:id="@+id/eventAttending"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/eventAddress"
+            android:layout_gravity="center"
+            android:layout_toLeftOf="@id/eventTime"
+            android:drawableLeft="@drawable/attending_icon_18dp"
+            android:drawablePadding="4dip"
+            android:text="2"
+            android:textSize="12sp" />
 
     </RelativeLayout>
 

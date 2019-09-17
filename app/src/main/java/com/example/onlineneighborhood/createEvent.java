@@ -1,6 +1,7 @@
 package com.example.onlineneighborhood;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
@@ -25,8 +26,10 @@ import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -34,8 +37,10 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -64,6 +69,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     //firebase variables
     private FirebaseAuth firebaseAuth;
     DatabaseReference databaseEvents;
+    DatabaseReference databaseUsers;
 
     //location variables
     private final String DEFAULT_LOCAL = "please wait a few seconds while we get your location";
@@ -80,6 +86,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     static TextView evTime, evDate;
     static int year, day, month;
     static int hour, minute;
+    ArrayList<UserInformation> users;
 
     // Two components used to get user Location
     private LocationManager locationManager;
@@ -90,16 +97,36 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
         super.onStart();
 
-        databaseEvents.addValueEventListener(new ValueEventListener() {
+        databaseUsers.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot userSnapshot: dataSnapshot.getChildren()){
-                    UserInformation user = userSnapshot.getValue(UserInformation.class);
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                users.clear();
+                for (DataSnapshot hostSnapshot : dataSnapshot.getChildren()) {
 
-                    host = user;
-                    Log.d("user info: ", "onDataChange: " + host.name);
-
+                    String checkCurUser = firebaseAuth.getCurrentUser().getUid();
+                    if (checkCurUser.equals(hostSnapshot.getKey())) {
+                        UserInformation currentUser = hostSnapshot.getValue(UserInformation.class);
+                        host = currentUser;
+                        break;
+                    }
+                    // Log.d("HEY LISTEN: ", ""+hostSnapshot);
                 }
+
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
             }
 
             @Override
@@ -107,16 +134,32 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
             }
         });
+
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
         setContentView(R.layout.activity_create_event);
 
         databaseEvents = FirebaseDatabase.getInstance().getReference("events");
+        databaseUsers = FirebaseDatabase.getInstance().getReference("Users");
+
+
+        //Metrics of the popup window. Currently setting it to 80% of screen width and height
+        DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+        int width = dm.widthPixels;
+        int height = dm.heightPixels;
+
+        getWindow().setLayout((int) (width * .8), (int) (height * .8));
 
         // Bind Simple Variables
+        users = new ArrayList<UserInformation>();
         eventTv = findViewById(R.id.eventTv);
         createEvent = findViewById(R.id.createBtn);
         getLocation = findViewById(R.id.btnGetLocation);
@@ -148,14 +191,14 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
                 String coordinates = "Long: " + lon + "Lat: " + lat;
 
-                Log.d("LOCATION", "Long: " + lon + "Lat: " + lat );
+                Log.d("LOCATION", "Long: " + lon + "Lat: " + lat);
 
 
                 //gets the specific location to the address
                 locat = getLocation(lon, lat);
 
 
-               Log.d("LOCATION", locat );
+                Log.d("LOCATION", locat);
 
 
             }
@@ -202,22 +245,22 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     //adding functionality to the buttons
     @Override
     public void onClick(View view) {
-        if(view == getLocation){
+        if (view == getLocation) {
             eventTv.setText(locat);
             //if this is true then location services has been requested and we are allowed to use it
             clicked = true;
         }
 
-        if(view == createEvent){
+        if (view == createEvent) {
             addEvent();
         }
 
-        if(view == evTime){
+        if (view == evTime) {
             showTruitonTimePickerDialog(view);
         }
 
 
-        if(view == evDate){
+        if (view == evDate) {
             showTruitonDatePickerDialog(view);
         }
     }
@@ -258,6 +301,16 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         Log.d("LOCATION", "FETCHING LOCATION UPDATES");
 
 
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    Activity#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for Activity#requestPermissions for more details.
+            return;
+        }
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 5, locationListener);
 
     }
@@ -268,6 +321,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
      *
      */
     public void addEvent(){
+
         //pass name, description, time, date, address, and user.
         String eventName = evName.getText().toString().trim();
         String eventDesc = evDesc.getText().toString().trim();
@@ -296,8 +350,26 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
             //this is just doing a couple of checks to ensure that a address is *actually* sent to firebase
             //TODO: this needs to be cleaned up/properly checked
-            if(!clicked && TextUtils.isEmpty(eventAddress)){
-                Toast.makeText(this, "you have not entered an address", Toast.LENGTH_LONG).show();
+            if(!TextUtils.isEmpty(eventAddress)){
+                String id = databaseEvents.push().getKey();
+                ArrayList<UserInformation> attendees = new ArrayList<UserInformation>();
+                attendees.add(host);
+                Event event = new Event(id, host, suburb, eventAddress, eventName, eventDesc, eventTime, eventDate, attendees);
+                databaseEvents.child(id).setValue(event);
+                Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
+
+                createCalenderEvent(eventName, eventDesc, eventAddress);
+            }
+            else if(!TextUtils.isEmpty(eventAddress)){
+                String id = databaseEvents.push().getKey();
+                ArrayList<UserInformation> attendees = new ArrayList<UserInformation>();
+                attendees.add(host);
+                Event event = new Event(id, host, suburb, eventAddress, eventName, eventDesc, eventTime, eventDate, attendees);
+                databaseEvents.child(id).setValue(event);
+                Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
+
+                createCalenderEvent(eventName, eventDesc, eventAddress);
+
             }
             else if(clicked && TextUtils.isEmpty(eventAddress) && !locat.equals(DEFAULT_LOCAL) && !locat.isEmpty()) {
                 eventAddress = locat;
@@ -309,13 +381,6 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
                 Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
 
                 createCalenderEvent(eventName, eventDesc, eventAddress);
-
-
-            }
-            //if anything is typed into the address box it will prioritize that as the address.
-            //might need to change
-            else{
-                Toast.makeText(this, "please enter all fields", Toast.LENGTH_LONG).show();
             }
         }
         else{
