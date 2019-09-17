@@ -78,10 +78,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mMap = googleMap;
 
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                Log.d("THISISMYTAG", marker.getTitle());
+            }
+        });
+
 
         databaseSuburb.addValueEventListener(new ValueEventListener() {
+
+
+
+
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                mMap.clear();
+
+
                 for(DataSnapshot suburbSnapshot : dataSnapshot.getChildren()) {
                     Suburb currentSuburb = suburbSnapshot.getValue(Suburb.class);
                     Intent i = getIntent();
