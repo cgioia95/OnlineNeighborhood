@@ -371,23 +371,6 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         String eventAddress = evAddress.getText().toString().trim();
 
 
-
-            Log.d("EVENTADDRESS", eventAddress);
-            Log.d("EVENTADDRESS", "HELLO");
-
-
-//         Validates address
-//         1. Exists at all
-//         2. Exists within
-//
-//         I: Convert the string address to a proper address
-//         II: Convert shose coordinates to an
-
-
-
-
-
-
         //checks all the fields are filled
         if(!TextUtils.isEmpty(eventName) && !TextUtils.isEmpty(eventDesc) && !eventTime.contains("Time")
         && !eventDate.contains("Date")){
