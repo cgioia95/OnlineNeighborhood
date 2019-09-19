@@ -85,6 +85,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+        LatLng MELBOURNE = new LatLng(-37.814, 144.96);
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(MELBOURNE, 10));
+
+
 
         databaseSuburb.addValueEventListener(new ValueEventListener() {
 

@@ -366,7 +366,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         String eventTime = evTime.getText().toString().trim();
         String eventDate = evDate.getText().toString().trim();
 
-        String addressStatus = "VALID";
+        Log.d("EVENTCREATE", "CREATING EVENT");
 
         String eventAddress = evAddress.getText().toString().trim();
 
@@ -388,7 +388,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
             //TODO: this needs to be cleaned up/properly checked
             if(!TextUtils.isEmpty(eventAddress)){
 
-                addressStatus = validate(eventAddress);
+                String addressStatus = validate(eventAddress);
 
                 if (addressStatus!="VALID"){
                     return;
@@ -417,7 +417,8 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
                 createCalenderEvent(eventName, eventDesc, eventAddress);
             }
             else if(!TextUtils.isEmpty(eventAddress)){
-                addressStatus = validate(eventAddress);
+
+                String addressStatus = validate(eventAddress);
 
                 if (addressStatus!="VALID"){
                     return;
@@ -447,7 +448,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
             else if(clicked && TextUtils.isEmpty(eventAddress) && !locat.equals(DEFAULT_LOCAL) && !locat.isEmpty()) {
                 eventAddress = locat;
 
-                addressStatus = validate(eventAddress);
+                String addressStatus = validate(eventAddress);
 
                 if (addressStatus!="VALID"){
                     return;
@@ -609,7 +610,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
             return "INVALID";
 
         }
-        return "random";
+        return "VALID";
     }
 
 
