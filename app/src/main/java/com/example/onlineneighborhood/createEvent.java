@@ -69,6 +69,8 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     UserInformation host;
 
 
+
+
     //firebase variables
     private FirebaseAuth firebaseAuth;
     DatabaseReference databaseEvents;
@@ -364,51 +366,25 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         String eventTime = evTime.getText().toString().trim();
         String eventDate = evDate.getText().toString().trim();
 
+        String addressStatus = "VALID";
 
         String eventAddress = evAddress.getText().toString().trim();
 
-        // Validates address
-        // 1. Exists at all
-        // 2. Exists within
-
-        // I: Convert the string address to a proper address
-        // II: Convert shose coordinates to an
-        String addressStatus = "VALID";
-        List<Address> addresses = null;
-        Geocoder geocoder = new Geocoder(getApplicationContext(), getDefault());
-        try {
-            addresses = geocoder.getFromLocationName(eventAddress, 1);
-            if (addresses.size() > 0) {
-
-                Address address = addresses.get(0);
-                String testedSuburb = address.getLocality();
-
-                Intent i = getIntent();
-                String intentSuburb = i.getStringExtra("SUBURB");
-
-                if (!intentSuburb.equals(testedSuburb)){
-                    Log.d("VALIDATOR" , "NOT IN SUBURB");
-                    Log.d("VALIDATOR" , "We are in " + intentSuburb + " You have entered: " + testedSuburb);
-                    addressStatus = "NOT_IN_SUBURB";
-                    Toast.makeText(this, "Address not in suburb", Toast.LENGTH_LONG).show();
-                    return;
-                }
 
 
-            }
-            else {
-                Log.d("VALIDATOR" , "2 - INVALID");
-                Toast.makeText(this, "Address not valid", Toast.LENGTH_LONG).show();
-                return;
-            }
+            Log.d("EVENTADDRESS", eventAddress);
+            Log.d("EVENTADDRESS", "HELLO");
 
-        } catch (IOException e) {
-            addressStatus = "INVALID";
-            Toast.makeText(this, "Address not valid", Toast.LENGTH_LONG).show();
-            e.printStackTrace();
-            return;
 
-        }
+//         Validates address
+//         1. Exists at all
+//         2. Exists within
+//
+//         I: Convert the string address to a proper address
+//         II: Convert shose coordinates to an
+
+
+
 
 
 
@@ -428,6 +404,12 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
             //this is just doing a couple of checks to ensure that a address is *actually* sent to firebase
             //TODO: this needs to be cleaned up/properly checked
             if(!TextUtils.isEmpty(eventAddress)){
+
+                addressStatus = validate(eventAddress);
+
+                if (addressStatus!="VALID"){
+                    return;
+                }
 
                 String id = databaseEvents.push().getKey();
                 ArrayList<UserInformation> attendees = new ArrayList<UserInformation>();
@@ -452,7 +434,11 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
                 createCalenderEvent(eventName, eventDesc, eventAddress);
             }
             else if(!TextUtils.isEmpty(eventAddress)){
-                String id = databaseEvents.push().getKey();
+                addressStatus = validate(eventAddress);
+
+                if (addressStatus!="VALID"){
+                    return;
+                }                String id = databaseEvents.push().getKey();
                 ArrayList<UserInformation> attendees = new ArrayList<UserInformation>();
                 attendees.add(host);
                 Event event = new Event(id, host, eventAddress, eventName, eventDesc, eventTime, eventDate, attendees);
@@ -477,6 +463,13 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
             }
             else if(clicked && TextUtils.isEmpty(eventAddress) && !locat.equals(DEFAULT_LOCAL) && !locat.isEmpty()) {
                 eventAddress = locat;
+
+                addressStatus = validate(eventAddress);
+
+                if (addressStatus!="VALID"){
+                    return;
+                }
+
                 String id = databaseEvents.push().getKey();
                 ArrayList<UserInformation> attendees = new ArrayList<UserInformation>();
                 attendees.add(host);
@@ -500,17 +493,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
             }
         }
 
-        else if (addressStatus.equals("INVALID")){
 
-            Toast.makeText(this, "Address not valid", Toast.LENGTH_LONG).show();
-
-        }
-
-        else if (addressStatus.equals("NOT_IN_SUBURB")){
-
-            Toast.makeText(this, "Address not in the current suburb", Toast.LENGTH_LONG).show();
-
-        }
         else{
 
             Toast.makeText(this, "please enter all fields", Toast.LENGTH_LONG).show();
@@ -606,5 +589,45 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
                 .putExtra(Events.EVENT_LOCATION, eventAddress);
         startActivity(intent);
     }
+
+    public String validate(String eventAddress){
+
+        List<Address> addresses = null;
+        Geocoder geocoder = new Geocoder(getApplicationContext(), getDefault());
+
+
+        try {
+            addresses = geocoder.getFromLocationName(eventAddress, 1);
+            if (addresses.size() > 0) {
+
+                Address address = addresses.get(0);
+                String testedSuburb = address.getLocality();
+
+                Intent i = getIntent();
+                String intentSuburb = i.getStringExtra("SUBURB");
+
+                if (!intentSuburb.equals(testedSuburb)) {
+                    Log.d("VALIDATOR", "NOT IN SUBURB");
+                    Log.d("VALIDATOR", "We are in " + intentSuburb + " You have entered: " + testedSuburb);
+                    Toast.makeText(this, "Address not in suburb", Toast.LENGTH_LONG).show();
+                    return "NOT_IN_SUBURB";
+                }
+
+
+            } else {
+                Log.d("VALIDATOR", "2 - INVALID");
+                Toast.makeText(this, "Address not valid", Toast.LENGTH_LONG).show();
+                return "INVALID";
+            }
+
+        } catch (IOException e) {
+            Toast.makeText(this, "Address not valid", Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+            return "INVALID";
+
+        }
+        return "random";
+    }
+
 
 }
