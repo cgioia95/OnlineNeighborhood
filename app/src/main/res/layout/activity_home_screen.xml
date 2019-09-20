@@ -48,8 +48,13 @@
         android:layout_marginEnd="20dp"
         android:text="LOGOUT" />
 
+    <Button
+        android:id="@+id/mapButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/addEvent"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="144dp"
+        android:text="MAP" />
 
 </RelativeLayout>
-
-
-

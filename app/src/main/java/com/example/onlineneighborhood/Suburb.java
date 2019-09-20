@@ -9,6 +9,7 @@ public class Suburb {
     private ArrayList<Event> events;
 
 
+
     public Suburb(){
 
     }
@@ -18,6 +19,14 @@ public class Suburb {
         this.subName = subName;
         this.postCode = postCode;
         this.events = events;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getSubName() {

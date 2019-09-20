@@ -53,6 +53,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static android.provider.CalendarContract.*;
+import static java.util.Locale.getDefault;
 
 public class createEvent extends AppCompatActivity implements View.OnClickListener {
 
@@ -61,15 +62,22 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     //long and latitude
     private double lon;
     private double lat;
+    private Suburb suburb;
+    private String suburbName = "NO SUBURB FOUND";
     //bool check to ensure get location has been requested
     private boolean clicked = false;
     UserInformation host;
+
+
 
 
     //firebase variables
     private FirebaseAuth firebaseAuth;
     DatabaseReference databaseEvents;
     DatabaseReference databaseUsers;
+    DatabaseReference databaseSuburb;
+
+
 
     //location variables
     private final String DEFAULT_LOCAL = "please wait a few seconds while we get your location";
@@ -100,16 +108,15 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         databaseUsers.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                users.clear();
-                for (DataSnapshot hostSnapshot : dataSnapshot.getChildren()) {
+                for(DataSnapshot hostSnapshot : dataSnapshot.getChildren()){
 
                     String checkCurUser = firebaseAuth.getCurrentUser().getUid();
-                    if (checkCurUser.equals(hostSnapshot.getKey())) {
+                    if(checkCurUser.equals(hostSnapshot.getKey())){
                         UserInformation currentUser = hostSnapshot.getValue(UserInformation.class);
                         host = currentUser;
                         break;
                     }
-                    // Log.d("HEY LISTEN: ", ""+hostSnapshot);
+                    Log.d("HOSTS: ", ""+hostSnapshot);
                 }
 
             }
@@ -131,9 +138,47 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d("error: ", ""+databaseError);
 
             }
         });
+
+
+        databaseSuburb.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot suburbSnapshot : dataSnapshot.getChildren()) {
+                   Suburb currentSuburb = suburbSnapshot.getValue(Suburb.class);
+                   Intent i = getIntent();
+                   String intentSuburb = i.getStringExtra("SUBURB");
+                    Log.d("SUBURB", "" + suburbSnapshot);
+                    try{
+
+                        if (intentSuburb.equals(currentSuburb.getSubName())) {
+                            suburb = currentSuburb;
+
+                            Log.d("CHOSEN: ", "" + suburb + suburb.getSubName());
+                            break;
+                        }
+
+                    } catch (NullPointerException e){
+                        //this catches null pointer exceptions, it happens alot
+                        //TODO: I need to find a better way to loop through all the suburbs
+                        //if you look at the log you can see the 'null pointer' still gets the suburb name. weird.
+                        Log.d("ERROR VALUES", "" + currentSuburb.getSubName());
+                    }
+
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
 
     }
 
@@ -141,13 +186,14 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         setContentView(R.layout.activity_create_event);
 
         databaseEvents = FirebaseDatabase.getInstance().getReference("events");
         databaseUsers = FirebaseDatabase.getInstance().getReference("Users");
-
+        databaseSuburb =  FirebaseDatabase.getInstance().getReference("suburbs");
 
         //Metrics of the popup window. Currently setting it to 80% of screen width and height
         DisplayMetrics dm = new DisplayMetrics();
@@ -156,7 +202,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         int width = dm.widthPixels;
         int height = dm.heightPixels;
 
-        getWindow().setLayout((int) (width * .8), (int) (height * .8));
+        getWindow().setLayout((int)(width*.8), (int)(height*.8));
 
         // Bind Simple Variables
         users = new ArrayList<UserInformation>();
@@ -191,14 +237,14 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
                 String coordinates = "Long: " + lon + "Lat: " + lat;
 
-                Log.d("LOCATION", "Long: " + lon + "Lat: " + lat);
+                Log.d("LOCATION", "Long: " + lon + "Lat: " + lat );
 
 
                 //gets the specific location to the address
                 locat = getLocation(lon, lat);
 
 
-                Log.d("LOCATION", locat);
+               Log.d("LOCATION", locat );
 
 
             }
@@ -239,28 +285,30 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
         //sets the
         eventTv.setText(locat);
+
+
     }
 
 
     //adding functionality to the buttons
     @Override
     public void onClick(View view) {
-        if (view == getLocation) {
+        if(view == getLocation){
             eventTv.setText(locat);
             //if this is true then location services has been requested and we are allowed to use it
             clicked = true;
         }
 
-        if (view == createEvent) {
+        if(view == createEvent){
             addEvent();
         }
 
-        if (view == evTime) {
+        if(view == evTime){
             showTruitonTimePickerDialog(view);
         }
 
 
-        if (view == evDate) {
+        if(view == evDate){
             showTruitonDatePickerDialog(view);
         }
     }
@@ -301,16 +349,6 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         Log.d("LOCATION", "FETCHING LOCATION UPDATES");
 
 
-        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    Activity#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for Activity#requestPermissions for more details.
-            return;
-        }
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 5, locationListener);
 
     }
@@ -328,9 +366,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         String eventTime = evTime.getText().toString().trim();
         String eventDate = evDate.getText().toString().trim();
 
-
-        Intent i = getIntent();
-        String suburb = i.getStringExtra("SUBURB");
+        Log.d("EVENTCREATE", "CREATING EVENT");
 
         String eventAddress = evAddress.getText().toString().trim();
 
@@ -351,21 +387,59 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
             //this is just doing a couple of checks to ensure that a address is *actually* sent to firebase
             //TODO: this needs to be cleaned up/properly checked
             if(!TextUtils.isEmpty(eventAddress)){
+
+                String addressStatus = validate(eventAddress);
+
+                if (addressStatus!="VALID"){
+                    return;
+                }
+
                 String id = databaseEvents.push().getKey();
                 ArrayList<UserInformation> attendees = new ArrayList<UserInformation>();
                 attendees.add(host);
-                Event event = new Event(id, host, suburb, eventAddress, eventName, eventDesc, eventTime, eventDate, attendees);
+                Event event = new Event(id, host, eventAddress, eventName, eventDesc, eventTime, eventDate, attendees);
+
+                DatabaseReference databaseSuburbChange = FirebaseDatabase.getInstance().getReference("suburbs").child(suburb.getId());
+                ArrayList<Event> events = new ArrayList<Event>();
+                events.add(event);
+                if(suburb.getEvents() == null){
+                    suburb.setEvents(events);
+                }else{
+                    suburb.getEvents().add(event);
+                }
+                databaseSuburbChange.setValue(suburb);
+
+
                 databaseEvents.child(id).setValue(event);
+
                 Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
 
                 createCalenderEvent(eventName, eventDesc, eventAddress);
             }
             else if(!TextUtils.isEmpty(eventAddress)){
-                String id = databaseEvents.push().getKey();
+
+                String addressStatus = validate(eventAddress);
+
+                if (addressStatus!="VALID"){
+                    return;
+                }                String id = databaseEvents.push().getKey();
                 ArrayList<UserInformation> attendees = new ArrayList<UserInformation>();
                 attendees.add(host);
-                Event event = new Event(id, host, suburb, eventAddress, eventName, eventDesc, eventTime, eventDate, attendees);
+                Event event = new Event(id, host, eventAddress, eventName, eventDesc, eventTime, eventDate, attendees);
+
+                DatabaseReference databaseSuburbChange = FirebaseDatabase.getInstance().getReference("suburbs").child(suburb.getId());
+                ArrayList<Event> events = new ArrayList<Event>();
+                events.add(event);
+                if(suburb.getEvents() == null){
+                    suburb.setEvents(events);
+                }else{
+                    suburb.getEvents().add(event);
+                }
+                databaseSuburbChange.setValue(suburb);
+
+
                 databaseEvents.child(id).setValue(event);
+
                 Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
 
                 createCalenderEvent(eventName, eventDesc, eventAddress);
@@ -373,17 +447,39 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
             }
             else if(clicked && TextUtils.isEmpty(eventAddress) && !locat.equals(DEFAULT_LOCAL) && !locat.isEmpty()) {
                 eventAddress = locat;
+
+                String addressStatus = validate(eventAddress);
+
+                if (addressStatus!="VALID"){
+                    return;
+                }
+
                 String id = databaseEvents.push().getKey();
                 ArrayList<UserInformation> attendees = new ArrayList<UserInformation>();
                 attendees.add(host);
-                Event event = new Event(id, host, suburb, eventAddress, eventName, eventDesc, eventTime, eventDate, attendees);
+                Event event = new Event(id, host, eventAddress, eventName, eventDesc, eventTime, eventDate, attendees);
+
+                DatabaseReference databaseSuburbChange = FirebaseDatabase.getInstance().getReference("suburbs").child(suburb.getId());
+                ArrayList<Event> events = new ArrayList<Event>();
+                events.add(event);
+                if(suburb.getEvents() == null){
+                    suburb.setEvents(events);
+                }else{
+                    suburb.getEvents().add(event);
+                }
+                databaseSuburbChange.setValue(suburb);
+
                 databaseEvents.child(id).setValue(event);
+
                 Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
 
                 createCalenderEvent(eventName, eventDesc, eventAddress);
             }
         }
+
+
         else{
+
             Toast.makeText(this, "please enter all fields", Toast.LENGTH_LONG).show();
         }
     }
@@ -477,5 +573,45 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
                 .putExtra(Events.EVENT_LOCATION, eventAddress);
         startActivity(intent);
     }
+
+    public String validate(String eventAddress){
+
+        List<Address> addresses = null;
+        Geocoder geocoder = new Geocoder(getApplicationContext(), getDefault());
+
+
+        try {
+            addresses = geocoder.getFromLocationName(eventAddress, 1);
+            if (addresses.size() > 0) {
+
+                Address address = addresses.get(0);
+                String testedSuburb = address.getLocality();
+
+                Intent i = getIntent();
+                String intentSuburb = i.getStringExtra("SUBURB");
+
+                if (!intentSuburb.equals(testedSuburb)) {
+                    Log.d("VALIDATOR", "NOT IN SUBURB");
+                    Log.d("VALIDATOR", "We are in " + intentSuburb + " You have entered: " + testedSuburb);
+                    Toast.makeText(this, "Address not in suburb", Toast.LENGTH_LONG).show();
+                    return "NOT_IN_SUBURB";
+                }
+
+
+            } else {
+                Log.d("VALIDATOR", "2 - INVALID");
+                Toast.makeText(this, "Address not valid", Toast.LENGTH_LONG).show();
+                return "INVALID";
+            }
+
+        } catch (IOException e) {
+            Toast.makeText(this, "Address not valid", Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+            return "INVALID";
+
+        }
+        return "VALID";
+    }
+
 
 }

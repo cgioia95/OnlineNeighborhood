@@ -29,12 +29,9 @@ import java.util.ArrayList;
 
 public class HomeScreen extends AppCompatActivity implements View.OnClickListener {
 
-    private static final String TAG = "HomeScreen";
-
     TextView suburbTextView;
 
-    Button logoutBtn;
-   // private Button profileBtn;
+    Button mapButton;
     ImageView addEvent;
     String suburb;
 
@@ -43,9 +40,10 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
 
     //Setting up recyclerview and adapter for displaying events
     private RecyclerView mRecyclerView;
-    private EventAdapter mAdapter;
+    private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private ArrayList<Event> eventList = new ArrayList<>();
+
 
 
     @Override
@@ -54,26 +52,27 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
         databaseEvents = FirebaseDatabase.getInstance().getReference("events");
 
 
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_screen);
 
         fireBaseAuth = FirebaseAuth.getInstance();
         addEvent = findViewById(R.id.addEvent);
 
+
         suburbTextView = findViewById(R.id.textViewSuburb);
 
         Button logoutBtn = findViewById(R.id.logOutBtn);
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-       // profileBtn = findViewById(R.id.profileBtn);
+        mapButton = findViewById(R.id.mapButton);
 
-       // profileBtn.setOnClickListener(this);
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+
         logoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 fireBaseAuth.signOut();
                 finish();
-                startActivity(new Intent(getApplicationContext(), Login.class));
-            }
+                startActivity(new Intent(getApplicationContext(), Login.class));            }
         });
 
         Intent i = getIntent();
@@ -81,6 +80,8 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
 
         suburbTextView.setText(suburb);
         addEvent.setOnClickListener(this);
+        mapButton.setOnClickListener(this);
+
 
 
     }
@@ -94,15 +95,14 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 eventList.clear();
-                for (DataSnapshot eventSnapShot : dataSnapshot.getChildren()) {
+                for(DataSnapshot eventSnapShot : dataSnapshot.getChildren()) {
                     Event event = eventSnapShot.getValue(Event.class);
 
                     eventList.add(event);
                     Log.d("DISPLAY EVENT DATE", event.getDate());
 
                 }
-
-                //SET UP EVENTLIST & ONLICK LISTENER
+                //SET UP EVENTLIST
 
                 mRecyclerView = findViewById(R.id.recyclerView);
                 mLayoutManager = new LinearLayoutManager(HomeScreen.this);
@@ -110,18 +110,6 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
 
                 mRecyclerView.setLayoutManager(mLayoutManager);
                 mRecyclerView.setAdapter(mAdapter);
-
-                mAdapter.setOnEventClickListener(new EventAdapter.onEventClickListener() {
-                    @Override
-                    public void onEventClick(int position) {
-                        Event event = eventList.get(position);
-                        Log.d(TAG, "CLICKED EVENT" + eventList.get(position));;
-
-                        Intent intent = new Intent(HomeScreen.this, EventScreen.class);
-                        intent.putExtra("eventObject",event);
-                        startActivity(intent);
-                    }
-                });
 
             }
 
@@ -133,19 +121,23 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
 
     }
 
-
     @Override
     public void onClick(View view) {
-
         if (view == addEvent){
+            String suburb = getIntent().getStringExtra("SUBURB");
             Intent i = new Intent(getApplicationContext(), createEvent.class);
             i.putExtra("SUBURB", suburb);
             startActivity(i);
         }
 
-//       if(view == profileBtn){
-//           startActivity(new Intent(this, ProfileScreen.class));
-//       }
+        else if (view == mapButton){
 
+            String suburb = getIntent().getStringExtra("SUBURB");
+            Intent i = new Intent(getApplicationContext(), MapsActivity.class);
+            i.putExtra("SUBURB", suburb);
+            startActivity(i);
+
+
+        }
     }
 }
