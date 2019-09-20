@@ -18,6 +18,15 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
     private ArrayList<Event> eventList;
     private Context mContext;
+    private onEventClickListener mListener;
+
+    public interface onEventClickListener {
+        void onEventClick(int position);
+    }
+
+    public void setOnEventClickListener(onEventClickListener listener) {
+        mListener = listener;
+    }
 
     public static class EventViewHolder extends RecyclerView.ViewHolder {
 
@@ -26,13 +35,28 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         public TextView mEventTime;
         public TextView mEventAddress;
 
-        public EventViewHolder(@NonNull View itemView) {
+        public EventViewHolder(@NonNull View itemView, final onEventClickListener listener) {
             super(itemView);
 
             mEvent = itemView.findViewById(R.id.eventName);
             mUserName = itemView.findViewById(R.id.userName);
             mEventTime = itemView.findViewById(R.id.eventTime);
             mEventAddress = itemView.findViewById(R.id.eventAddress);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(listener!=null) {
+                        int position = getAdapterPosition();
+                        Log.d(TAG, "In onclick in eventadapter: position:" + position);
+                        if(position!= RecyclerView.NO_POSITION) {
+                            listener.onEventClick(position);
+                        }
+
+                    }
+
+                }
+            });
         }
     }
 
@@ -46,7 +70,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     @Override
     public EventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.event_item, parent, false);
-        EventViewHolder viewholder = new EventViewHolder(v);
+        EventViewHolder viewholder = new EventViewHolder(v, mListener);
         return viewholder;
 
     }

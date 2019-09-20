@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -28,6 +29,8 @@ import java.util.ArrayList;
 
 public class HomeScreen extends AppCompatActivity implements View.OnClickListener {
 
+    private static final String TAG = "HomeScreen";
+
     TextView suburbTextView;
 
     Button logoutBtn;
@@ -40,7 +43,7 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
 
     //Setting up recyclerview and adapter for displaying events
     private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private EventAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private ArrayList<Event> eventList = new ArrayList<>();
 
@@ -98,7 +101,8 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
                     Log.d("DISPLAY EVENT DATE", event.getDate());
 
                 }
-                //SET UP EVENTLIST
+
+                //SET UP EVENTLIST & ONLICK LISTENER
 
                 mRecyclerView = findViewById(R.id.recyclerView);
                 mLayoutManager = new LinearLayoutManager(HomeScreen.this);
@@ -106,6 +110,18 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
 
                 mRecyclerView.setLayoutManager(mLayoutManager);
                 mRecyclerView.setAdapter(mAdapter);
+
+                mAdapter.setOnEventClickListener(new EventAdapter.onEventClickListener() {
+                    @Override
+                    public void onEventClick(int position) {
+                        Event event = eventList.get(position);
+                        Log.d(TAG, "CLICKED EVENT" + eventList.get(position));;
+
+                        Intent intent = new Intent(HomeScreen.this, EventScreen.class);
+                        intent.putExtra("eventObject",event);
+                        startActivity(intent);
+                    }
+                });
 
             }
 

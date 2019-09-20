@@ -1,10 +1,13 @@
 package com.example.onlineneighborhood;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 
-public class Event {
+public class Event implements Parcelable {
     private String id;
     private UserInformation host;
     private String suburb;
@@ -32,6 +35,28 @@ public class Event {
         this.date = date;
         this.attendees = attendees;
     }
+
+    protected Event(Parcel in) {
+        id = in.readString();
+        suburb = in.readString();
+        address = in.readString();
+        eventName = in.readString();
+        description = in.readString();
+        time = in.readString();
+        date = in.readString();
+    }
+
+    public static final Creator<Event> CREATOR = new Creator<Event>() {
+        @Override
+        public Event createFromParcel(Parcel in) {
+            return new Event(in);
+        }
+
+        @Override
+        public Event[] newArray(int size) {
+            return new Event[size];
+        }
+    };
 
     public String getTime() {
         return time;
@@ -103,5 +128,21 @@ public class Event {
 
     public void setAttendees(ArrayList<UserInformation> attendees) {
         this.attendees = attendees;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(suburb);
+        dest.writeString(address);
+        dest.writeString(eventName);
+        dest.writeString(description);
+        dest.writeString(time);
+        dest.writeString(date);
     }
 }
