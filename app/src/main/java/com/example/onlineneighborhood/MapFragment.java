@@ -74,7 +74,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         Intent i = getActivity().getIntent();
         suburbName = i.getStringExtra("SUBURB");
 
-        Log.d("MAGFRAGMENT", suburbName);
+        Log.d("MAGFRAGMENT",""+ suburbName);
 
         if (mapFragment == null){
             FragmentManager fm = getFragmentManager();

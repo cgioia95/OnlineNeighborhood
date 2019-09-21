@@ -45,8 +45,9 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     // Declare simple variables
-    private Button registerBtn, loginBtn, suburbBtn;
+    private Button registerBtn, loginBtn, suburbBtn, getLocationBtn;
     private String suburb = "NO SUBURB FOUND";
+    private String getLocat = "NO SUBURB FOUND";
     private Spinner suburbSpinner;
     private TextView tvSuburb;
 
@@ -67,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Bind simple variables
         suburbBtn = (Button) findViewById(R.id.chooseSuburbBtn);
         registerBtn = (Button) findViewById(R.id.registerBtn);
+        getLocationBtn = (Button) findViewById(R.id.getLocationBtn);
         loginBtn = (Button) findViewById(R.id.loginBtn);
         suburbSpinner = findViewById(R.id.suburbSpinner);
         tvSuburb = findViewById(R.id.tvSuburb);
@@ -76,6 +78,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         suburbBtn.setOnClickListener(this);
         registerBtn.setOnClickListener(this);
         loginBtn.setOnClickListener(this);
+        getLocationBtn.setOnClickListener(this);
+
 
 
         // Setup the Location Manager and Listener
@@ -96,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 //gets the specific location to the address
                 suburb = getSuburb(lon, lat);
-
+                getLocat = getSuburb(lon, lat);
 
                 Log.d("LOCATION", suburb );
 
@@ -149,6 +153,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Intent i = new Intent(this, Login.class);
             i.putExtra("SUBURB", suburb);
             startActivity(i);
+
         } else if(view == loginBtn && suburb.equals("NO SUBURB FOUND")) {
             Toast.makeText(this, "we need a suburb before you can enter", Toast.LENGTH_LONG).show();
         }
@@ -160,6 +165,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(view == suburbBtn){
             suburb = suburbSpinner.getSelectedItem().toString();
             tvSuburb.setText(suburbSpinner.getSelectedItem().toString());
+            tvSuburb.setVisibility(View.VISIBLE);
+        }
+
+        if(view == getLocationBtn){
+            suburb = getLocat;
+            tvSuburb.setText(getLocat);
             tvSuburb.setVisibility(View.VISIBLE);
         }
 

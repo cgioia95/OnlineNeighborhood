@@ -114,20 +114,22 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
         super.onStart();
 
-        databaseUsers.addChildEventListener(new ChildEventListener() {
+        databaseUsers.addChildEventListener(new ChildEventListener(){
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 for(DataSnapshot hostSnapshot : dataSnapshot.getChildren()){
 
                     String checkCurUser = firebaseAuth.getCurrentUser().getUid();
+
                     if(checkCurUser.equals(hostSnapshot.getKey())){
                         UserInformation currentUser = hostSnapshot.getValue(UserInformation.class);
+                        Log.d("found one: ", ""+currentUser);
                         host = currentUser;
                         break;
                     }
                     Log.d("HOSTS: ", ""+hostSnapshot);
+                    Log.d("checking against: ", ""+checkCurUser);
                 }
-
             }
 
             @Override
@@ -410,7 +412,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
                 if (addressStatus!="VALID"){
                     return;
                 }
-                if(addEventToSuburb(eventAddress, eventName, eventDesc, eventTime, endTime, endDate, type, eventDate)){
+                if(addEventToSuburb(eventAddress, eventName, eventDesc, eventTime, eventDate, endTime, endDate, type)){
                     Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
                     if(addCal.isChecked()){
                         createCalenderEvent(eventName, eventDesc, eventAddress);
@@ -425,7 +427,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
                 if (addressStatus!="VALID"){
                     return;
                 }
-                if(addEventToSuburb(eventAddress, eventName, eventDesc, eventTime, endTime, endDate, type, eventDate)){
+                if(addEventToSuburb(eventAddress, eventName, eventDesc, eventTime, eventDate, endTime, endDate, type)){
                     Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
 
                     if(addCal.isChecked()){

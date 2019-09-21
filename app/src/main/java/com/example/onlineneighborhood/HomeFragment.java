@@ -43,6 +43,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
     // private Button profileBtn;
     ImageView addEvent;
     String suburb;
+    String currSuburb;
     private static final String TAG = "HomeScreen";
 
     private FirebaseAuth fireBaseAuth;
@@ -55,11 +56,21 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
     private ArrayList<Event> eventList = new ArrayList<>();
     Context applicationContext = BottomNavigationActivity.getContextOfApplication();
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+
+        super.onCreate(savedInstanceState);
+    }
+
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View mView = inflater.inflate(R.layout.activity_home_screen, null);
+        if(getArguments() != null){
+            currSuburb = getArguments().getString("SUBURB");
+
+        }
 
 
         fireBaseAuth = FirebaseAuth.getInstance();
@@ -90,22 +101,47 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
     @Override
     public void onStart(){
         super.onStart();
-        databaseEvents = FirebaseDatabase.getInstance().getReference("events");
+        databaseEvents = FirebaseDatabase.getInstance().getReference("suburbs");
 
         databaseEvents.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 eventList.clear();
-                for (DataSnapshot eventSnapShot : dataSnapshot.getChildren()) {
-                    Event event = eventSnapShot.getValue(Event.class);
+                for(DataSnapshot suburbSnapshot : dataSnapshot.getChildren()) {
+                    ArrayList<Event> events = new ArrayList<Event>();
+                    Suburb currentSuburb = suburbSnapshot.getValue(Suburb.class);
+                    try{
+                        Log.d("currSuburb", ""+currSuburb);
+                        if (currSuburb.equals(currentSuburb.getSubName())) {
+                            events = currentSuburb.getEvents();
+                            Log.d("DISPLAY EVENT DATE", ""+events);
+                            for(Event event:events){
+                                if(event != null) {
+                                    eventList.add(event);
+                                }
+                            }
+                            Log.d("eventArray", ""+events);
+                            break;
+                        }
 
-                    eventList.add(event);
-                    Log.d("DISPLAY EVENT DATE", event.getDate());
+                    } catch (NullPointerException e){
+                        //this catches null pointer exceptions, it happens alot
+                        //TODO: I need to find a better way to loop through all the suburbs
+                        //if you look at the log you can see the 'null pointer' still gets the suburb name. weird.
+                        Log.d("ERROR VALUES", "" + currentSuburb.getSubName());
+                    }
+
 
                 }
                 //SET UP EVENTLIST
-
+                //i think when theres no list of events this throws. not sure why but just put an error check on it
+                //TODO: NEED TO FIX THIS ASAP. 
+                try{
+                    mRecyclerView = getActivity().findViewById(R.id.recyclerView);
+                }catch (NullPointerException e){
+                    e.printStackTrace();
+                }
                 mRecyclerView = getActivity().findViewById(R.id.recyclerView);
                 mLayoutManager = new LinearLayoutManager(getActivity());
                 mAdapter = new EventAdapter(eventList, getActivity());
@@ -152,4 +188,5 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
 //       }
 
     }
+
 }

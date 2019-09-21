@@ -21,17 +21,6 @@ public class Event implements Serializable {
 
     }
 
-    public Event(String id, UserInformation host, String address, String eventName, String description, String time, String date, ArrayList<UserInformation> attendees) {
-        this.id = id;
-        this.host = host;
-        this.address = address;
-        this.eventName = eventName;
-        this.description = description;
-        this.time = time;
-        this.date = date;
-        this.attendees = attendees;
-    }
-
     public Event(String id, UserInformation host, String address, String eventName, String description, String time, String date, String endTime, String endDate, String type, ArrayList<UserInformation> attendees) {
         this.id = id;
         this.host = host;
