@@ -63,7 +63,6 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
         suburbTextView = findViewById(R.id.textViewSuburb);
 
         Button logoutBtn = findViewById(R.id.logOutBtn);
-        mapButton = findViewById(R.id.mapButton);
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
