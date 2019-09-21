@@ -75,37 +75,6 @@ public class ProfileFragment extends Fragment implements DatePickerDialog.OnDate
 
     private List<String> preferenceOptions = Arrays.asList("Sports", "Gigs", "Dating", "Misc.");
 
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                for(DataSnapshot hostSnapshot : dataSnapshot.getChildren()){
-                    Log.d("On DATA CHANGE ", "IN");
-                    Log.d("On DATA CHANGE", "Snapshot" + hostSnapshot);
-                }
-/*                String name = dataSnapshot.child("name").getValue().toString();
-                String preference = dataSnapshot.child("preference").getValue().toString();
-                String dob = dataSnapshot.child("dob").getValue().toString();
-                String bio = dataSnapshot.child("bio").getValue().toString();
-
-                textViewName.setText(name);
-                spinnerPreferences.setSelection(preferenceOptions.indexOf(preference));
-                editTextdob.setText(dob);
-                editTextBio.setText(bio);
-                downloadImage();*/
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -151,7 +120,28 @@ public class ProfileFragment extends Fragment implements DatePickerDialog.OnDate
         });
 
 
+        databaseReference.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d("On DATA CHANGE ", "IN");
+                Log.d("On DATA CHANGE", "Snapshot" + dataSnapshot);
+                String name = dataSnapshot.child("name").getValue().toString();
+                String preference = dataSnapshot.child("preference").getValue().toString();
+                String dob = dataSnapshot.child("dob").getValue().toString();
+                String bio = dataSnapshot.child("bio").getValue().toString();
 
+                textViewName.setText(name);
+                spinnerPreferences.setSelection(preferenceOptions.indexOf(preference));
+                editTextdob.setText(dob);
+                editTextBio.setText(bio);
+                downloadImage();
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
 
         editProfileBtn.setOnClickListener(new View.OnClickListener() {
             @Override

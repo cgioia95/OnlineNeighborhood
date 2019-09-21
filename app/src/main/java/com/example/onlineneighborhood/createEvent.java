@@ -38,6 +38,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -100,6 +101,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     static int year, day, month;
     static int hour, minute;
     private static boolean startAndEnd;
+    private Spinner eventType;
     CheckBox addCal;
     ArrayList<UserInformation> users;
 
@@ -224,6 +226,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         evEndTime = findViewById(R.id.endTime);
         evAddress = findViewById(R.id.eventAddress);
         addCal = findViewById(R.id.addCal);
+        eventType = (Spinner) findViewById(R.id.spinnerType);
 
         // Bind On clicks
         getLocation.setOnClickListener(this);
@@ -378,8 +381,9 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         String eventDesc = evDesc.getText().toString().trim();
         String eventTime = evTime.getText().toString().trim();
         String eventDate = evDate.getText().toString().trim();
-        String EndTime = evEndTime.getText().toString().trim();
-        String EndDate = evEndDate.getText().toString().trim();
+        String endTime = evEndTime.getText().toString().trim();
+        String endDate = evEndDate.getText().toString().trim();
+        final String type = eventType.getSelectedItem().toString();
 
         Log.d("EVENTCREATE", "CREATING EVENT");
 
@@ -387,9 +391,8 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
 
         //checks all the fields are filled
-        if(!TextUtils.isEmpty(eventName) && !eventTime.contains("Time")
-        && !eventDate.contains("Date")){
-
+        if(!TextUtils.isEmpty(eventName) && !eventTime.contains("Time") && !endDate.contains("Date")
+                && !endTime.contains("Time") && !TextUtils.isEmpty(eventDesc) && !eventDate.contains("Date")){
 
             // Checks if the User's Logged in already, if so bypasses the Login Screen and takes them to Choose Screen
             //put this here to ensure that the user is not null and if it is will exit to the log in screen
@@ -407,7 +410,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
                 if (addressStatus!="VALID"){
                     return;
                 }
-                if(addEventToSuburb(eventAddress, eventName, eventDesc, eventTime, eventDate)){
+                if(addEventToSuburb(eventAddress, eventName, eventDesc, eventTime, endTime, endDate, type, eventDate)){
                     Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
                     if(addCal.isChecked()){
                         createCalenderEvent(eventName, eventDesc, eventAddress);
@@ -422,7 +425,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
                 if (addressStatus!="VALID"){
                     return;
                 }
-                if(addEventToSuburb(eventAddress, eventName, eventDesc, eventTime, eventDate)){
+                if(addEventToSuburb(eventAddress, eventName, eventDesc, eventTime, endTime, endDate, type, eventDate)){
                     Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
 
                     if(addCal.isChecked()){
@@ -441,12 +444,12 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     }
 
 
-    public boolean addEventToSuburb(String eventAddress,String eventName,String eventDesc, String eventTime, String eventDate){
+    public boolean addEventToSuburb(String eventAddress,String eventName,String eventDesc, String eventTime, String eventDate, String endTime, String endDate, String type){
         try{
             String id = databaseEvents.push().getKey();
             ArrayList<UserInformation> attendees = new ArrayList<UserInformation>();
             attendees.add(host);
-            Event event = new Event(id, host, eventAddress, eventName, eventDesc, eventTime, eventDate, attendees);
+            Event event = new Event(id, host, eventAddress, eventName, eventDesc, eventTime, eventDate, endTime, endDate, type, attendees);
 
             DatabaseReference databaseSuburbChange = FirebaseDatabase.getInstance().getReference("suburbs").child(suburb.getId());
             ArrayList<Event> events = new ArrayList<Event>();

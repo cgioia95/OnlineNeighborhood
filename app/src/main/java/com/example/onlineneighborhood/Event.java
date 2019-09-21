@@ -11,12 +11,7 @@ import java.util.ArrayList;
 public class Event implements Serializable {
     private String id;
     private UserInformation host;
-    private String address;
-    private String eventName;
-    private String description;
-    private String time;
-    private String suburb;
-    private String date;
+    private String address, eventName, description, time, date, endTime, endDate, type;
   
 
     private ArrayList<UserInformation> attendees;
@@ -35,6 +30,53 @@ public class Event implements Serializable {
         this.time = time;
         this.date = date;
         this.attendees = attendees;
+    }
+
+    public Event(String id, UserInformation host, String address, String eventName, String description, String time, String date, String endTime, String endDate, String type, ArrayList<UserInformation> attendees) {
+        this.id = id;
+        this.host = host;
+        this.address = address;
+        this.eventName = eventName;
+        this.description = description;
+        this.time = time;
+        this.date = date;
+        this.endTime = endTime;
+        this.endDate = endDate;
+        this.type = type;
+        this.attendees = attendees;
+    }
+
+
+    public String getEventName() {
+        return eventName;
+    }
+
+    public void setEventName(String eventName) {
+        this.eventName = eventName;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
+
+    public String getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getTime() {
