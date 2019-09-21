@@ -111,6 +111,8 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
                 mRecyclerView.setLayoutManager(mLayoutManager);
                 mRecyclerView.setAdapter(mAdapter);
 
+
+
             }
 
             @Override
