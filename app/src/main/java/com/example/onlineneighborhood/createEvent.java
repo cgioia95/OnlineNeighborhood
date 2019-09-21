@@ -7,11 +7,13 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.icu.util.Calendar;
@@ -91,9 +93,10 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     //XML variables
     EditText evName, evDesc, evAddress;
     private TextView eventTv;
-    static TextView evTime, evDate;
+    static TextView evTime, evDate, evEndTime, evEndDate;
     static int year, day, month;
     static int hour, minute;
+    private static boolean startAndEnd;
     ArrayList<UserInformation> users;
 
     // Two components used to get user Location
@@ -202,7 +205,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         int width = dm.widthPixels;
         int height = dm.heightPixels;
 
-        getWindow().setLayout((int)(width*.8), (int)(height*.8));
+        getWindow().setLayout((int)(width*.9), (int)(height*.9));
 
         // Bind Simple Variables
         users = new ArrayList<UserInformation>();
@@ -213,6 +216,8 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         evDesc = findViewById(R.id.eventDesc);
         evTime = findViewById(R.id.eventTime);
         evDate = findViewById(R.id.eventDate);
+        evEndDate = findViewById(R.id.endDate);
+        evEndTime = findViewById(R.id.endTime);
         evAddress = findViewById(R.id.eventAddress);
 
         // Bind On clicks
@@ -220,6 +225,8 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         createEvent.setOnClickListener(this);
         evDate.setOnClickListener(this);
         evTime.setOnClickListener(this);
+        evEndTime.setOnClickListener(this);
+        evEndDate.setOnClickListener(this);
 
         //getting authentication info to link the event to the user creating it
         firebaseAuth = FirebaseAuth.getInstance();
@@ -280,7 +287,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
             return;
         } else {
             //configure Button is the method which updates the location every 5 seconds
-            configureButton();
+             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 5, locationListener);
         }
 
         //sets the
@@ -304,13 +311,24 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         }
 
         if(view == evTime){
+            startAndEnd = true;
+            showTruitonTimePickerDialog(view);
+        }
+        if(view == evEndTime){
+            startAndEnd = false;
             showTruitonTimePickerDialog(view);
         }
 
-
         if(view == evDate){
+            startAndEnd = true;
             showTruitonDatePickerDialog(view);
         }
+
+        if(view == evEndDate){
+            startAndEnd = false;
+            showTruitonDatePickerDialog(view);
+        }
+
     }
 
 
@@ -343,16 +361,6 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     }
 
 
-    // Once the Location Button is pressed, the location manager will start returning user's location
-    public void configureButton() {
-
-        Log.d("LOCATION", "FETCHING LOCATION UPDATES");
-
-
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 5, locationListener);
-
-    }
-
     /**
      * This method takes all the data provided by the activity and sends it to firebase.
      * (as long as it passes the error checks)
@@ -365,6 +373,8 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         String eventDesc = evDesc.getText().toString().trim();
         String eventTime = evTime.getText().toString().trim();
         String eventDate = evDate.getText().toString().trim();
+        String EndTime = evEndTime.getText().toString().trim();
+        String EndDate = evEndDate.getText().toString().trim();
 
         Log.d("EVENTCREATE", "CREATING EVENT");
 
@@ -387,101 +397,88 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
             //this is just doing a couple of checks to ensure that a address is *actually* sent to firebase
             //TODO: this needs to be cleaned up/properly checked
             if(!TextUtils.isEmpty(eventAddress)){
-
                 String addressStatus = validate(eventAddress);
 
                 if (addressStatus!="VALID"){
                     return;
                 }
+                if(addEventToSuburb(eventAddress, eventName, eventDesc, eventTime, eventDate)){
+                    Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
 
-                String id = databaseEvents.push().getKey();
-                ArrayList<UserInformation> attendees = new ArrayList<UserInformation>();
-                attendees.add(host);
-                Event event = new Event(id, host, eventAddress, eventName, eventDesc, eventTime, eventDate, attendees);
-
-                DatabaseReference databaseSuburbChange = FirebaseDatabase.getInstance().getReference("suburbs").child(suburb.getId());
-                ArrayList<Event> events = new ArrayList<Event>();
-                events.add(event);
-                if(suburb.getEvents() == null){
-                    suburb.setEvents(events);
+                    calenderPrompt(eventName, eventDesc, eventAddress);
                 }else{
-                    suburb.getEvents().add(event);
+                    Toast.makeText(this, "sorry, something went wrong, please try again", Toast.LENGTH_LONG).show();
                 }
-                databaseSuburbChange.setValue(suburb);
-
-
-                databaseEvents.child(id).setValue(event);
-
-                Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
-
-                createCalenderEvent(eventName, eventDesc, eventAddress);
-            }
-            else if(!TextUtils.isEmpty(eventAddress)){
-
-                String addressStatus = validate(eventAddress);
-
-                if (addressStatus!="VALID"){
-                    return;
-                }                String id = databaseEvents.push().getKey();
-                ArrayList<UserInformation> attendees = new ArrayList<UserInformation>();
-                attendees.add(host);
-                Event event = new Event(id, host, eventAddress, eventName, eventDesc, eventTime, eventDate, attendees);
-
-                DatabaseReference databaseSuburbChange = FirebaseDatabase.getInstance().getReference("suburbs").child(suburb.getId());
-                ArrayList<Event> events = new ArrayList<Event>();
-                events.add(event);
-                if(suburb.getEvents() == null){
-                    suburb.setEvents(events);
-                }else{
-                    suburb.getEvents().add(event);
-                }
-                databaseSuburbChange.setValue(suburb);
-
-
-                databaseEvents.child(id).setValue(event);
-
-                Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
-
-                createCalenderEvent(eventName, eventDesc, eventAddress);
 
             }
             else if(clicked && TextUtils.isEmpty(eventAddress) && !locat.equals(DEFAULT_LOCAL) && !locat.isEmpty()) {
                 eventAddress = locat;
-
                 String addressStatus = validate(eventAddress);
-
                 if (addressStatus!="VALID"){
                     return;
                 }
+                if(addEventToSuburb(eventAddress, eventName, eventDesc, eventTime, eventDate)){
+                    Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
 
-                String id = databaseEvents.push().getKey();
-                ArrayList<UserInformation> attendees = new ArrayList<UserInformation>();
-                attendees.add(host);
-                Event event = new Event(id, host, eventAddress, eventName, eventDesc, eventTime, eventDate, attendees);
+                    calenderPrompt(eventName, eventDesc, eventAddress);
 
-                DatabaseReference databaseSuburbChange = FirebaseDatabase.getInstance().getReference("suburbs").child(suburb.getId());
-                ArrayList<Event> events = new ArrayList<Event>();
-                events.add(event);
-                if(suburb.getEvents() == null){
-                    suburb.setEvents(events);
                 }else{
-                    suburb.getEvents().add(event);
+                    Toast.makeText(this, "sorry, something went wrong, please try again", Toast.LENGTH_LONG).show();
                 }
-                databaseSuburbChange.setValue(suburb);
 
-                databaseEvents.child(id).setValue(event);
-
-                Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
-
-                createCalenderEvent(eventName, eventDesc, eventAddress);
             }
         }
-
-
         else{
-
             Toast.makeText(this, "please enter all fields", Toast.LENGTH_LONG).show();
         }
+    }
+
+
+    public boolean addEventToSuburb(String eventAddress,String eventName,String eventDesc, String eventTime, String eventDate){
+        try{
+            String id = databaseEvents.push().getKey();
+            ArrayList<UserInformation> attendees = new ArrayList<UserInformation>();
+            attendees.add(host);
+            Event event = new Event(id, host, eventAddress, eventName, eventDesc, eventTime, eventDate, attendees);
+
+            DatabaseReference databaseSuburbChange = FirebaseDatabase.getInstance().getReference("suburbs").child(suburb.getId());
+            ArrayList<Event> events = new ArrayList<Event>();
+            events.add(event);
+            if(suburb.getEvents() == null){
+                suburb.setEvents(events);
+            }else{
+                suburb.getEvents().add(event);
+            }
+            databaseSuburbChange.setValue(suburb);
+            return true;
+        } catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public void calenderPrompt(String eventName, String eventDesc, String eventAddress){
+        final String eventN = eventName;
+        final String eventD = eventDesc;
+        final String eventA = eventAddress;
+        AlertDialog.Builder builder = new AlertDialog.Builder(createEvent.this);
+        builder.setCancelable(true);
+        builder.setTitle("Add To Calender");
+        builder.setMessage("Add this Event to your Calender?");
+        builder.setNegativeButton("No Thanks", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.cancel();
+            }
+        });
+
+        builder.setPositiveButton("Yes Please", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                createCalenderEvent(eventN, eventD, eventA);
+            }
+        });
+        builder.show();
     }
 
 
@@ -514,13 +511,24 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
             // Do something with the time chosen by the user
             // due to int data type, a bodge job adding zeros manually.
-            if(minute < 10){
-                evTime.setText(hourOfDay + ":0"	+ minute);
-            }
-            else if(minute == 0){
-                evTime.setText(hourOfDay + ":00" + minute);
-            }else {
-                evTime.setText(hourOfDay + ":"	+ minute);
+            if(startAndEnd){
+                if(minute < 10){
+                    evTime.setText(hourOfDay + ":0"	+ minute);
+                }
+                else if(minute == 0){
+                    evTime.setText(hourOfDay + ":00" + minute);
+                }else {
+                    evTime.setText(hourOfDay + ":"	+ minute);
+                }
+            }else{
+                if(minute < 10){
+                    evEndTime.setText(hourOfDay + ":0"	+ minute);
+                }
+                else if(minute == 0){
+                    evEndTime.setText(hourOfDay + ":00" + minute);
+                }else {
+                    evEndTime.setText(hourOfDay + ":"	+ minute);
+                }
             }
         }
     }
@@ -542,7 +550,12 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
         public void onDateSet(DatePicker view, int year, int month, int day) {
             // Do something with the date chosen by the user
-            evDate.setText(day + "/" + (month + 1) + "/" + year);
+            if(startAndEnd){
+                evDate.setText(day + "/" + (month + 1) + "/" + year);
+            }
+            else {
+                evEndDate.setText(day + "/" + (month + 1) + "/" + year);
+            }
         }
     }
 
