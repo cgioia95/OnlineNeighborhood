@@ -30,6 +30,7 @@ import com.example.onlineneighborhood.UserInformation;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -63,12 +64,15 @@ public class ProfileFragment extends Fragment implements DatePickerDialog.OnDate
     private DatePickerDialog.OnDateSetListener DateSetListener;
     private FirebaseAuth fireBaseAuth;
     private DatabaseReference databaseReference;
+    private DatabaseReference databaseReferenceUser;
+
     private FirebaseStorage storage;
     private StorageReference storageReference;
     private UserInformation user;
     private static final int PICK_IMAGE = 1;
     private static final String TAG = "My Profile";
     private String uid;
+
     Uri imageuri;
     UserInformation host;
     Context applicationContext = BottomNavigationActivity.getContextOfApplication();
@@ -120,28 +124,47 @@ public class ProfileFragment extends Fragment implements DatePickerDialog.OnDate
         });
 
 
-        databaseReference.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+
+        // Getting the user info reference databaseReferenceUser and grabbing its info
+        databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d("On DATA CHANGE ", "IN");
-                Log.d("On DATA CHANGE", "Snapshot" + dataSnapshot);
-                String name = dataSnapshot.child("name").getValue().toString();
-                String preference = dataSnapshot.child("preference").getValue().toString();
-                String dob = dataSnapshot.child("dob").getValue().toString();
-                String bio = dataSnapshot.child("bio").getValue().toString();
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot dataSnapshotI: dataSnapshot.getChildren()){
 
-                textViewName.setText(name);
-                spinnerPreferences.setSelection(preferenceOptions.indexOf(preference));
-                editTextdob.setText(dob);
-                editTextBio.setText(bio);
-                downloadImage();
+                    if (dataSnapshotI.hasChild(uid)){
 
+                        DataSnapshot userSnapshot = dataSnapshotI.child(uid);
+
+                        databaseReferenceUser = userSnapshot.getRef();
+
+                        Log.d("PROFILE", String.valueOf(userSnapshot));
+
+                        String name = userSnapshot.child("name").getValue().toString();
+                        String preference = userSnapshot.child("preference").getValue().toString();
+                        String dob = userSnapshot.child("dob").getValue().toString();
+                        String bio = userSnapshot.child("bio").getValue().toString();
+
+
+
+                        textViewName.setText(name);
+                        spinnerPreferences.setSelection(preferenceOptions.indexOf(preference));
+                        editTextdob.setText(dob);
+                        editTextBio.setText(bio);
+                        downloadImage();
+                    }
+
+                }
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
             }
         });
+
+
+
+
 
         editProfileBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -150,9 +173,14 @@ public class ProfileFragment extends Fragment implements DatePickerDialog.OnDate
                 String dob = editTextdob.getText().toString();
                 String bio = editTextBio.getText().toString();
                 Log.d("ON PREFERENCE CHANGE ", "to" + selectedPreference);
-                databaseReference.child(uid).child("preference").setValue(selectedPreference);
-                databaseReference.child(uid).child("dob").setValue(dob);
-                databaseReference.child(uid).child("bio").setValue(bio);
+                databaseReferenceUser.child("preference").setValue(selectedPreference);
+                databaseReferenceUser.child("dob").setValue(dob);
+                databaseReferenceUser.child("bio").setValue(bio);
+
+
+
+
+
                 Toast.makeText(getActivity(), "Saved Succesfully!!", Toast.LENGTH_SHORT).show();
 
             }
