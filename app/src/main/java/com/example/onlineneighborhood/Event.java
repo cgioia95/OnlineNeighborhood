@@ -5,9 +5,10 @@ import android.os.Parcelable;
 
 import com.google.firebase.auth.FirebaseUser;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Event implements Parcelable {
+public class Event implements Serializable {
     private String id;
     private UserInformation host;
     private String address;
@@ -34,7 +35,7 @@ public class Event implements Parcelable {
         this.date = date;
         this.attendees = attendees;
     }
-
+/*
     protected Event(Parcel in) {
         id = in.readString();
         suburb = in.readString();
@@ -44,7 +45,7 @@ public class Event implements Parcelable {
         time = in.readString();
         date = in.readString();
     }
-
+/*
     public static final Creator<Event> CREATOR = new Creator<Event>() {
         @Override
         public Event createFromParcel(Parcel in) {
@@ -55,7 +56,7 @@ public class Event implements Parcelable {
         public Event[] newArray(int size) {
             return new Event[size];
         }
-    };
+    }; */
 
     public String getTime() {
         return time;
@@ -121,7 +122,7 @@ public class Event implements Parcelable {
     public void setAttendees(ArrayList<UserInformation> attendees) {
         this.attendees = attendees;
     }
-
+/*
     @Override
     public int describeContents() {
         return 0;
@@ -137,5 +138,5 @@ public class Event implements Parcelable {
         dest.writeString(description);
         dest.writeString(time);
         dest.writeString(date);
-    }
+    }*/
 }

@@ -1,6 +1,8 @@
 package com.example.onlineneighborhood;
 
-public class UserInformation {
+import java.io.Serializable;
+
+public class UserInformation implements Serializable {
 
     public String uid;
     public String name;

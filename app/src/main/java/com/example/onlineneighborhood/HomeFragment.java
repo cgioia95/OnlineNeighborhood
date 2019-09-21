@@ -32,9 +32,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class HomeFragment extends Fragment implements View.OnClickListener {
+public class HomeFragment extends Fragment implements View.OnClickListener, Serializable {
 
     TextView suburbTextView;
 
@@ -49,7 +50,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
     //Setting up recyclerview and adapter for displaying events
     private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private EventAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private ArrayList<Event> eventList = new ArrayList<>();
     Context applicationContext = BottomNavigationActivity.getContextOfApplication();
@@ -112,6 +113,24 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 mRecyclerView.setLayoutManager(mLayoutManager);
                 mRecyclerView.setAdapter(mAdapter);
                 mRecyclerView.setAdapter(mAdapter);
+
+                mAdapter.setOnEventClickListener(new EventAdapter.onEventClickListener() {
+                    @Override
+                    public void onEventClick(int position) {
+                        Event event = eventList.get(position);
+
+                        Intent intent = new Intent(getActivity(), EventScreen.class);
+
+                        intent.putExtra("MyObject", event);
+                        startActivity(intent);
+
+                        /*Intent intent = new Intent(getActivity(), EventScreen.class);
+                        intent.putExtra("eventObject",event);
+                        Log.d(TAG, "onEventClick: EVENT" + event.getName());
+                        Log.d(TAG, "onEventClick: EVENT" + event.getDescription());
+                        startActivity(intent);*/
+                    }
+                });
 
             }
 
