@@ -1,10 +1,20 @@
 package com.example.onlineneighborhood;
 
-import android.content.Context;
+
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -13,20 +23,11 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
-import android.util.Log;
-import android.view.MenuItem;
-import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,10 +36,13 @@ import java.util.List;
 import static java.util.Locale.getDefault;
 
 
-public class BottomNavigationActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
-
-
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class MapFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap mMap;
+
+    SupportMapFragment mapFragment;
 
     String suburbName;
     Suburb suburb;
@@ -50,75 +54,40 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
     DatabaseReference databaseUsers;
     DatabaseReference databaseSuburb;
 
-    public static Context contextOfApplication;
-    public static Context getContextOfApplication()
-    {
-        return contextOfApplication;
+    public MapFragment() {
+        // Required empty public constructor
     }
+
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_bottom_navigation);
-        BottomNavigationView navView = findViewById(R.id.nav_view);
-        navView.setOnNavigationItemSelectedListener(this);
-        contextOfApplication = getApplicationContext();
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View v =  inflater.inflate(R.layout.fragment_map, container, false);
+        mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
 
         databaseEvents = FirebaseDatabase.getInstance().getReference("events");
         databaseUsers = FirebaseDatabase.getInstance().getReference("Users");
         databaseSuburb =  FirebaseDatabase.getInstance().getReference("suburbs");
 
 
+        Intent i = getActivity().getIntent();
+        suburbName = i.getStringExtra("SUBURB");
 
+        Log.d("MAGFRAGMENT", suburbName);
 
-    }
-
-
-    private boolean loadFragment(Fragment fragment){
-
-       if(fragment != null){
-
-           getSupportFragmentManager()
-                   .beginTransaction()
-                   .replace(R.id.fragment_container,fragment).commit();
-       }
-       return false;
-    }
-
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-
-        Fragment fragment = null;
-        switch (menuItem.getItemId()){
-
-            case R.id.navigation_profile:
-                fragment= new ProfileFragment();
-                break;
-
-
-            case R.id.navigation_map:
-                // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-
-                fragment = new MapFragment();
-
-
-
-//                SupportMapFragment mapFragment = (SupportMapFragment) this.getSupportFragmentManager().
-//                        findFragmentById(R.id.map);
-//                mapFragment.getMapAsync(this);
-
-                break;
-
-            case R.id.navigation_home:
-                fragment= new HomeFragment();
-                break;
+        if (mapFragment == null){
+            FragmentManager fm = getFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
+            mapFragment = SupportMapFragment.newInstance();
+            ft.replace(R.id.map, mapFragment).commit();
 
         }
-        return loadFragment(fragment);
+        mapFragment.getMapAsync(this);
+        return  v;
     }
 
-
-    //@Override
+    @Override
     public void onMapReady(GoogleMap googleMap) {
 
         mMap = googleMap;
@@ -149,13 +118,11 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
 
                 for(DataSnapshot suburbSnapshot : dataSnapshot.getChildren()) {
                     Suburb currentSuburb = suburbSnapshot.getValue(Suburb.class);
-                    Intent i = getIntent();
-                    String intentSuburb = i.getStringExtra("SUBURB");
                     Log.d("SUBURB", "" + suburbSnapshot);
 
                     try{
 
-                        if (intentSuburb.equals(currentSuburb.getSubName())) {
+                        if (suburbName.equals(currentSuburb.getSubName())) {
 
                             suburb = currentSuburb;
 
@@ -178,7 +145,7 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
                                     Log.d("MAPTEST", address);
 
 
-                                    Geocoder geocoder = new Geocoder(getApplicationContext(), getDefault());
+                                    Geocoder geocoder = new Geocoder(getActivity(), getDefault());
                                     List<Address> addresses = null;
                                     try {
                                         addresses = geocoder.getFromLocationName(address, 1);
@@ -225,10 +192,4 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
 
             }
         });
-    }
-
-    @Override
-    public void onPointerCaptureChanged(boolean hasCapture) {
-
-    }
-}
+    }}
