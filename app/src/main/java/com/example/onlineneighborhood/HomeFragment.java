@@ -123,12 +123,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
 
                         intent.putExtra("MyObject", event);
                         startActivity(intent);
-
-                        /*Intent intent = new Intent(getActivity(), EventScreen.class);
-                        intent.putExtra("eventObject",event);
-                        Log.d(TAG, "onEventClick: EVENT" + event.getName());
-                        Log.d(TAG, "onEventClick: EVENT" + event.getDescription());
-                        startActivity(intent);*/
                     }
                 });
 

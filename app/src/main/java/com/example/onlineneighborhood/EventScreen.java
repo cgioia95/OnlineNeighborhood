@@ -17,10 +17,7 @@ public class EventScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_screen);
 
-        //Intent i = getIntent();
         Event mEvent= (Event) getIntent().getSerializableExtra("MyObject");
-        //Event mEvent = (Event) i.getParcelableExtra("eventObject");
-       // Log.d(TAG, "onCreate: eventName " + mEvent.getName());
 
         mEventName = findViewById(R.id.eventName);
         mDescription = findViewById(R.id.eventDesc);
