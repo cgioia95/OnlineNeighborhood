@@ -33,8 +33,11 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -97,6 +100,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     static int year, day, month;
     static int hour, minute;
     private static boolean startAndEnd;
+    CheckBox addCal;
     ArrayList<UserInformation> users;
 
     // Two components used to get user Location
@@ -219,6 +223,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         evEndDate = findViewById(R.id.endDate);
         evEndTime = findViewById(R.id.endTime);
         evAddress = findViewById(R.id.eventAddress);
+        addCal = findViewById(R.id.addCal);
 
         // Bind On clicks
         getLocation.setOnClickListener(this);
@@ -382,7 +387,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
 
         //checks all the fields are filled
-        if(!TextUtils.isEmpty(eventName) && !TextUtils.isEmpty(eventDesc) && !eventTime.contains("Time")
+        if(!TextUtils.isEmpty(eventName) && !eventTime.contains("Time")
         && !eventDate.contains("Date")){
 
 
@@ -404,12 +409,12 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
                 }
                 if(addEventToSuburb(eventAddress, eventName, eventDesc, eventTime, eventDate)){
                     Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
-
-                    calenderPrompt(eventName, eventDesc, eventAddress);
+                    if(addCal.isChecked()){
+                        createCalenderEvent(eventName, eventDesc, eventAddress);
+                    }
                 }else{
                     Toast.makeText(this, "sorry, something went wrong, please try again", Toast.LENGTH_LONG).show();
                 }
-
             }
             else if(clicked && TextUtils.isEmpty(eventAddress) && !locat.equals(DEFAULT_LOCAL) && !locat.isEmpty()) {
                 eventAddress = locat;
@@ -420,7 +425,9 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
                 if(addEventToSuburb(eventAddress, eventName, eventDesc, eventTime, eventDate)){
                     Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
 
-                    calenderPrompt(eventName, eventDesc, eventAddress);
+                    if(addCal.isChecked()){
+                        createCalenderEvent(eventName, eventDesc, eventAddress);
+                    }
 
                 }else{
                     Toast.makeText(this, "sorry, something went wrong, please try again", Toast.LENGTH_LONG).show();
@@ -455,30 +462,6 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
             e.printStackTrace();
             return false;
         }
-    }
-
-    public void calenderPrompt(String eventName, String eventDesc, String eventAddress){
-        final String eventN = eventName;
-        final String eventD = eventDesc;
-        final String eventA = eventAddress;
-        AlertDialog.Builder builder = new AlertDialog.Builder(createEvent.this);
-        builder.setCancelable(true);
-        builder.setTitle("Add To Calender");
-        builder.setMessage("Add this Event to your Calender?");
-        builder.setNegativeButton("No Thanks", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.cancel();
-            }
-        });
-
-        builder.setPositiveButton("Yes Please", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                createCalenderEvent(eventN, eventD, eventA);
-            }
-        });
-        builder.show();
     }
 
 

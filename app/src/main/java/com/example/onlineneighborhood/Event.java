@@ -16,6 +16,7 @@ public class Event implements Parcelable {
     private String time;
     private String suburb;
     private String date;
+  
 
     private ArrayList<UserInformation> attendees;
 
