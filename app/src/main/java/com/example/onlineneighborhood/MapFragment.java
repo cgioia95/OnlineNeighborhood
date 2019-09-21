@@ -108,8 +108,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         databaseSuburb.addValueEventListener(new ValueEventListener() {
 
 
-
-
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
