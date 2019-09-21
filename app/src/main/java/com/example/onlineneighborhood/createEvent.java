@@ -123,12 +123,9 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
                     if(checkCurUser.equals(hostSnapshot.getKey())){
                         UserInformation currentUser = hostSnapshot.getValue(UserInformation.class);
-                        Log.d("found one: ", ""+currentUser);
                         host = currentUser;
                         break;
                     }
-                    Log.d("HOSTS: ", ""+hostSnapshot);
-                    Log.d("checking against: ", ""+checkCurUser);
                 }
             }
 
@@ -167,8 +164,6 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
                         if (intentSuburb.equals(currentSuburb.getSubName())) {
                             suburb = currentSuburb;
-
-                            Log.d("CHOSEN: ", "" + suburb + suburb.getSubName());
                             break;
                         }
 

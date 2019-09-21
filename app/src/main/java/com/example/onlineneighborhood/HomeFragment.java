@@ -112,16 +112,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
                     ArrayList<Event> events = new ArrayList<Event>();
                     Suburb currentSuburb = suburbSnapshot.getValue(Suburb.class);
                     try{
-                        Log.d("currSuburb", ""+currSuburb);
+
                         if (currSuburb.equals(currentSuburb.getSubName())) {
                             events = currentSuburb.getEvents();
-                            Log.d("DISPLAY EVENT DATE", ""+events);
                             for(Event event:events){
                                 if(event != null) {
                                     eventList.add(event);
                                 }
                             }
-                            Log.d("eventArray", ""+events);
                             break;
                         }
 
@@ -129,26 +127,26 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
                         //this catches null pointer exceptions, it happens alot
                         //TODO: I need to find a better way to loop through all the suburbs
                         //if you look at the log you can see the 'null pointer' still gets the suburb name. weird.
-                        Log.d("ERROR VALUES", "" + currentSuburb.getSubName());
                     }
 
 
                 }
                 //SET UP EVENTLIST
                 //i think when theres no list of events this throws. not sure why but just put an error check on it
-                //TODO: NEED TO FIX THIS ASAP. 
+                //TODO: NEED TO FIX THIS ASAP. (turns out it still crashes even with this)
                 try{
                     mRecyclerView = getActivity().findViewById(R.id.recyclerView);
+                    mRecyclerView = getActivity().findViewById(R.id.recyclerView);
+                    mLayoutManager = new LinearLayoutManager(getActivity());
+                    mAdapter = new EventAdapter(eventList, getActivity());
+
+                    mRecyclerView.setLayoutManager(mLayoutManager);
+                    mRecyclerView.setAdapter(mAdapter);
+                    mRecyclerView.setAdapter(mAdapter);
+
                 }catch (NullPointerException e){
                     e.printStackTrace();
                 }
-                mRecyclerView = getActivity().findViewById(R.id.recyclerView);
-                mLayoutManager = new LinearLayoutManager(getActivity());
-                mAdapter = new EventAdapter(eventList, getActivity());
-
-                mRecyclerView.setLayoutManager(mLayoutManager);
-                mRecyclerView.setAdapter(mAdapter);
-                mRecyclerView.setAdapter(mAdapter);
 
                 mAdapter.setOnEventClickListener(new EventAdapter.onEventClickListener() {
                     @Override
