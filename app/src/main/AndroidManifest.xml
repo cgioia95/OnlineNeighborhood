@@ -23,7 +23,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".BottomNavigationActivity"
-            android:label="Bottom Navigation bar"></activity>
+            android:label="Online Neighbourhood"></activity>
         <activity android:name=".EventScreen"></activity>
         <activity
             android:name=".createEvent"

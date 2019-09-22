@@ -58,6 +58,8 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
         setContentView(R.layout.activity_bottom_navigation);
         BottomNavigationView navView = findViewById(R.id.nav_view);
         navView.setOnNavigationItemSelectedListener(this);
@@ -75,6 +77,7 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
 
     private boolean loadFragment(Fragment fragment){
 
+
        if(fragment != null){
 
            getSupportFragmentManager()
@@ -87,6 +90,13 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+
+        Intent i = getIntent();
+        String intentSuburb = i.getStringExtra("SUBURB");
+        Bundle bundle = new Bundle();
+        bundle.putString("SUBURB", intentSuburb);
+        HomeFragment home = new HomeFragment();
+        home.setArguments(bundle);
 
         Fragment fragment = null;
         switch (menuItem.getItemId()){
@@ -110,13 +120,12 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
                 break;
 
             case R.id.navigation_home:
-                fragment= new HomeFragment();
+                fragment= home;
                 break;
 
         }
         return loadFragment(fragment);
     }
-
 
     //@Override
     public void onMapReady(GoogleMap googleMap) {

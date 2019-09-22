@@ -49,9 +49,7 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        databaseEvents = FirebaseDatabase.getInstance().getReference("events");
-
-
+        databaseEvents = FirebaseDatabase.getInstance().getReference("suburbs");
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_screen);
@@ -71,7 +69,7 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
             public void onClick(View view) {
                 fireBaseAuth.signOut();
                 finish();
-                startActivity(new Intent(getApplicationContext(), Login.class));            }
+                startActivity(new Intent(getApplicationContext(), Login.class));}
         });
 
         Intent i = getIntent();
@@ -94,11 +92,32 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 eventList.clear();
-                for(DataSnapshot eventSnapShot : dataSnapshot.getChildren()) {
-                    Event event = eventSnapShot.getValue(Event.class);
+                for(DataSnapshot suburbSnapshot : dataSnapshot.getChildren()) {
+                    ArrayList<Event> events = new ArrayList<Event>();
+                    Suburb currentSuburb = suburbSnapshot.getValue(Suburb.class);
+                    Intent i = getIntent();
+                    String intentSuburb = i.getStringExtra("SUBURB");
+                    try{
 
-                    eventList.add(event);
-                    Log.d("DISPLAY EVENT DATE", event.getDate());
+                        if (intentSuburb.equals(currentSuburb.getSubName())) {
+                            events = currentSuburb.getEvents();
+                            Log.d("DISPLAY EVENT DATE", ""+events);
+
+                            break;
+                        }
+
+                    } catch (NullPointerException e){
+                        //this catches null pointer exceptions, it happens alot
+                        //TODO: I need to find a better way to loop through all the suburbs
+                        //if you look at the log you can see the 'null pointer' still gets the suburb name. weird.
+                        Log.d("ERROR VALUES", "" + currentSuburb.getSubName());
+                    }
+
+                    for(Event event:events){
+                        eventList.add(event);
+                        Log.d("DISPLAY EVENT DATE", event.getDate());
+                    }
+                    break;
 
                 }
                 //SET UP EVENTLIST
