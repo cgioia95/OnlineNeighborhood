@@ -15,6 +15,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -30,9 +32,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.Locale.getDefault;
 
@@ -40,7 +47,7 @@ import static java.util.Locale.getDefault;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
+public class MapFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap mMap;
 
     SupportMapFragment mapFragment;
@@ -49,15 +56,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     Suburb suburb;
     ArrayList<Event> events;
 
-
+    String filterType = "NO_FILTER";
 
     DatabaseReference databaseEvents;
     DatabaseReference databaseUsers;
     DatabaseReference databaseSuburb;
 
+    ArrayList<Marker> defaultMarkers;
+
     DatabaseReference databaseSuburbChange;
 
+    Button filterButton, todayFilterButton;
+    EditText editTextDays;
+
+    Date todayDate, newDate;
+
     HashMap<String, Event> markerToEvent = new HashMap<String, Event>();
+    HashMap<String, Marker> markerIDtoMarker = new HashMap<String, Marker>();
+
 
     public MapFragment() {
         // Required empty public constructor
@@ -74,6 +90,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         databaseEvents = FirebaseDatabase.getInstance().getReference("events");
         databaseUsers = FirebaseDatabase.getInstance().getReference("Users");
         databaseSuburb =  FirebaseDatabase.getInstance().getReference("suburbs");
+
+        todayDate = new Date();
+        int year = todayDate.getYear();
+        int month = todayDate.getMonth();
+        int date = todayDate.getDate();
+        todayDate = new Date(year, month, date);
+
+        defaultMarkers = new ArrayList<Marker>();
 
 
         Intent i = getActivity().getIntent();
@@ -93,7 +117,109 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(final GoogleMap googleMap) {
+
+        filterButton = getView().findViewById(R.id.filterButton);
+        todayFilterButton = getView().findViewById(R.id.todayFilterButton);
+
+        editTextDays = getView().findViewById(R.id.editTextDays);
+
+        todayFilterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                filterType = "TODAY_FILTER";
+
+                Log.d( "TODAYDATE" , todayDate.toString());
+
+                for (HashMap.Entry<String,Event> entry : markerToEvent.entrySet()) {
+
+                    Log.d("MAPTEST" , entry.getValue().getName());
+                    Log.d("MAPTEST" , entry.getValue().getDate());
+
+                    String stringDate = entry.getValue().getDate();
+
+                    try {
+                        Date testedDate =new SimpleDateFormat("dd/MM/yyyy").parse(stringDate);
+                        Log.d("TESTED DATE" , testedDate.toString());
+
+                        if (todayDate.compareTo(testedDate) != 0){
+
+                            markerIDtoMarker.get(entry.getKey()).setVisible(false);
+                            Log.d("MATCHTEST" , "MATCH");
+                        }
+
+
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+            }
+        });
+
+        filterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                filterType = "DAYS_FILTER";
+
+
+                for (Marker marker: defaultMarkers){
+                    marker.setVisible(true);
+                }
+
+                String daysString = editTextDays.getText().toString();
+                int days = Integer.parseInt(daysString);
+
+                Date todayDate = new Date();
+                int year = todayDate.getYear();
+                int month = todayDate.getMonth();
+                int date = todayDate.getDate();
+                todayDate = new Date(year, month, date);
+
+                Log.d( "TODAYDATE" , todayDate.toString());
+
+                Calendar c = Calendar.getInstance();
+                c.set(year, month, date);
+                c.add(Calendar.DAY_OF_YEAR, days);
+                newDate = c.getTime();
+
+                int newYear = newDate.getYear() + 1900;
+                int newMonth = newDate.getMonth();
+                int newDay = newDate.getDate();
+
+                newDate = new Date (newYear, newMonth, newDay);
+                Log.d("NEWDATE" , newDate.toString());
+
+
+                for (HashMap.Entry<String,Event> entry : markerToEvent.entrySet()) {
+
+
+                    String stringDate = entry.getValue().getDate();
+
+                    try {
+                        Date testedDate =new SimpleDateFormat("dd/MM/yyyy").parse(stringDate);
+
+                        if (testedDate.after(newDate)){
+
+                            Log.d("COMPARISON" , testedDate.toString() + " is after " + newDate.toString());
+                            markerIDtoMarker.get(entry.getKey()).setVisible(false);
+                        }
+
+
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+
+
+            }
+        });
+
 
         mMap = googleMap;
 
@@ -120,6 +246,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
                 mMap.clear();
 
+                Date todayDate = new Date();
+                int year = todayDate.getYear();
+                int month = todayDate.getMonth();
+                int date = todayDate.getDate();
+                todayDate = new Date(year, month, date);
+
+
 
                 for(DataSnapshot suburbSnapshot : dataSnapshot.getChildren()) {
                     Suburb currentSuburb = suburbSnapshot.getValue(Suburb.class);
@@ -144,7 +277,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
                                     String title = event.getName();
                                     String address = event.getAddress();
-                                    String date = event.getDate();
+                                    String stringDate = event.getDate();
+
 
 
 
@@ -165,15 +299,57 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
                                     LatLng locat = new LatLng(latitude, longitude);
 
+                                    try {
+                                        Date testedDate =new SimpleDateFormat("dd/MM/yyyy").parse(stringDate);
+                                        Log.d("TESTED DATE" , testedDate.toString());
 
-                                    Marker marker = mMap.addMarker(new MarkerOptions()
-                                            .position(locat)
-                                            .title(event.getName())
-                                            .snippet(event.getDescription()));
+                                        if (!testedDate.before(todayDate)){
 
-                                    String markerID = marker.getId();
+                                            Marker marker = mMap.addMarker(new MarkerOptions()
+                                                    .position(locat)
+                                                    .title(event.getName())
+                                                    .snippet(event.getDescription())
+                                            );
 
-                                    markerToEvent.put(markerID, event);
+
+
+                                            String markerId = marker.getId();
+
+                                            markerToEvent.put(markerId, event);
+
+                                            defaultMarkers.add(marker);
+
+                                            markerIDtoMarker.put(markerId, marker);
+
+                                            if (filterType.equals("TODAY_FILTER")){
+
+                                                if (!(testedDate.compareTo(todayDate) == 0)){
+                                                    marker.setVisible(false);
+                                                }
+
+                                            }
+
+                                            else if (filterType.equals("DAYS_FILTER")){
+
+                                                if (testedDate.after(newDate)){
+
+                                                    marker.setVisible(false);
+
+                                                }
+                                            }
+
+
+
+                                        }
+
+
+                                    } catch (ParseException e) {
+                                        e.printStackTrace();
+                                    }
+
+
+
+
 
                                     mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
                                         @Override
@@ -216,15 +392,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
             }
         });
+
+
     }
 
-
-    @Override
-    public void onInfoWindowClick(Marker marker) {
-        String markerId = marker.getId();
-        Event event =  markerToEvent.get(markerId);
-        String name = event.getName();
-        Log.d("MAPTEST", name);
-
-    }
 }
