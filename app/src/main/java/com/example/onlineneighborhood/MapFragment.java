@@ -31,6 +31,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static java.util.Locale.getDefault;
@@ -39,7 +40,7 @@ import static java.util.Locale.getDefault;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MapFragment extends Fragment implements OnMapReadyCallback {
+public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
     private GoogleMap mMap;
 
     SupportMapFragment mapFragment;
@@ -53,6 +54,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     DatabaseReference databaseEvents;
     DatabaseReference databaseUsers;
     DatabaseReference databaseSuburb;
+
+    DatabaseReference databaseSuburbChange;
+
+    HashMap<String, Event> markerToEvent = new HashMap<String, Event>();
 
     public MapFragment() {
         // Required empty public constructor
@@ -74,7 +79,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         Intent i = getActivity().getIntent();
         suburbName = i.getStringExtra("SUBURB");
 
-        Log.d("MAGFRAGMENT", suburbName);
+        Log.d("MAGFRAGMENT",""+ suburbName);
 
         if (mapFragment == null){
             FragmentManager fm = getFragmentManager();
@@ -91,6 +96,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onMapReady(GoogleMap googleMap) {
 
         mMap = googleMap;
+
+
 
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
@@ -124,7 +131,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
                             suburb = currentSuburb;
 
-                            DatabaseReference databaseSuburbChange = FirebaseDatabase.getInstance().getReference("suburbs").child(suburb.getId());
+                            databaseSuburbChange = FirebaseDatabase.getInstance().getReference("suburbs").child(suburb.getId());
 
 
                             Log.d("CHOSEN: ", "" + suburb + suburb.getSubName());
@@ -132,11 +139,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                             if ((events = suburb.getEvents()) != null){
 
 
-                                for (Event event: events){
+                                for (final Event event: events){
+
 
                                     String title = event.getName();
                                     String address = event.getAddress();
                                     String date = event.getDate();
+
 
 
                                     Log.d("MAPTEST", title);
@@ -161,6 +170,23 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                                             .position(locat)
                                             .title(event.getName())
                                             .snippet(event.getDescription()));
+
+                                    String markerID = marker.getId();
+
+                                    markerToEvent.put(markerID, event);
+
+                                    mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                                        @Override
+                                        public void onInfoWindowClick(Marker marker) {
+
+                                            Intent intent = new Intent(getActivity(), EventScreen.class);
+
+                                            intent.putExtra("MyObject", event);
+                                            startActivity(intent);
+
+
+                                        }
+                                    });
 
 
                                     Log.d("MAPTEST", "LONG: " +  Double.toString(longitude) + " LAT: " + Double.toString(latitude));
@@ -190,4 +216,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
             }
         });
-    }}
+    }
+
+
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+        String markerId = marker.getId();
+        Event event =  markerToEvent.get(markerId);
+        String name = event.getName();
+        Log.d("MAPTEST", name);
+
+    }
+}
