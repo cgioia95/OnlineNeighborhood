@@ -52,6 +52,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
     private String localSuburb = "DEFAULT_LOCAL_SUBURB";
 
+
     private double lon;
     private double lat;
     private TextView textViewSuburb;
@@ -102,7 +103,10 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         // Checks if the User's Logged in already, if so bypasses the Login Screen and takes them to Choose Screen
         if (firebaseAuth.getCurrentUser() != null) {
             finish();
-            startActivity(new Intent(getApplicationContext(), HomeScreen.class));
+            Intent i = new Intent(getApplicationContext(), BottomNavigationActivity.class);
+            String suburb = getIntent().getStringExtra("SUBURB");
+            i.putExtra("SUBURB", suburb);
+            startActivity(i);
 
         }
 
@@ -198,7 +202,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                         if (task.isSuccessful()) {
                             //start the profile activity
                             finish();
-                            Intent i = new Intent(getApplicationContext(), HomeScreen.class);
+                            Intent i = new Intent(getApplicationContext(), BottomNavigationActivity.class);
                             i.putExtra("SUBURB", textViewSuburb.getText().toString());
                             startActivity(i);
                         } else {

@@ -7,11 +7,13 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.icu.util.Calendar;
@@ -31,8 +33,12 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -53,6 +59,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static android.provider.CalendarContract.*;
+import static java.util.Locale.getDefault;
 
 public class createEvent extends AppCompatActivity implements View.OnClickListener {
 
@@ -61,15 +68,22 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     //long and latitude
     private double lon;
     private double lat;
+    private Suburb suburb;
+    private String suburbName = "NO SUBURB FOUND";
     //bool check to ensure get location has been requested
     private boolean clicked = false;
     UserInformation host;
+
+
 
 
     //firebase variables
     private FirebaseAuth firebaseAuth;
     DatabaseReference databaseEvents;
     DatabaseReference databaseUsers;
+    DatabaseReference databaseSuburb;
+
+
 
     //location variables
     private final String DEFAULT_LOCAL = "please wait a few seconds while we get your location";
@@ -83,9 +97,12 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     //XML variables
     EditText evName, evDesc, evAddress;
     private TextView eventTv;
-    static TextView evTime, evDate;
+    static TextView evTime, evDate, evEndTime, evEndDate;
     static int year, day, month;
     static int hour, minute;
+    private static boolean startAndEnd;
+    private Spinner eventType;
+    CheckBox addCal;
     ArrayList<UserInformation> users;
 
     // Two components used to get user Location
@@ -97,21 +114,19 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
         super.onStart();
 
-        databaseUsers.addChildEventListener(new ChildEventListener() {
+        databaseUsers.addChildEventListener(new ChildEventListener(){
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                users.clear();
                 for(DataSnapshot hostSnapshot : dataSnapshot.getChildren()){
 
                     String checkCurUser = firebaseAuth.getCurrentUser().getUid();
+
                     if(checkCurUser.equals(hostSnapshot.getKey())){
                         UserInformation currentUser = hostSnapshot.getValue(UserInformation.class);
                         host = currentUser;
                         break;
                     }
-                   // Log.d("HEY LISTEN: ", ""+hostSnapshot);
                 }
-
             }
 
             @Override
@@ -131,9 +146,45 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d("error: ", ""+databaseError);
 
             }
         });
+
+
+        databaseSuburb.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot suburbSnapshot : dataSnapshot.getChildren()) {
+                   Suburb currentSuburb = suburbSnapshot.getValue(Suburb.class);
+                   Intent i = getIntent();
+                   String intentSuburb = i.getStringExtra("SUBURB");
+                    Log.d("SUBURB", "" + suburbSnapshot);
+                    try{
+
+                        if (intentSuburb.equals(currentSuburb.getSubName())) {
+                            suburb = currentSuburb;
+                            break;
+                        }
+
+                    } catch (NullPointerException e){
+                        //this catches null pointer exceptions, it happens alot
+                        //TODO: I need to find a better way to loop through all the suburbs
+                        //if you look at the log you can see the 'null pointer' still gets the suburb name. weird.
+                        Log.d("ERROR VALUES", "" + currentSuburb.getSubName());
+                    }
+
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
 
     }
 
@@ -141,13 +192,14 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         setContentView(R.layout.activity_create_event);
 
         databaseEvents = FirebaseDatabase.getInstance().getReference("events");
-        databaseUsers = FirebaseDatabase.getInstance().getReference("Users"); 
-
+        databaseUsers = FirebaseDatabase.getInstance().getReference("Users");
+        databaseSuburb =  FirebaseDatabase.getInstance().getReference("suburbs");
 
         //Metrics of the popup window. Currently setting it to 80% of screen width and height
         DisplayMetrics dm = new DisplayMetrics();
@@ -156,7 +208,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         int width = dm.widthPixels;
         int height = dm.heightPixels;
 
-        getWindow().setLayout((int)(width*.8), (int)(height*.8));
+        getWindow().setLayout((int)(width*.9), (int)(height*.9));
 
         // Bind Simple Variables
         users = new ArrayList<UserInformation>();
@@ -167,13 +219,19 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         evDesc = findViewById(R.id.eventDesc);
         evTime = findViewById(R.id.eventTime);
         evDate = findViewById(R.id.eventDate);
+        evEndDate = findViewById(R.id.endDate);
+        evEndTime = findViewById(R.id.endTime);
         evAddress = findViewById(R.id.eventAddress);
+        addCal = findViewById(R.id.addCal);
+        eventType = (Spinner) findViewById(R.id.spinnerType);
 
         // Bind On clicks
         getLocation.setOnClickListener(this);
         createEvent.setOnClickListener(this);
         evDate.setOnClickListener(this);
         evTime.setOnClickListener(this);
+        evEndTime.setOnClickListener(this);
+        evEndDate.setOnClickListener(this);
 
         //getting authentication info to link the event to the user creating it
         firebaseAuth = FirebaseAuth.getInstance();
@@ -234,11 +292,13 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
             return;
         } else {
             //configure Button is the method which updates the location every 5 seconds
-            configureButton();
+             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 5, locationListener);
         }
 
         //sets the
         eventTv.setText(locat);
+
+
     }
 
 
@@ -256,13 +316,24 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         }
 
         if(view == evTime){
+            startAndEnd = true;
+            showTruitonTimePickerDialog(view);
+        }
+        if(view == evEndTime){
+            startAndEnd = false;
             showTruitonTimePickerDialog(view);
         }
 
-
         if(view == evDate){
+            startAndEnd = true;
             showTruitonDatePickerDialog(view);
         }
+
+        if(view == evEndDate){
+            startAndEnd = false;
+            showTruitonDatePickerDialog(view);
+        }
+
     }
 
 
@@ -295,16 +366,6 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     }
 
 
-    // Once the Location Button is pressed, the location manager will start returning user's location
-    public void configureButton() {
-
-        Log.d("LOCATION", "FETCHING LOCATION UPDATES");
-
-
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 5, locationListener);
-
-    }
-
     /**
      * This method takes all the data provided by the activity and sends it to firebase.
      * (as long as it passes the error checks)
@@ -317,18 +378,18 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         String eventDesc = evDesc.getText().toString().trim();
         String eventTime = evTime.getText().toString().trim();
         String eventDate = evDate.getText().toString().trim();
+        String endTime = evEndTime.getText().toString().trim();
+        String endDate = evEndDate.getText().toString().trim();
+        final String type = eventType.getSelectedItem().toString();
 
-
-        Intent i = getIntent();
-        String suburb = i.getStringExtra("SUBURB");
+        Log.d("EVENTCREATE", "CREATING EVENT");
 
         String eventAddress = evAddress.getText().toString().trim();
 
 
         //checks all the fields are filled
-        if(!TextUtils.isEmpty(eventName) && !TextUtils.isEmpty(eventDesc) && !eventTime.contains("Time")
-        && !eventDate.contains("Date")){
-
+        if(!TextUtils.isEmpty(eventName) && !eventTime.contains("Time") && !endDate.contains("Date")
+                && !endTime.contains("Time") && !TextUtils.isEmpty(eventDesc) && !eventDate.contains("Date")){
 
             // Checks if the User's Logged in already, if so bypasses the Login Screen and takes them to Choose Screen
             //put this here to ensure that the user is not null and if it is will exit to the log in screen
@@ -341,40 +402,65 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
             //this is just doing a couple of checks to ensure that a address is *actually* sent to firebase
             //TODO: this needs to be cleaned up/properly checked
             if(!TextUtils.isEmpty(eventAddress)){
-                String id = databaseEvents.push().getKey();
-                ArrayList<UserInformation> attendees = new ArrayList<UserInformation>();
-                attendees.add(host);
-                Event event = new Event(id, host, suburb, eventAddress, eventName, eventDesc, eventTime, eventDate, attendees);
-                databaseEvents.child(id).setValue(event);
-                Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
+                String addressStatus = validate(eventAddress);
 
-                createCalenderEvent(eventName, eventDesc, eventAddress);
-            }
-            else if(!TextUtils.isEmpty(eventAddress)){
-                String id = databaseEvents.push().getKey();
-                ArrayList<UserInformation> attendees = new ArrayList<UserInformation>();
-                attendees.add(host);
-                Event event = new Event(id, host, suburb, eventAddress, eventName, eventDesc, eventTime, eventDate, attendees);
-                databaseEvents.child(id).setValue(event);
-                Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
-
-                createCalenderEvent(eventName, eventDesc, eventAddress);
-
+                if (addressStatus!="VALID"){
+                    return;
+                }
+                if(addEventToSuburb(eventAddress, eventName, eventDesc, eventTime, eventDate, endTime, endDate, type)){
+                    Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
+                    if(addCal.isChecked()){
+                        createCalenderEvent(eventName, eventDesc, eventAddress);
+                    }
+                }else{
+                    Toast.makeText(this, "sorry, something went wrong, please try again", Toast.LENGTH_LONG).show();
+                }
             }
             else if(clicked && TextUtils.isEmpty(eventAddress) && !locat.equals(DEFAULT_LOCAL) && !locat.isEmpty()) {
                 eventAddress = locat;
-                String id = databaseEvents.push().getKey();
-                ArrayList<UserInformation> attendees = new ArrayList<UserInformation>();
-                attendees.add(host);
-                Event event = new Event(id, host, suburb, eventAddress, eventName, eventDesc, eventTime, eventDate, attendees);
-                databaseEvents.child(id).setValue(event);
-                Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
+                String addressStatus = validate(eventAddress);
+                if (addressStatus!="VALID"){
+                    return;
+                }
+                if(addEventToSuburb(eventAddress, eventName, eventDesc, eventTime, eventDate, endTime, endDate, type)){
+                    Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
 
-                createCalenderEvent(eventName, eventDesc, eventAddress);
+                    if(addCal.isChecked()){
+                        createCalenderEvent(eventName, eventDesc, eventAddress);
+                    }
+
+                }else{
+                    Toast.makeText(this, "sorry, something went wrong, please try again", Toast.LENGTH_LONG).show();
+                }
+
             }
         }
         else{
             Toast.makeText(this, "please enter all fields", Toast.LENGTH_LONG).show();
+        }
+    }
+
+
+    public boolean addEventToSuburb(String eventAddress,String eventName,String eventDesc, String eventTime, String eventDate, String endTime, String endDate, String type){
+        try{
+            String id = databaseEvents.push().getKey();
+            ArrayList<UserInformation> attendees = new ArrayList<UserInformation>();
+            attendees.add(host);
+            Event event = new Event(id, host, eventAddress, eventName, eventDesc, eventTime, eventDate, endTime, endDate, type, attendees);
+
+            DatabaseReference databaseSuburbChange = FirebaseDatabase.getInstance().getReference("suburbs").child(suburb.getId());
+            ArrayList<Event> events = new ArrayList<Event>();
+            events.add(event);
+            if(suburb.getEvents() == null){
+                suburb.setEvents(events);
+            }else{
+                suburb.getEvents().add(event);
+            }
+            databaseSuburbChange.setValue(suburb);
+            return true;
+        } catch (Exception e){
+            e.printStackTrace();
+            return false;
         }
     }
 
@@ -408,13 +494,24 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
             // Do something with the time chosen by the user
             // due to int data type, a bodge job adding zeros manually.
-            if(minute < 10){
-                evTime.setText(hourOfDay + ":0"	+ minute);
-            }
-            else if(minute == 0){
-                evTime.setText(hourOfDay + ":00" + minute);
-            }else {
-                evTime.setText(hourOfDay + ":"	+ minute);
+            if(startAndEnd){
+                if(minute < 10){
+                    evTime.setText(hourOfDay + ":0"	+ minute);
+                }
+                else if(minute == 0){
+                    evTime.setText(hourOfDay + ":00" + minute);
+                }else {
+                    evTime.setText(hourOfDay + ":"	+ minute);
+                }
+            }else{
+                if(minute < 10){
+                    evEndTime.setText(hourOfDay + ":0"	+ minute);
+                }
+                else if(minute == 0){
+                    evEndTime.setText(hourOfDay + ":00" + minute);
+                }else {
+                    evEndTime.setText(hourOfDay + ":"	+ minute);
+                }
             }
         }
     }
@@ -436,7 +533,12 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
         public void onDateSet(DatePicker view, int year, int month, int day) {
             // Do something with the date chosen by the user
-            evDate.setText(day + "/" + (month + 1) + "/" + year);
+            if(startAndEnd){
+                evDate.setText(day + "/" + (month + 1) + "/" + year);
+            }
+            else {
+                evEndDate.setText(day + "/" + (month + 1) + "/" + year);
+            }
         }
     }
 
@@ -467,5 +569,45 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
                 .putExtra(Events.EVENT_LOCATION, eventAddress);
         startActivity(intent);
     }
+
+    public String validate(String eventAddress){
+
+        List<Address> addresses = null;
+        Geocoder geocoder = new Geocoder(getApplicationContext(), getDefault());
+
+
+        try {
+            addresses = geocoder.getFromLocationName(eventAddress, 1);
+            if (addresses.size() > 0) {
+
+                Address address = addresses.get(0);
+                String testedSuburb = address.getLocality();
+
+                Intent i = getIntent();
+                String intentSuburb = i.getStringExtra("SUBURB");
+
+                if (!intentSuburb.equals(testedSuburb)) {
+                    Log.d("VALIDATOR", "NOT IN SUBURB");
+                    Log.d("VALIDATOR", "We are in " + intentSuburb + " You have entered: " + testedSuburb);
+                    Toast.makeText(this, "Address not in suburb", Toast.LENGTH_LONG).show();
+                    return "NOT_IN_SUBURB";
+                }
+
+
+            } else {
+                Log.d("VALIDATOR", "2 - INVALID");
+                Toast.makeText(this, "Address not valid", Toast.LENGTH_LONG).show();
+                return "INVALID";
+            }
+
+        } catch (IOException e) {
+            Toast.makeText(this, "Address not valid", Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+            return "INVALID";
+
+        }
+        return "VALID";
+    }
+
 
 }

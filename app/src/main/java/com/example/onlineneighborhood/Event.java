@@ -1,18 +1,18 @@
 package com.example.onlineneighborhood;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.firebase.auth.FirebaseUser;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Event {
+public class Event implements Serializable {
     private String id;
     private UserInformation host;
-    private String suburb;
-    private String address;
-    private String eventName;
-    private String description;
-    private String time;
-    private String date;
+    private String address, eventName, description, time, date, endTime, endDate, type;
+  
 
     private ArrayList<UserInformation> attendees;
 
@@ -21,16 +21,51 @@ public class Event {
 
     }
 
-    public Event(String id, UserInformation host, String suburb, String address, String eventName, String description, String time, String date, ArrayList<UserInformation> attendees) {
+    public Event(String id, UserInformation host, String address, String eventName, String description, String time, String date, String endTime, String endDate, String type, ArrayList<UserInformation> attendees) {
         this.id = id;
         this.host = host;
-        this.suburb = suburb;
         this.address = address;
         this.eventName = eventName;
         this.description = description;
         this.time = time;
         this.date = date;
+        this.endTime = endTime;
+        this.endDate = endDate;
+        this.type = type;
         this.attendees = attendees;
+    }
+
+
+    public String getEventName() {
+        return eventName;
+    }
+
+    public void setEventName(String eventName) {
+        this.eventName = eventName;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
+
+    public String getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getTime() {
@@ -49,13 +84,6 @@ public class Event {
         this.date = date;
     }
 
-    public String getSuburb() {
-        return suburb;
-    }
-
-    public void setSuburb(String suburb) {
-        this.suburb = suburb;
-    }
 
     public String getAddress() {
         return address;
@@ -104,4 +132,5 @@ public class Event {
     public void setAttendees(ArrayList<UserInformation> attendees) {
         this.attendees = attendees;
     }
+
 }
