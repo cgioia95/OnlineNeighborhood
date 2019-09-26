@@ -21,7 +21,7 @@ public class UserInformation implements Serializable {
     }
 
 
-    public UserInformation(String name, String preference, String dob, String bio) {
+    public UserInformation( String name, String preference, String dob, String bio) {
         this.name = name;
         this.preference = preference;
         this.dob = dob;

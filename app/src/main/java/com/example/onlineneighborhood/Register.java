@@ -140,6 +140,7 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
 
                             Toast.makeText(Register.this, "Registered Succesfully", Toast.LENGTH_SHORT).show();
 
+
                             String Uid = task.getResult().getUser().getUid();
 
                             UserInformation userInformation = new UserInformation(name, preference, dob, bio);

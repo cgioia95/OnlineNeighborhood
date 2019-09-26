@@ -98,7 +98,6 @@ public class ProfileFragment extends Fragment implements DatePickerDialog.OnDate
                         databaseReferenceUser = userSnapshot.getRef();
 
                         Log.d("PROFILE", String.valueOf(userSnapshot));
-
                         name = userSnapshot.child("name").getValue().toString();
                         preference = userSnapshot.child("preference").getValue().toString();
                         dob = userSnapshot.child("dob").getValue().toString();
