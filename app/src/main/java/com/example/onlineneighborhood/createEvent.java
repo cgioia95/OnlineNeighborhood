@@ -126,35 +126,6 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
             }
         });
 
-        databaseUsers.addChildEventListener(new ChildEventListener(){
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-                }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.d("error: ", ""+databaseError);
-
-            }
-        });
-
-
         databaseSuburb.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -204,7 +175,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         databaseUsers = FirebaseDatabase.getInstance().getReference("Users");
         databaseSuburb =  FirebaseDatabase.getInstance().getReference("suburbs");
 
-        //Metrics of the popup window. Currently setting it to 80% of screen width and height
+        //Metrics of the popup window. Currently setting it to 90% of screen width and height
         DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
 
@@ -446,12 +417,19 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
     public boolean addEventToSuburb(String eventAddress,String eventName,String eventDesc, String eventTime, String eventDate, String endTime, String endDate, String type){
         try{
+            //creating the event and all the variables needed for the event.
             String id = databaseEvents.push().getKey();
+
+            //gets currents users ID and assigns it as the host, creates and adds it to the attendee list
             hostID = new UserInformation(firebaseAuth.getCurrentUser().getUid());
             ArrayList<UserInformation> attendees = new ArrayList<UserInformation>();
             attendees.add(hostID);
+
+            //creating 2 events. one to add to the suburb, and one to link to the user.
             Event event = new Event(id, hostID, eventAddress, eventName, eventDesc, eventTime, eventDate, endTime, endDate, type, attendees);
             Event userEvent = new Event(id);
+
+            //creating database references and list arrays to properly ensure that a dynamic array will be properly updated to suburb/user values
             DatabaseReference databaseSuburbChange = FirebaseDatabase.getInstance().getReference("suburbs").child(suburb.getId());
             DatabaseReference databaseUpdateUser = FirebaseDatabase.getInstance().getReference("Users").child(hostKey).child(hostID.getUid());
             ArrayList<Event> events = new ArrayList<Event>();
@@ -460,6 +438,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
             userEvents.add(userEvent);
             ArrayList<Event> eventCheck = host.getMyEvents();
 
+            //checks if a array exists, if it doesnt it creates one
             if(suburb.getEvents() == null){
                 suburb.setEvents(events);
             }else{
@@ -472,6 +451,8 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
                 host.getMyEvents().add(userEvent);
             }
 
+
+            //sends update to firebase
             databaseUpdateUser.setValue(host);
             databaseSuburbChange.setValue(suburb);
             return true;
