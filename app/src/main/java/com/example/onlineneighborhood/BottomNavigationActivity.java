@@ -64,13 +64,14 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.d("Bottom Nav", "onCreate: " + savedInstanceState);
-        if (savedInstanceState == null) {
-            HomeFragment home = new HomeFragment();
-            Log.d("Bottom Nav", "onCreate: " + home);
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,home).commit();
+//        Log.d("Bottom Nav", "onCreate: " + savedInstanceState);
+//        if (savedInstanceState == null) {
+//            HomeFragment home = new HomeFragment();
+//            Log.d("Bottom Nav", "onCreate: " + home);
+//            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,home).commit();
+//
+//        }
 
-        }
 
         setContentView(R.layout.activity_bottom_navigation);
         BottomNavigationView navView = findViewById(R.id.nav_view);
@@ -84,6 +85,13 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Online Neighborhood");
+
+        String intentSuburb = ((OnlineNeighborhood) this.getApplication()).getsuburb();
+        Bundle bundle = new Bundle();
+        bundle.putString("SUBURB", intentSuburb);
+        HomeFragment home = new HomeFragment();
+        home.setArguments(bundle);
+        loadFragment(home);
 
 
     }

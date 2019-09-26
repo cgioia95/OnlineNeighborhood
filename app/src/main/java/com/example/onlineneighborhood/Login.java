@@ -106,6 +106,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             Intent i = new Intent(getApplicationContext(), BottomNavigationActivity.class);
             String suburb = getIntent().getStringExtra("SUBURB");
             i.putExtra("SUBURB", suburb);
+            ((OnlineNeighborhood) this.getApplication()).setsuburb(suburb);;
+
             startActivity(i);
 
         }

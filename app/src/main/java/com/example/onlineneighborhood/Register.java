@@ -53,7 +53,7 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
 
         // DatabaseReference pointing to a sub-reference Users where User Information is stored
         fireBaseAuth = FirebaseAuth.getInstance();
-        databaseReference = FirebaseDatabase.getInstance().getReference("Users").push();
+        databaseReference = FirebaseDatabase.getInstance().getReference("Users");
 
         // Bind all simple variables
 
@@ -124,7 +124,7 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
 
                             String Uid = task.getResult().getUser().getUid();
 
-                            UserInformation userInformation = new UserInformation(name, preference, "default DOB", "default BIO");
+                            UserInformation userInformation = new UserInformation(name, preference, "", "");
 
                             databaseReference.child(Uid).setValue(userInformation);
 

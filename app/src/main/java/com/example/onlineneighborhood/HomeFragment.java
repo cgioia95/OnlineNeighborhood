@@ -56,11 +56,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
     private ArrayList<Event> eventList = new ArrayList<>();
     Context applicationContext = BottomNavigationActivity.getContextOfApplication();
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-
-        super.onCreate(savedInstanceState);
-    }
+//    @Override
+//    public void onCreate(Bundle savedInstanceState) {
+//
+//        super.onCreate(savedInstanceState);
+//    }
 
 
     @Nullable
@@ -71,6 +71,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
             currSuburb = getArguments().getString("SUBURB");
 
         }
+
 
 
         fireBaseAuth = FirebaseAuth.getInstance();
@@ -89,7 +90,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
 //        });
 
         Intent i = getActivity().getIntent();
-        suburb = i.getStringExtra("SUBURB");
+        currSuburb=suburb = ((OnlineNeighborhood) getActivity().getApplication()).getsuburb();
+//        suburb = i.getStringExtra("SUBURB");
 
         suburbTextView.setText(suburb);
         addEvent.setOnClickListener(this);
