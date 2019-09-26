@@ -1,14 +1,16 @@
 package com.example.onlineneighborhood;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class UserInformation implements Serializable {
 
-    public String uid;
-    public String name;
-    public String preference;
-    public String dob;
-    public String bio;
+    private String uid;
+    private String name;
+    private String preference;
+    private String dob;
+    private String bio;
+    private ArrayList<Event> myEvents;
 
     public UserInformation(){
 
@@ -18,17 +20,20 @@ public class UserInformation implements Serializable {
         this.uid = id;
     }
 
-    public UserInformation(String uid, String name, String preference) {
-        this.uid = uid;
-        this.name = name;
-        this.preference = preference;
-    }
 
     public UserInformation(String name, String preference, String dob, String bio) {
         this.name = name;
         this.preference = preference;
         this.dob = dob;
         this.bio = bio;
+    }
+
+    public UserInformation(String name, String preference, String dob, String bio, ArrayList<Event> myEvents) {
+        this.name = name;
+        this.preference = preference;
+        this.dob = dob;
+        this.bio = bio;
+        this.myEvents = myEvents;
     }
 
     public String getUid() {
@@ -55,7 +60,27 @@ public class UserInformation implements Serializable {
         this.preference = preference;
     }
 
+    public String getDob() {
+        return dob;
+    }
 
+    public void setDob(String dob) {
+        this.dob = dob;
+    }
 
+    public String getBio() {
+        return bio;
+    }
 
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
+    public ArrayList<Event> getMyEvents() {
+        return myEvents;
+    }
+
+    public void setMyEvents(ArrayList<Event> myEvents) {
+        this.myEvents = myEvents;
+    }
 }

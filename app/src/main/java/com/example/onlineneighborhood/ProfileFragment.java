@@ -279,7 +279,7 @@ public class ProfileFragment extends Fragment implements DatePickerDialog.OnDate
     }
 
     protected void downloadImage(){
-        storageReference.child("profilePics/"+uid.toString()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+        storageReference.child("profilePics/"+uid).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
                 // Got the download URL for 'users/me/profile.png' in uri
