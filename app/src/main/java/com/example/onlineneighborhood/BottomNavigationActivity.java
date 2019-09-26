@@ -23,10 +23,15 @@ import com.google.firebase.database.ValueEventListener;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toolbar;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -59,6 +64,13 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Log.d("Bottom Nav", "onCreate: " + savedInstanceState);
+        if (savedInstanceState == null) {
+            HomeFragment home = new HomeFragment();
+            Log.d("Bottom Nav", "onCreate: " + home);
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,home).commit();
+
+        }
 
         setContentView(R.layout.activity_bottom_navigation);
         BottomNavigationView navView = findViewById(R.id.nav_view);
@@ -69,11 +81,31 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
         databaseUsers = FirebaseDatabase.getInstance().getReference("Users");
         databaseSuburb =  FirebaseDatabase.getInstance().getReference("suburbs");
 
-
+        androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Online Neighborhood");
 
 
     }
 
+    private void setSupportActionBar(Toolbar toolbar) {
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.toolbar_menu, menu);
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item){
+        if(item.getItemId() == R.id.profile){
+
+            Intent i = new Intent(getApplicationContext(), UserProfile.class);
+            startActivity(i);
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     private boolean loadFragment(Fragment fragment){
 
@@ -101,8 +133,8 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
         Fragment fragment = null;
         switch (menuItem.getItemId()){
 
-            case R.id.navigation_profile:
-                fragment= new ProfileFragment();
+            case R.id.navigation_events:
+//                fragment= new ProfileFragment();
                 break;
 
 

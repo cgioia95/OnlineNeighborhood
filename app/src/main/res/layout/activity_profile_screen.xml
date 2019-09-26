@@ -13,9 +13,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".MainActivity">
-
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar" />
     <ImageButton
         android:id="@+id/imageButtonPicture"
+
         style="@style/Widget.AppCompat.ImageButton"
         android:layout_width="200dp"
         android:layout_height="200dp"
@@ -119,6 +122,7 @@
         app:layout_constraintEnd_toEndOf="@+id/imageButtonPicture"
         app:layout_constraintStart_toStartOf="@+id/imageButtonPicture"
         app:layout_constraintTop_toBottomOf="@+id/editTextbio" />
+
 
 </LinearLayout>
 </ScrollView>
