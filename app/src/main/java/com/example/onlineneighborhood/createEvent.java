@@ -419,6 +419,9 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         try{
             //creating the event and all the variables needed for the event.
             String id = databaseEvents.push().getKey();
+            //the method above generates a random key every second. need to consolidate the value so it
+            //doesnt change everytime id is called.
+            String confirmid = id;
 
             //gets currents users ID and assigns it as the host, creates and adds it to the attendee list
             hostID = new UserInformation(firebaseAuth.getCurrentUser().getUid());
@@ -426,8 +429,8 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
             attendees.add(hostID);
 
             //creating 2 events. one to add to the suburb, and one to link to the user.
-            Event event = new Event(id, hostID, eventAddress, eventName, eventDesc, eventTime, eventDate, endTime, endDate, type, attendees);
-            Event userEvent = new Event(id);
+            Event event = new Event(confirmid, hostID, eventAddress, eventName, eventDesc, eventTime, eventDate, endTime, endDate, type, attendees);
+            Event userEvent = new Event(confirmid);
 
             //creating database references and list arrays to properly ensure that a dynamic array will be properly updated to suburb/user values
             DatabaseReference databaseSuburbChange = FirebaseDatabase.getInstance().getReference("suburbs").child(suburb.getId());
