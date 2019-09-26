@@ -54,7 +54,7 @@ import static java.util.Calendar.getInstance;
 
 public class ProfileFragment extends Fragment implements DatePickerDialog.OnDateSetListener {
 
-    private TextView textViewName;
+    private TextView textViewName, tvDOB, tvBio;
     private Spinner spinnerPreferences;
     private Button editProfileBtn;
     // private TextView textViewdob;
@@ -73,6 +73,7 @@ public class ProfileFragment extends Fragment implements DatePickerDialog.OnDate
     private static final String TAG = "My Profile";
     private String uid;
     private String name, preference, bio, dob;
+
 
     Uri imageuri;
     UserInformation host;
@@ -114,8 +115,6 @@ public class ProfileFragment extends Fragment implements DatePickerDialog.OnDate
 
             }
         });
-
-
     }
 
     @Nullable
@@ -129,19 +128,24 @@ public class ProfileFragment extends Fragment implements DatePickerDialog.OnDate
         editTextdob = mView.findViewById(R.id.editTextdob);
         editTextBio = mView.findViewById(R.id.editTextbio);
         imageButtonPicture = mView.findViewById(R.id.imageButtonPicture);
+        tvBio = mView.findViewById(R.id.tvBio);
+        tvDOB = mView.findViewById(R.id.tvDob);
         fireBaseAuth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference("Users");
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
 
-        if (fireBaseAuth.getCurrentUser() != null)
+        tvBio.setVisibility(View.INVISIBLE);
+        tvDOB.setVisibility(View.INVISIBLE);
+        textViewName.setVisibility(View.INVISIBLE);
+
+        if (fireBaseAuth.getCurrentUser() != null){
             uid = fireBaseAuth.getCurrentUser().getUid();
-
-        spinnerPreferences.setSelection(preferenceOptions.indexOf(preference));
-        editTextdob.setText(dob);
-        editTextBio.setText(bio);
-        textViewName.setText(name);
-
+        } else {
+            // sends you to log in if you have not logged in
+            Intent intent = new Intent(getActivity(), Login.class);
+            startActivity(intent);
+        }
 //        StorageReference pathToFile = storageReference.child("profilePics/" + uid+".jpg");
 
 
@@ -179,9 +183,18 @@ public class ProfileFragment extends Fragment implements DatePickerDialog.OnDate
                 String bio = editTextBio.getText().toString();
                 Log.d("ON PREFERENCE CHANGE ", "to" + selectedPreference);
                 UserInformation user = new UserInformation(name, selectedPreference, dob, bio);
-                databaseReferenceUser.child(uid).setValue(user);
+                databaseReferenceUser.child("preference").setValue(selectedPreference);
+                databaseReferenceUser.child("dob").setValue(dob);
+                databaseReferenceUser.child("bio").setValue(bio);
 
                 Toast.makeText(getActivity(), "Saved Succesfully!!", Toast.LENGTH_SHORT).show();
+                tvBio.setVisibility(View.VISIBLE);
+                tvDOB.setVisibility(View.VISIBLE);
+                textViewName.setVisibility(View.VISIBLE);
+                spinnerPreferences.setSelection(preferenceOptions.indexOf(preference));
+                tvDOB.setText("date of birth: "+ dob);
+                tvBio.setText("bio: "+ bio);
+                textViewName.setText("name: "+name);
 
             }
 
@@ -266,7 +279,7 @@ public class ProfileFragment extends Fragment implements DatePickerDialog.OnDate
     }
 
     protected void downloadImage(){
-        storageReference.child("profilePics/"+uid).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+        storageReference.child("profilePics/"+uid.toString()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
                 // Got the download URL for 'users/me/profile.png' in uri
@@ -279,7 +292,7 @@ public class ProfileFragment extends Fragment implements DatePickerDialog.OnDate
             @Override
             public void onFailure(@NonNull Exception exception) {
                 // Handle any errors
-                Log.d(TAG, "DOWNLOAD URL: FAILURE");
+                Log.d(TAG, "DOWNLOAD URL: FAILURE" + uid);
 
             }
         });
