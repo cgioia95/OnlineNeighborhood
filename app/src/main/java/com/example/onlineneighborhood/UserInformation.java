@@ -14,11 +14,9 @@ public class UserInformation implements Serializable {
 
     }
 
-    public UserInformation(String name, String preference) {
-        this.name = name;
-        this.preference = preference;
+    public UserInformation(String id){
+        this.uid = id;
     }
-
 
     public UserInformation(String uid, String name, String preference) {
         this.uid = uid;

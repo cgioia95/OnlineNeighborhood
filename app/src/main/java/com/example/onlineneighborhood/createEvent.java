@@ -69,7 +69,6 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     private double lon;
     private double lat;
     private Suburb suburb;
-    private String suburbName = "NO SUBURB FOUND";
     //bool check to ensure get location has been requested
     private boolean clicked = false;
     UserInformation host;
@@ -119,13 +118,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 for(DataSnapshot hostSnapshot : dataSnapshot.getChildren()){
 
-                    String checkCurUser = firebaseAuth.getCurrentUser().getUid();
 
-                    if(checkCurUser.equals(hostSnapshot.getKey())){
-                        UserInformation currentUser = hostSnapshot.getValue(UserInformation.class);
-                        host = currentUser;
-                        break;
-                    }
                 }
             }
 
@@ -444,6 +437,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     public boolean addEventToSuburb(String eventAddress,String eventName,String eventDesc, String eventTime, String eventDate, String endTime, String endDate, String type){
         try{
             String id = databaseEvents.push().getKey();
+            host = new UserInformation(firebaseAuth.getCurrentUser().getUid());
             ArrayList<UserInformation> attendees = new ArrayList<UserInformation>();
             attendees.add(host);
             Event event = new Event(id, host, eventAddress, eventName, eventDesc, eventTime, eventDate, endTime, endDate, type, attendees);

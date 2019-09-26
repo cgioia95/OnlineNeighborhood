@@ -51,6 +51,24 @@
             android:layout_marginTop="15dp"
             android:hint="Enter your Name" />
 
+        <EditText
+            android:id="@+id/etBio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:ems="10"
+            android:hint="Tell us about yourself "
+            android:inputType="textPersonName" />
+
+        <EditText
+            android:id="@+id/etDOB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:ems="10"
+            android:hint="Date of Birth"
+            android:inputType="date" />
+
         <Spinner
             android:id="@+id/spinnerPreferences"
             android:layout_width="match_parent"
