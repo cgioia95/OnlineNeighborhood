@@ -79,7 +79,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     public void onBindViewHolder(@NonNull EventViewHolder holder, int position) {
         Event currentItem = eventList.get(position);
         holder.mEvent.setText(currentItem.getName());
-        //holder.mUserName.setText(currentItem.getHost().getName()); //TODO: get the name of the host
+        //holder.mUserName.setText(currentItem.getHost().getName()); //TODO: get the name of the hostID
         holder.mEventTime.setText(currentItem.getTime());
         holder.mEventAddress.setText(currentItem.getAddress());
 

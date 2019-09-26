@@ -33,7 +33,7 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
     private Button buttonRegister;
     private EditText editTextEmail;
     private EditText editTextPassword;
-    private EditText editTextName;
+    private EditText editTextName, editBio, editDob;
     private Spinner spinnerPreferences;
     private TextView textViewSignIn;
 
@@ -62,6 +62,8 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
         editTextEmail = (EditText) findViewById(R.id.editTextEmail);
         editTextPassword = (EditText) findViewById(R.id.editTextPassword);
         editTextName = (EditText) findViewById(R.id.editTextName);
+        editBio = (EditText) findViewById(R.id.etBio);
+        editDob = (EditText) findViewById(R.id.etDOB);
         spinnerPreferences = (Spinner) findViewById(R.id.spinnerPreferences);
         textViewSignIn = (TextView) findViewById(R.id.textViewSignIn);
 
@@ -80,6 +82,8 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
         String password = editTextPassword.getText().toString().trim();
         final String name = editTextName.getText().toString().trim();
         final String preference = spinnerPreferences.getSelectedItem().toString();
+        final String bio = editBio.getText().toString().trim();
+        final String dob = editDob.getText().toString().trim();
 
         if (TextUtils.isEmpty(email)){
             Toast.makeText(this, "Please enter your email", Toast.LENGTH_SHORT).show();
@@ -109,6 +113,20 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
             return;
         }
 
+        if (TextUtils.isEmpty(bio)){
+            // password  is empty
+            Toast.makeText(this, "Please enter bio", Toast.LENGTH_SHORT).show();
+            // Stopping this function executive further
+            return;
+        }
+
+        if (TextUtils.isEmpty(dob)){
+            // password  is empty
+            Toast.makeText(this, "Please enter Date of Birth", Toast.LENGTH_SHORT).show();
+            // Stopping this function executive further
+            return;
+        }
+
         progressDialog.setMessage("Registering User");
         progressDialog.show();
 
@@ -122,9 +140,10 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
 
                             Toast.makeText(Register.this, "Registered Succesfully", Toast.LENGTH_SHORT).show();
 
+
                             String Uid = task.getResult().getUser().getUid();
 
-                            UserInformation userInformation = new UserInformation(name, preference, "default DOB", "default BIO");
+                            UserInformation userInformation = new UserInformation(name, preference, dob, bio);
 
                             databaseReference.child(Uid).setValue(userInformation);
 

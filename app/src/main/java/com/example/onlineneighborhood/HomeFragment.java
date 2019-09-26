@@ -114,8 +114,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
                             events = currentSuburb.getEvents();
                             for(Event event:events){
                                 if(event != null) {
+                                    Log.d(TAG, "HOST ID: "+event.getHost());
                                     eventList.add(event);
                                 }
+
+
                             }
                             break;
                         }
