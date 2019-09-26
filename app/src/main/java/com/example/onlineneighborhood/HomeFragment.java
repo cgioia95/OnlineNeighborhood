@@ -39,7 +39,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
 
     TextView suburbTextView;
 
-    Button logoutBtn;
+    //Button logoutBtn;
     // private Button profileBtn;
     ImageView addEvent;
     String suburb;
@@ -76,20 +76,17 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
         fireBaseAuth = FirebaseAuth.getInstance();
         addEvent = mView.findViewById(R.id.addEvent);
         suburbTextView = mView.findViewById(R.id.textViewSuburb);
-
-        Button logoutBtn = mView.findViewById(R.id.logOutBtn);
-//        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        // profileBtn = findViewById(R.id.profileBtn);
-
-        // profileBtn.setOnClickListener(this);
-        logoutBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                fireBaseAuth.signOut();
-                //finish();
-                startActivity(new Intent(applicationContext, Login.class));
-            }
-        });
+//
+//        Button logoutBtn = mView.findViewById(R.id.logOutBtn);
+//
+//        logoutBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                fireBaseAuth.signOut();
+//                //finish();
+//                startActivity(new Intent(applicationContext, Login.class));
+//            }
+//        });
 
         Intent i = getActivity().getIntent();
         suburb = i.getStringExtra("SUBURB");
@@ -180,10 +177,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
             i.putExtra("SUBURB", suburb);
             startActivity(i);
         }
-
-//       if(view == profileBtn){
-//           startActivity(new Intent(this, ProfileScreen.class));
-//       }
 
     }
 
