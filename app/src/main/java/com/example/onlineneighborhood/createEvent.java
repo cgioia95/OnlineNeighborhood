@@ -64,7 +64,6 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     private boolean clicked = false;
     UserInformation hostID;
     UserInformation host;
-    String hostKey;
 
 
 
@@ -111,10 +110,9 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
                 String checkCurUser = firebaseAuth.getCurrentUser().getUid();
                 for(DataSnapshot hostSnapshot : dataSnapshot.getChildren()){
                     Log.d("TAG: ", "HOST: "+hostSnapshot);
-                    if(hostSnapshot.hasChild(checkCurUser)){
-                        UserInformation currentUser = hostSnapshot.child(checkCurUser).getValue(UserInformation.class);
+                    if(hostSnapshot.getKey().equals(checkCurUser)){
+                        UserInformation currentUser = hostSnapshot.getValue(UserInformation.class);
                         host = currentUser;
-                        hostKey = hostSnapshot.getKey();
                         break;
                     }
                 }
@@ -434,7 +432,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
             //creating database references and list arrays to properly ensure that a dynamic array will be properly updated to suburb/user values
             DatabaseReference databaseSuburbChange = FirebaseDatabase.getInstance().getReference("suburbs").child(suburb.getId());
-            DatabaseReference databaseUpdateUser = FirebaseDatabase.getInstance().getReference("Users").child(hostKey).child(hostID.getUid());
+            DatabaseReference databaseUpdateUser = FirebaseDatabase.getInstance().getReference("Users").child(hostID.getUid());
             ArrayList<Event> events = new ArrayList<Event>();
             events.add(event);
             ArrayList<Event> userEvents = new ArrayList<Event>();
