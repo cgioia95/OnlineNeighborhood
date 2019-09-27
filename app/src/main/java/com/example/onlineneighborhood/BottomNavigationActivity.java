@@ -86,6 +86,7 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Online Neighborhood");
 
+
         String intentSuburb = ((OnlineNeighborhood) this.getApplication()).getsuburb();
         Bundle bundle = new Bundle();
         bundle.putString("SUBURB", intentSuburb);
