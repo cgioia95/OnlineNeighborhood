@@ -44,34 +44,22 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
 
 
     private GoogleMap mMap;
-
     String suburbName;
     Suburb suburb;
     ArrayList<Event> events;
-
-
-
     DatabaseReference databaseEvents;
     DatabaseReference databaseUsers;
     DatabaseReference databaseSuburb;
-
     public static Context contextOfApplication;
     public static Context getContextOfApplication()
     {
         return contextOfApplication;
     }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-//        Log.d("Bottom Nav", "onCreate: " + savedInstanceState);
-//        if (savedInstanceState == null) {
-//            HomeFragment home = new HomeFragment();
-//            Log.d("Bottom Nav", "onCreate: " + home);
-//            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,home).commit();
-//
-//        }
-
 
         setContentView(R.layout.activity_bottom_navigation);
         BottomNavigationView navView = findViewById(R.id.nav_view);
@@ -82,11 +70,14 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
         databaseUsers = FirebaseDatabase.getInstance().getReference("Users");
         databaseSuburb =  FirebaseDatabase.getInstance().getReference("suburbs");
 
+
+        //Setting toolbar for adding profile icon
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Online Neighborhood");
 
 
+        //To load home screen automatically after logging in
         String intentSuburb = ((OnlineNeighborhood) this.getApplication()).getsuburb();
         Bundle bundle = new Bundle();
         bundle.putString("SUBURB", intentSuburb);
@@ -100,6 +91,7 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
     private void setSupportActionBar(Toolbar toolbar) {
     }
 
+    //inflate toolbar menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -107,6 +99,8 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
         return true;
     }
 
+
+    //managing toolbar items
     public boolean onOptionsItemSelected(MenuItem item){
         if(item.getItemId() == R.id.profile){
 
@@ -116,6 +110,7 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
         return super.onOptionsItemSelected(item);
     }
 
+    //loading fragment above the navigation bar
     private boolean loadFragment(Fragment fragment){
 
 
@@ -143,7 +138,7 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
         switch (menuItem.getItemId()){
 
             case R.id.navigation_events:
-//                fragment= new ProfileFragment();
+//              Add "My events" fragment here
                 break;
 
 
@@ -151,13 +146,6 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
                 // Obtain the SupportMapFragment and get notified when the map is ready to be used.
 
                 fragment = new MapFragment();
-
-
-
-//                SupportMapFragment mapFragment = (SupportMapFragment) this.getSupportFragmentManager().
-//                        findFragmentById(R.id.map);
-//                mapFragment.getMapAsync(this);
-
                 break;
 
             case R.id.navigation_home:
@@ -168,6 +156,9 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
         return loadFragment(fragment);
     }
 
+
+
+    //Handling Maps
     //@Override
     public void onMapReady(GoogleMap googleMap) {
 
