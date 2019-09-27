@@ -7,6 +7,28 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/searchBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme" />
+
+    <com.miguelcatalan.materialsearchview.MaterialSearchView
+        android:id="@+id/searchView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:searchBackground="?colorPrimary"
+        app:searchBackIcon="@drawable/ic_action_navigation_arrow_back_inverted"
+        app:searchCloseIcon="@drawable/ic_action_navigation_close_inverted"
+        app:searchSuggestionIcon="@drawable/ic_suggestion"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#FFFFFF">
+
+    </com.miguelcatalan.materialsearchview.MaterialSearchView>
+
     <TextView
         android:id="@+id/headingTv"
         android:layout_width="match_parent"
@@ -35,27 +57,11 @@
         android:id="@+id/textView7"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Choose a Suburb or wait for your Location"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:text="Use the search bar to find a Suburb"
         android:textAlignment="center"
         android:textSize="18sp" />
-
-    <Spinner
-        android:id="@+id/suburbSpinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:entries="@array/suburbs"
-        android:textAlignment="center" />
-
-    <Button
-        android:id="@+id/chooseSuburbBtn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginRight="20dp"
-        android:text="Choose" />
 
     <TextView
         android:id="@+id/ORtv"
