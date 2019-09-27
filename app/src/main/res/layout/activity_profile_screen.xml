@@ -1,59 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:fillViewport="false">
+
+<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".MainActivity">
     <include
         android:id="@+id/toolbar"
         layout="@layout/toolbar" />
+
     <ImageButton
         android:id="@+id/imageButtonPicture"
-        android:layout_width="match_parent"
-        android:layout_centerHorizontal="true"
+
+        style="@style/Widget.AppCompat.ImageButton"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:layout_marginBottom="30dp"
-        android:layout_marginEnd="114dp"
-        android:layout_marginRight="114dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginRight="20dp"
+        android:contentDescription="@string/picture_here"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@tools:sample/avatars[0]" />
+        tools:srcCompat="@tools:sample/avatars" />
 
     <TextView
         android:id="@+id/textViewName"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/imageButtonPicture"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="22dp"
-        android:layout_marginEnd="11dp"
-        android:layout_marginRight="11dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="20dp"
         android:text="Name"
+        android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="@+id/imageButtonPicture"
         app:layout_constraintTop_toBottomOf="@+id/imageButtonPicture" />
+
+    <TextView
+        android:id="@+id/tvBio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:text="TextView"
+        android:textAlignment="center" />
+
+    <TextView
+        android:id="@+id/tvDob"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:text="TextView"
+        android:textAlignment="center" />
 
     <EditText
         android:id="@+id/editTextdob"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="20dp"
         android:layout_marginTop="16dp"
+        android:layout_marginRight="20dp"
         android:ems="10"
         android:hint="DOB"
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="@+id/editTextbio"
         app:layout_constraintStart_toStartOf="@+id/editTextbio"
-        app:layout_constraintTop_toBottomOf="@+id/textViewName" />
+        app:layout_constraintTop_toBottomOf="@+id/textViewName"
+        android:importantForAutofill="no" />
+
+    <EditText
+        android:id="@+id/editTextbio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:ems="10"
+        android:gravity="start|top"
+        android:hint="Bio Update"
+        android:importantForAutofill="no"
+        android:inputType="textMultiLine"
+        app:layout_constraintBottom_toTopOf="@+id/editProfileBtn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spinnerPreferences" />
 
     <Spinner
         android:id="@+id/spinnerPreferences"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:layout_marginLeft="20dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginRight="20dp"
         android:layout_marginBottom="59dp"
         android:entries="@array/preferences"
         app:layout_constraintBottom_toTopOf="@+id/editTextbio"
@@ -61,47 +111,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextdob" />
 
-    <EditText
-        android:id="@+id/editTextbio"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/editTextdob"
-        android:layout_alignBottom="@id/editProfileBtn"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="69dp"
-        android:layout_marginRight="69dp"
-        android:layout_marginBottom="24dp"
-        android:ems="10"
-        android:gravity="start|top"
-        android:hint="WERKKK"
-        android:inputType="textMultiLine"
-        app:layout_constraintBottom_toTopOf="@+id/editProfileBtn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinnerPreferences" />
-
     <Button
         android:id="@+id/editProfileBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@id/editTextdob"
-        android:layout_centerInParent="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="149dp"
-        android:layout_marginBottom="70dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
         android:text="SAVE CHANGES"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/imageButtonPicture"
         app:layout_constraintStart_toStartOf="@+id/imageButtonPicture"
         app:layout_constraintTop_toBottomOf="@+id/editTextbio" />
 
-    <Button
-        android:id="@+id/logoutBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="160dp"
-        android:layout_marginBottom="84dp"
-        android:text="LOG OUT" />
-</RelativeLayout>
+
+</LinearLayout>
+</ScrollView>

@@ -52,7 +52,7 @@ import static java.util.Calendar.*;
 
 public class UserProfile extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
-    private TextView textViewName;
+    private TextView textViewName, tvBio, tvDOB;
     private Spinner spinnerPreferences;
     private Button editProfileBtn;
     private Button logoutBtn;
@@ -80,6 +80,10 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
         setContentView(R.layout.activity_profile_screen);
 
         textViewName = findViewById(R.id.textViewName);
+        tvBio = findViewById(R.id.tvBio);
+        tvDOB = findViewById(R.id.tvDob);
+        tvDOB.setVisibility(View.INVISIBLE);
+        tvBio.setVisibility(View.INVISIBLE);
         editProfileBtn = findViewById(R.id.editProfileBtn);
         spinnerPreferences = (Spinner) findViewById(R.id.spinnerPreferences);
         editTextdob = findViewById(R.id.editTextdob);
@@ -167,6 +171,10 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
                 databaseReference.child(uid).child("preference").setValue(selectedPreference);
                 databaseReference.child(uid).child("dob").setValue(dob);
                 databaseReference.child(uid).child("bio").setValue(bio);
+                tvDOB.setText("DOB updated to: " + dob);
+                tvBio.setText("Bio updated to: " + bio);
+                tvDOB.setVisibility(View.VISIBLE);
+                tvBio.setVisibility(View.VISIBLE);
                 Toast.makeText(UserProfile.this, "Saved Succesfully!!", Toast.LENGTH_SHORT).show();
 
             }
