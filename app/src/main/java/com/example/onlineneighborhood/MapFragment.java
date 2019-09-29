@@ -1,12 +1,15 @@
 package com.example.onlineneighborhood;
 
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -16,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -66,10 +70,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     DatabaseReference databaseSuburbChange;
 
-    Button filterButton, todayFilterButton;
+    Button filterButton, todayFilterButton, dateButton, calenderFilterButton;
     EditText editTextDays;
 
-    Date todayDate, newDate;
+    Date todayDate;
+    Date newDate;
+    static Date calenderDate;
+
+
 
     HashMap<String, Event> markerToEvent = new HashMap<String, Event>();
     HashMap<String, Marker> markerIDtoMarker = new HashMap<String, Marker>();
@@ -122,7 +130,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         filterButton = getView().findViewById(R.id.filterButton);
         todayFilterButton = getView().findViewById(R.id.todayFilterButton);
 
+        dateButton = getView().findViewById(R.id.dateButton);
+
+        calenderFilterButton = getView().findViewById(R.id.calenderFilterButton);
+
         editTextDays = getView().findViewById(R.id.editTextDays);
+
+
 
         todayFilterButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -152,6 +166,55 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
                     } catch (ParseException e) {
                         e.printStackTrace();
+                    }
+
+                }
+
+            }
+        });
+
+        dateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                DialogFragment newFragment = new SelectDateFragment();
+                newFragment.show(getFragmentManager(), "DatePicker");
+
+            }
+        });
+
+        calenderFilterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (calenderDate != null){
+
+                    filterType = "CALENDER_FILTER";
+
+                    Log.d("CALENDER FILTER BUTTON", calenderDate.toString());
+
+                    for (Marker marker: defaultMarkers){
+                        marker.setVisible(true);
+                    }
+
+                    for (HashMap.Entry<String,Event> entry : markerToEvent.entrySet()) {
+
+
+                        String stringDate = entry.getValue().getDate();
+
+                        try {
+                            Date testedDate =new SimpleDateFormat("dd/MM/yyyy").parse(stringDate);
+
+                            if (calenderDate.compareTo(testedDate) != 0 ){
+
+                                markerIDtoMarker.get(entry.getKey()).setVisible(false);
+                            }
+
+
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+
                     }
 
                 }
@@ -214,8 +277,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     }
 
                 }
-
-
 
             }
         });
@@ -393,6 +454,32 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
+
+    }
+
+
+    // NEED TO REFERENCE THIS 
+    public static class SelectDateFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            final Calendar calendar = Calendar.getInstance();
+            int yy = calendar.get(Calendar.YEAR);
+            int mm = calendar.get(Calendar.MONTH);
+            int dd = calendar.get(Calendar.DAY_OF_MONTH);
+            return new DatePickerDialog(getActivity(), this, yy, mm, dd);
+        }
+
+        public void onDateSet(DatePicker view, int yy, int mm, int dd) {
+            populateSetDate(yy, mm+1, dd);
+        }
+        public Date populateSetDate(int year, int month, int day) {
+
+              calenderDate = new Date(year - 1900, month - 1, day);
+              Log.d("CALENDER DATE POPULATE" , calenderDate.toString());
+
+              return calenderDate;
+        }
 
     }
 

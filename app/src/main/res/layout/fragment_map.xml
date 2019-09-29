@@ -55,11 +55,26 @@
     </LinearLayout>
 
     <Button
+        android:id="@+id/dateButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:text="SET DATE" />
+
+    <Button
         android:id="@+id/todayFilterButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="510dp"
         android:text="TODAY" />
+
+    <Button
+        android:id="@+id/calenderFilterButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="100dp"
+        android:layout_marginTop="50dp"
+        android:text="FILTER" />
 
 
 </FrameLayout>
