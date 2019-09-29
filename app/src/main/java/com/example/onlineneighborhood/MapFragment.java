@@ -127,14 +127,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(final GoogleMap googleMap) {
 
-        filterButton = getView().findViewById(R.id.filterButton);
         todayFilterButton = getView().findViewById(R.id.todayFilterButton);
 
         dateButton = getView().findViewById(R.id.dateButton);
 
         calenderFilterButton = getView().findViewById(R.id.calenderFilterButton);
 
-        editTextDays = getView().findViewById(R.id.editTextDays);
 
 
 
@@ -221,66 +219,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
             }
         });
-
-        filterButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                filterType = "DAYS_FILTER";
-
-
-                for (Marker marker: defaultMarkers){
-                    marker.setVisible(true);
-                }
-
-                String daysString = editTextDays.getText().toString();
-                int days = Integer.parseInt(daysString);
-
-                Date todayDate = new Date();
-                int year = todayDate.getYear();
-                int month = todayDate.getMonth();
-                int date = todayDate.getDate();
-                todayDate = new Date(year, month, date);
-
-                Log.d( "TODAYDATE" , todayDate.toString());
-
-                Calendar c = Calendar.getInstance();
-                c.set(year, month, date);
-                c.add(Calendar.DAY_OF_YEAR, days);
-                newDate = c.getTime();
-
-                int newYear = newDate.getYear() + 1900;
-                int newMonth = newDate.getMonth();
-                int newDay = newDate.getDate();
-
-                newDate = new Date (newYear, newMonth, newDay);
-                Log.d("NEWDATE" , newDate.toString());
-
-
-                for (HashMap.Entry<String,Event> entry : markerToEvent.entrySet()) {
-
-
-                    String stringDate = entry.getValue().getDate();
-
-                    try {
-                        Date testedDate =new SimpleDateFormat("dd/MM/yyyy").parse(stringDate);
-
-                        if (testedDate.after(newDate)){
-
-                            Log.d("COMPARISON" , testedDate.toString() + " is after " + newDate.toString());
-                            markerIDtoMarker.get(entry.getKey()).setVisible(false);
-                        }
-
-
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-
-            }
-        });
-
 
         mMap = googleMap;
 
@@ -390,9 +328,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
                                             }
 
-                                            else if (filterType.equals("DAYS_FILTER")){
+                                            else if (filterType.equals("CALENDER_FILTER")){
 
-                                                if (testedDate.after(newDate)){
+                                                if (testedDate.compareTo(calenderDate) != 0){
 
                                                     marker.setVisible(false);
 
@@ -458,7 +396,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
 
-    // NEED TO REFERENCE THIS 
+    // NEED TO REFERENCE THIS
     public static class SelectDateFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 
         @Override
