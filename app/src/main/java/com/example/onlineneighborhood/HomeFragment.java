@@ -45,6 +45,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
     ImageView filterButton;
     String suburb;
     String currSuburb;
+    String timeFilter, dateFilter, typeFilter;
     private static final String TAG = "HomeScreen";
 
     private FirebaseAuth fireBaseAuth;
@@ -58,12 +59,19 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
     Context applicationContext = BottomNavigationActivity.getContextOfApplication();
 
 
+
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View mView = inflater.inflate(R.layout.activity_home_screen, null);
         if (getArguments() != null) {
             currSuburb = getArguments().getString("SUBURB");
+            timeFilter = getArguments().getString("TIME");
+            dateFilter = getArguments().getString("DATE");
+            typeFilter = getArguments().getString("TYPE");
+
+            Log.d("PASSED VALUES", currSuburb +" "+ typeFilter +" "+ timeFilter +" "+dateFilter);
 
         }
 
@@ -182,6 +190,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
 
         if (view == filterButton) {
             Intent i = new Intent(applicationContext, FilterEvents.class);
+            i.putExtra("SUBURB", suburb);
             startActivity(i);
         }
 

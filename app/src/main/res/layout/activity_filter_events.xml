@@ -8,8 +8,8 @@
     tools:context=".FilterEvents">
 
     <LinearLayout
-        android:layout_width="310dp"
-        android:layout_height="263dp"
+        android:layout_width="323dp"
+        android:layout_height="393dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
@@ -32,6 +32,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="55dp"
+            android:layout_marginBottom="20dp"
             android:orientation="horizontal">
 
             <TextView
@@ -60,6 +61,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="55dp"
+            android:layout_marginBottom="20dp"
             android:orientation="horizontal">
 
             <TextView
@@ -96,6 +98,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="55dp"
+            android:layout_marginBottom="20dp"
             android:orientation="horizontal">
 
             <TextView
@@ -126,6 +129,7 @@
             android:layout_width="150dp"
             android:layout_height="50dp"
             android:layout_gravity="center"
+            android:layout_marginTop="50dp"
             android:text="Apply"
             android:textAlignment="center" />
     </LinearLayout>

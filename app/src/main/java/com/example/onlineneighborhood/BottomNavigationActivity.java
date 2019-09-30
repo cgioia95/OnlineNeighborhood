@@ -44,7 +44,8 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
 
 
     private GoogleMap mMap;
-    String suburbName;
+    String intentSuburb, dateRange, typeFilter, time;
+    Bundle bundle = new Bundle();
     Suburb suburb;
     ArrayList<Event> events;
     DatabaseReference databaseEvents;
@@ -56,6 +57,24 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
         return contextOfApplication;
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        Intent i = getIntent();
+        intentSuburb = i.getStringExtra("SUBURB");
+        dateRange  = i.getStringExtra("DATE");
+        typeFilter  = i.getStringExtra("TYPE");
+        time = i.getStringExtra("TIME");
+
+        bundle.putString("SUBURB", intentSuburb);
+        bundle.putString("DATE",  dateRange);
+        bundle.putString("TYPE", typeFilter);
+        bundle.putString("TIME", time);
+
+        Log.d("BUNDLEVALUES:", ""+intentSuburb
+                +dateRange+ typeFilter +time);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,11 +96,12 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
         getSupportActionBar().setTitle("Online Neighborhood");
 
 
-        //To load home screen automatically after logging in
-        Intent i = getIntent();
-        String intentSuburb = i.getStringExtra("SUBURB");
+        //To load home screen automatically after logging it
         Bundle bundle = new Bundle();
         bundle.putString("SUBURB", intentSuburb);
+        bundle.putString("DATE",  dateRange);
+        bundle.putString("TYPE", typeFilter);
+        bundle.putString("TIME", time);
         HomeFragment home = new HomeFragment();
         home.setArguments(bundle);
         loadFragment(home);
@@ -128,10 +148,11 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
 
-        Intent i = getIntent();
-        String intentSuburb = i.getStringExtra("SUBURB");
         Bundle bundle = new Bundle();
         bundle.putString("SUBURB", intentSuburb);
+        bundle.putString("DATE",  dateRange);
+        bundle.putString("TYPE", typeFilter);
+        bundle.putString("TIME", time);
         HomeFragment home = new HomeFragment();
         home.setArguments(bundle);
 
