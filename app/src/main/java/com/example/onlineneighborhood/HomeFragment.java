@@ -42,8 +42,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
     //Button logoutBtn;
     // private Button profileBtn;
     ImageView addEvent;
+    ImageView filterButton;
     String suburb;
     String currSuburb;
+    String timeFilter, dateFilter, typeFilter;
     private static final String TAG = "HomeScreen";
 
     private FirebaseAuth fireBaseAuth;
@@ -56,27 +58,29 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
     private ArrayList<Event> eventList = new ArrayList<>();
     Context applicationContext = BottomNavigationActivity.getContextOfApplication();
 
-//    @Override
-//    public void onCreate(Bundle savedInstanceState) {
-//
-//        super.onCreate(savedInstanceState);
-//    }
+
 
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View mView = inflater.inflate(R.layout.activity_home_screen, null);
-        if(getArguments() != null){
+        if (getArguments() != null) {
             currSuburb = getArguments().getString("SUBURB");
+            timeFilter = getArguments().getString("TIME");
+            dateFilter = getArguments().getString("DATE");
+            typeFilter = getArguments().getString("TYPE");
+
+            Log.d("PASSED VALUES", currSuburb +" "+ typeFilter +" "+ timeFilter +" "+dateFilter);
 
         }
-
 
 
         fireBaseAuth = FirebaseAuth.getInstance();
         addEvent = mView.findViewById(R.id.addEvent);
         suburbTextView = mView.findViewById(R.id.textViewSuburb);
+        filterButton = mView.findViewById(R.id.buttonFilter);
+
 //
 //        Button logoutBtn = mView.findViewById(R.id.logOutBtn);
 //
@@ -90,15 +94,17 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
 //        });
 
         Intent i = getActivity().getIntent();
-        currSuburb=suburb = ((OnlineNeighborhood) getActivity().getApplication()).getsuburb();
+        currSuburb = suburb = ((OnlineNeighborhood) getActivity().getApplication()).getsuburb();
 //        suburb = i.getStringExtra("SUBURB");
 
         suburbTextView.setText(suburb);
         addEvent.setOnClickListener(this);
+        filterButton.setOnClickListener(this);
         return mView;
     }
+
     @Override
-    public void onStart(){
+    public void onStart() {
         super.onStart();
         databaseEvents = FirebaseDatabase.getInstance().getReference("suburbs");
 
@@ -107,16 +113,16 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 eventList.clear();
-                for(DataSnapshot suburbSnapshot : dataSnapshot.getChildren()) {
+                for (DataSnapshot suburbSnapshot : dataSnapshot.getChildren()) {
                     ArrayList<Event> events = new ArrayList<Event>();
                     Suburb currentSuburb = suburbSnapshot.getValue(Suburb.class);
-                    try{
+                    try {
 
                         if (currSuburb.equals(currentSuburb.getSubName())) {
                             events = currentSuburb.getEvents();
-                            for(Event event:events){
-                                if(event != null) {
-                                    Log.d(TAG, "HOST ID: "+event.getHost());
+                            for (Event event : events) {
+                                if (event != null) {
+                                    Log.d(TAG, "HOST ID: " + event.getHost());
                                     eventList.add(event);
                                 }
 
@@ -125,7 +131,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
                             break;
                         }
 
-                    } catch (NullPointerException e){
+                    } catch (NullPointerException e) {
                         //this catches null pointer exceptions, it happens alot
                         //TODO: I need to find a better way to loop through all the suburbs
                         //if you look at the log you can see the 'null pointer' still gets the suburb name. weird.
@@ -136,7 +142,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
                 //SET UP EVENTLIST
                 //i think when theres no list of events this throws. not sure why but just put an error check on it
                 //TODO: NEED TO FIX THIS ASAP. (turns out it still crashes even with this)
-                try{
+                try {
                     mRecyclerView = getActivity().findViewById(R.id.recyclerView);
                     mRecyclerView = getActivity().findViewById(R.id.recyclerView);
                     mLayoutManager = new LinearLayoutManager(getActivity());
@@ -145,23 +151,21 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
                     mRecyclerView.setLayoutManager(mLayoutManager);
                     mRecyclerView.setAdapter(mAdapter);
                     mRecyclerView.setAdapter(mAdapter);
+                    mAdapter.setOnEventClickListener(new EventAdapter.onEventClickListener() {
+                        @Override
+                        public void onEventClick(int position) {
+                            Event event = eventList.get(position);
 
-                }catch (NullPointerException e){
+                            Intent intent = new Intent(getActivity(), EventScreen.class);
+
+                            intent.putExtra("MyObject", event);
+                            startActivity(intent);
+                        }
+                    });
+
+                } catch (NullPointerException e) {
                     e.printStackTrace();
                 }
-
-                mAdapter.setOnEventClickListener(new EventAdapter.onEventClickListener() {
-                    @Override
-                    public void onEventClick(int position) {
-                        Event event = eventList.get(position);
-
-                        Intent intent = new Intent(getActivity(), EventScreen.class);
-
-                        intent.putExtra("MyObject", event);
-                        startActivity(intent);
-                    }
-                });
-
             }
 
             @Override
@@ -173,16 +177,20 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
     }
 
 
-
     //@Override
     public void onClick(View view) {
 
-        if (view == addEvent){
+        if (view == addEvent) {
             Intent i = new Intent(applicationContext, createEvent.class);
             i.putExtra("SUBURB", suburb);
             startActivity(i);
         }
 
-    }
+        if (view == filterButton) {
+            Intent i = new Intent(applicationContext, FilterEvents.class);
+            i.putExtra("SUBURB", suburb);
+            startActivity(i);
+        }
 
+    }
 }
