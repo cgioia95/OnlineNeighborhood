@@ -58,16 +58,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
     Context applicationContext = BottomNavigationActivity.getContextOfApplication();
 
 
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View mView = inflater.inflate(R.layout.activity_home_screen, null);
-        if(getArguments() != null){
+        if (getArguments() != null) {
             currSuburb = getArguments().getString("SUBURB");
 
         }
-
 
 
         fireBaseAuth = FirebaseAuth.getInstance();
@@ -88,15 +86,17 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
 //        });
 
         Intent i = getActivity().getIntent();
-        currSuburb=suburb = ((OnlineNeighborhood) getActivity().getApplication()).getsuburb();
+        currSuburb = suburb = ((OnlineNeighborhood) getActivity().getApplication()).getsuburb();
 //        suburb = i.getStringExtra("SUBURB");
 
         suburbTextView.setText(suburb);
         addEvent.setOnClickListener(this);
+        filterButton.setOnClickListener(this);
         return mView;
     }
+
     @Override
-    public void onStart(){
+    public void onStart() {
         super.onStart();
         databaseEvents = FirebaseDatabase.getInstance().getReference("suburbs");
 
@@ -105,16 +105,16 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 eventList.clear();
-                for(DataSnapshot suburbSnapshot : dataSnapshot.getChildren()) {
+                for (DataSnapshot suburbSnapshot : dataSnapshot.getChildren()) {
                     ArrayList<Event> events = new ArrayList<Event>();
                     Suburb currentSuburb = suburbSnapshot.getValue(Suburb.class);
-                    try{
+                    try {
 
                         if (currSuburb.equals(currentSuburb.getSubName())) {
                             events = currentSuburb.getEvents();
-                            for(Event event:events){
-                                if(event != null) {
-                                    Log.d(TAG, "HOST ID: "+event.getHost());
+                            for (Event event : events) {
+                                if (event != null) {
+                                    Log.d(TAG, "HOST ID: " + event.getHost());
                                     eventList.add(event);
                                 }
 
@@ -123,7 +123,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
                             break;
                         }
 
-                    } catch (NullPointerException e){
+                    } catch (NullPointerException e) {
                         //this catches null pointer exceptions, it happens alot
                         //TODO: I need to find a better way to loop through all the suburbs
                         //if you look at the log you can see the 'null pointer' still gets the suburb name. weird.
@@ -134,7 +134,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
                 //SET UP EVENTLIST
                 //i think when theres no list of events this throws. not sure why but just put an error check on it
                 //TODO: NEED TO FIX THIS ASAP. (turns out it still crashes even with this)
-                try{
+                try {
                     mRecyclerView = getActivity().findViewById(R.id.recyclerView);
                     mRecyclerView = getActivity().findViewById(R.id.recyclerView);
                     mLayoutManager = new LinearLayoutManager(getActivity());
@@ -144,7 +144,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
                     mRecyclerView.setAdapter(mAdapter);
                     mRecyclerView.setAdapter(mAdapter);
 
-                }catch (NullPointerException e){
+                } catch (NullPointerException e) {
                     e.printStackTrace();
                 }
 
@@ -171,35 +171,19 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
     }
 
 
-
     //@Override
     public void onClick(View view) {
 
-        if (view == addEvent){
+        if (view == addEvent) {
             Intent i = new Intent(applicationContext, createEvent.class);
             i.putExtra("SUBURB", suburb);
             startActivity(i);
         }
 
-        if(view == filterButton){
-            Fragment filterFrag = new eventFilter();
+        if (view == filterButton) {
+            Intent i = new Intent(applicationContext, FilterEvents.class);
+            startActivity(i);
         }
 
     }
-
-
-    //loading fragment above the navigation bar
-    private boolean loadFragment(Fragment fragment){
-
-
-        if(fragment != null){
-
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_container,fragment).commit();
-        }
-        return false;
-    }
-
-
 }
