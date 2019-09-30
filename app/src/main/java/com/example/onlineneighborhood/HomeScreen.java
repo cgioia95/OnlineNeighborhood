@@ -33,6 +33,7 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
 
     Button mapButton;
     ImageView addEvent;
+    ImageView filterButton;
     String suburb;
 
     private FirebaseAuth fireBaseAuth;
@@ -56,6 +57,7 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
 
         fireBaseAuth = FirebaseAuth.getInstance();
         addEvent = findViewById(R.id.addEvent);
+        filterButton = findViewById(R.id.buttonFilter);
 
 
         suburbTextView = findViewById(R.id.textViewSuburb);
@@ -77,6 +79,7 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
 
         suburbTextView.setText(suburb);
         addEvent.setOnClickListener(this);
+        filterButton.setOnClickListener(this);
         mapButton.setOnClickListener(this);
 
 
@@ -150,14 +153,17 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
             startActivity(i);
         }
 
-        else if (view == mapButton){
+        if (view == mapButton){
 
             String suburb = getIntent().getStringExtra("SUBURB");
             Intent i = new Intent(getApplicationContext(), MapsActivity.class);
             i.putExtra("SUBURB", suburb);
             startActivity(i);
+        }
 
-
+        if(view == filterButton){
+            Intent i = new Intent(this, FilterEvents.class);
+            startActivity(i);
         }
     }
 }
