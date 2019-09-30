@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class Event implements Serializable {
     private String id;
     private UserInformation host;
-    private String address, eventName, description, time, date, endTime, endDate, type;
+    private String address, eventName, description, time, date, endTime, endDate, type, suburbId;
   
 
     private ArrayList<UserInformation> attendees;
@@ -21,8 +21,9 @@ public class Event implements Serializable {
 
     }
 
-    public Event(String id){
+    public Event(String id, String suburbId){
         this.id = id;
+        this.suburbId = suburbId;
     }
 
     public Event(String id, UserInformation host, String address, String eventName, String description, String time, String date, String endTime, String endDate, String type, ArrayList<UserInformation> attendees) {
@@ -137,4 +138,11 @@ public class Event implements Serializable {
         this.attendees = attendees;
     }
 
+    public String getSuburbId() {
+        return suburbId;
+    }
+
+    public void setSuburbId(String suburbId) {
+        this.suburbId = suburbId;
+    }
 }
