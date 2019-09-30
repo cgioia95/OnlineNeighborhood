@@ -146,9 +146,31 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
                     mRecyclerView.setAdapter(mAdapter);
                     mRecyclerView.setAdapter(mAdapter);
 
+
+
+
+
+
                 }catch (NullPointerException e){
                     e.printStackTrace();
                 }
+
+
+                mAdapter.setOnEventLongClickListener(new EventAdapter.onEventLongClickListener() {
+                    @Override
+                    public void onEventLongClick(int position) {
+
+                        Event event = eventList.get(position);
+
+                        Intent intent = new Intent(applicationContext, editDelete.class);
+
+                        Log.d(TAG, "Long Click");
+
+                        intent.putExtra("MyObject", event);
+                        startActivity(intent);
+
+                    }
+                });
 
                 mAdapter.setOnEventClickListener(new EventAdapter.onEventClickListener() {
                     @Override
@@ -157,9 +179,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
 
                         Intent intent = new Intent(getActivity(), EventScreen.class);
 
+                        Log.d(TAG, "Single Click");
+
                         intent.putExtra("MyObject", event);
                         startActivity(intent);
                     }
+
+
                 });
 
             }

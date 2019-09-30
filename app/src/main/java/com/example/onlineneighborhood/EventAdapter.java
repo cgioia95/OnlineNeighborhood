@@ -1,6 +1,7 @@
 package com.example.onlineneighborhood;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,17 +17,37 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
     private static final String TAG = "Event Adapter";
 
-    private ArrayList<Event> eventList;
-    private Context mContext;
+    private static ArrayList<Event> eventList;
+    private static Context mContext;
     private onEventClickListener mListener;
+
+    private onEventLongClickListener mListener2;
+
+
+
+
+
 
     public interface onEventClickListener {
         void onEventClick(int position);
     }
 
+
+    public interface onEventLongClickListener {
+        void onEventLongClick(int position);
+    }
+
+
+
     public void setOnEventClickListener(onEventClickListener listener) {
         mListener = listener;
     }
+
+
+    public void setOnEventLongClickListener(onEventLongClickListener listener) {
+        mListener2 = listener;
+    }
+
 
     public static class EventViewHolder extends RecyclerView.ViewHolder {
 
@@ -35,7 +56,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         public TextView mEventTime;
         public TextView mEventAddress;
 
-        public EventViewHolder(@NonNull View itemView, final onEventClickListener listener) {
+        public EventViewHolder(@NonNull View itemView, final onEventClickListener listener , final  onEventLongClickListener listener2) {
             super(itemView);
 
             mEvent = itemView.findViewById(R.id.eventName);
@@ -57,6 +78,25 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
                 }
             });
+
+
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+
+                    if(listener2!=null) {
+                        int position = getAdapterPosition();
+                        Log.d(TAG, "In onclick in eventadapter: position:" + position);
+                        if(position!= RecyclerView.NO_POSITION) {
+                            listener2.onEventLongClick(position);
+                        }
+
+                    }
+
+                    return true;
+
+                }
+            });
         }
     }
 
@@ -70,7 +110,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     @Override
     public EventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.event_item, parent, false);
-        EventViewHolder viewholder = new EventViewHolder(v, mListener);
+        EventViewHolder viewholder = new EventViewHolder(v, mListener, mListener2);
         return viewholder;
 
     }
@@ -82,6 +122,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         //holder.mUserName.setText(currentItem.getHost().getName()); //TODO: get the name of the hostID
         holder.mEventTime.setText(currentItem.getTime());
         holder.mEventAddress.setText(currentItem.getAddress());
+
+
 
 
         Log.d(TAG, "onBindViewHolder: " + currentItem.getHost());
