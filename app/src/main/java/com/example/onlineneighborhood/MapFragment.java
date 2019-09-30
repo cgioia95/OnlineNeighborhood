@@ -36,6 +36,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -91,6 +92,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+
+
         // Inflate the layout for this fragment
         View v =  inflater.inflate(R.layout.fragment_map, container, false);
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
@@ -120,6 +124,42 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             ft.replace(R.id.map, mapFragment).commit();
 
         }
+
+
+
+        databaseSuburb.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                for(DataSnapshot suburbSnapshot : dataSnapshot.getChildren()) {
+                    Suburb currentSuburb = suburbSnapshot.getValue(Suburb.class);
+                    Log.d("SUBURB", "" + suburbSnapshot);
+
+
+                        if (suburbName.equals(currentSuburb.getSubName())) {
+
+                            suburb = currentSuburb;
+
+                            databaseSuburbChange = FirebaseDatabase.getInstance().getReference("suburbs").child(suburb.getId());
+
+
+                            Log.d("CHOSEN: ", "" + suburb + suburb.getSubName());
+
+
+                        }
+
+            }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
+
         mapFragment.getMapAsync(this);
         return  v;
     }
@@ -237,7 +277,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
 
 
-        databaseSuburb.addValueEventListener(new ValueEventListener() {
+        databaseSuburbChange.addValueEventListener(new ValueEventListener() {
 
 
             @Override
@@ -251,25 +291,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 int date = todayDate.getDate();
                 todayDate = new Date(year, month, date);
 
+                Log.d("SNAPSHOT" , dataSnapshot.toString());
 
+                Log.d("SNAPSHOT" , String.valueOf(dataSnapshot.child("events")));
 
-                for(DataSnapshot suburbSnapshot : dataSnapshot.getChildren()) {
-                    Suburb currentSuburb = suburbSnapshot.getValue(Suburb.class);
-                    Log.d("SUBURB", "" + suburbSnapshot);
-
-                    try{
-
-                        if (suburbName.equals(currentSuburb.getSubName())) {
-
-                            suburb = currentSuburb;
-
-                            databaseSuburbChange = FirebaseDatabase.getInstance().getReference("suburbs").child(suburb.getId());
-
-
-                            Log.d("CHOSEN: ", "" + suburb + suburb.getSubName());
+                Suburb suburb = dataSnapshot.getValue(Suburb.class);
 
                             if ((events = suburb.getEvents()) != null){
-
 
                                 for (final Event event: events){
 
@@ -372,29 +400,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
                             }
 
-                            break;
                         }
-
-                    } catch (NullPointerException e){
-                        //this catches null pointer exceptions, it happens alot
-                        //TODO: I need to find a better way to loop through all the suburbs
-                        //if you look at the log you can see the 'null pointer' still gets the suburb name. weird.
-                        Log.d("ERROR VALUES", "" + currentSuburb.getSubName());
-                    }
-
-
-                }
-            }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
+
         });
 
 
-    }
-
+                }
 
     // NEED TO REFERENCE THIS
     public static class SelectDateFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
@@ -413,12 +429,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
         public Date populateSetDate(int year, int month, int day) {
 
-              calenderDate = new Date(year - 1900, month - 1, day);
-              Log.d("CALENDER DATE POPULATE" , calenderDate.toString());
+            calenderDate = new Date(year - 1900, month - 1, day);
+            Log.d("CALENDER DATE POPULATE" , calenderDate.toString());
 
-              return calenderDate;
+            return calenderDate;
         }
 
     }
 
-}
+            }
+
+
+
+
