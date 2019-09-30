@@ -78,7 +78,8 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
 
 
         //To load home screen automatically after logging in
-        String intentSuburb = ((OnlineNeighborhood) this.getApplication()).getsuburb();
+        Intent i = getIntent();
+        String intentSuburb = i.getStringExtra("SUBURB");
         Bundle bundle = new Bundle();
         bundle.putString("SUBURB", intentSuburb);
         HomeFragment home = new HomeFragment();

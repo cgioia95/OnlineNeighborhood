@@ -42,6 +42,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
     //Button logoutBtn;
     // private Button profileBtn;
     ImageView addEvent;
+    ImageView filterButton;
     String suburb;
     String currSuburb;
     private static final String TAG = "HomeScreen";
@@ -56,11 +57,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
     private ArrayList<Event> eventList = new ArrayList<>();
     Context applicationContext = BottomNavigationActivity.getContextOfApplication();
 
-//    @Override
-//    public void onCreate(Bundle savedInstanceState) {
-//
-//        super.onCreate(savedInstanceState);
-//    }
 
 
     @Nullable
@@ -77,6 +73,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
         fireBaseAuth = FirebaseAuth.getInstance();
         addEvent = mView.findViewById(R.id.addEvent);
         suburbTextView = mView.findViewById(R.id.textViewSuburb);
+        filterButton = mView.findViewById(R.id.buttonFilter);
+
 //
 //        Button logoutBtn = mView.findViewById(R.id.logOutBtn);
 //
@@ -183,6 +181,25 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
             startActivity(i);
         }
 
+        if(view == filterButton){
+            Fragment filterFrag = new eventFilter();
+        }
+
     }
+
+
+    //loading fragment above the navigation bar
+    private boolean loadFragment(Fragment fragment){
+
+
+        if(fragment != null){
+
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container,fragment).commit();
+        }
+        return false;
+    }
+
 
 }
