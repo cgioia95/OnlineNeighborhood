@@ -87,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SUGGESTION = convertArray(suburbList);
         mMaterialSearchView = findViewById(R.id.searchView);
         mMaterialSearchView.setSuggestions(SUGGESTION);
+        getSupportActionBar().setTitle("Search a Suburb");
 
 
         // Set on Click Listeners

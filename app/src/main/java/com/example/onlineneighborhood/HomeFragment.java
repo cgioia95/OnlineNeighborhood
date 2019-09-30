@@ -145,23 +145,21 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
                     mRecyclerView.setLayoutManager(mLayoutManager);
                     mRecyclerView.setAdapter(mAdapter);
                     mRecyclerView.setAdapter(mAdapter);
+                    mAdapter.setOnEventClickListener(new EventAdapter.onEventClickListener() {
+                        @Override
+                        public void onEventClick(int position) {
+                            Event event = eventList.get(position);
+
+                            Intent intent = new Intent(getActivity(), EventScreen.class);
+
+                            intent.putExtra("MyObject", event);
+                            startActivity(intent);
+                        }
+                    });
 
                 }catch (NullPointerException e){
                     e.printStackTrace();
                 }
-
-                mAdapter.setOnEventClickListener(new EventAdapter.onEventClickListener() {
-                    @Override
-                    public void onEventClick(int position) {
-                        Event event = eventList.get(position);
-
-                        Intent intent = new Intent(getActivity(), EventScreen.class);
-
-                        intent.putExtra("MyObject", event);
-                        startActivity(intent);
-                    }
-                });
-
             }
 
             @Override
