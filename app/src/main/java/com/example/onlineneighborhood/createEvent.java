@@ -1,7 +1,6 @@
 package com.example.onlineneighborhood;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 
@@ -37,7 +36,6 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -185,7 +183,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         // Bind Simple Variables
         users = new ArrayList<UserInformation>();
         eventTv = findViewById(R.id.eventTv);
-        createEvent = findViewById(R.id.createBtn);
+        createEvent = findViewById(R.id.editBtn);
         getLocation = findViewById(R.id.btnGetLocation);
         evName = findViewById(R.id.eventName);
         evDesc = findViewById(R.id.eventDesc);

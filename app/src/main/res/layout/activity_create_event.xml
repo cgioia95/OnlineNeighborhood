@@ -185,7 +185,7 @@
         android:text="Add to Calender?" />
 
     <Button
-        android:id="@+id/createBtn"
+        android:id="@+id/editBtn"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"

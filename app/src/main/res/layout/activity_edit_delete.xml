@@ -190,18 +190,18 @@
         android:orientation="horizontal"></LinearLayout>
 
     <Button
-        android:id="@+id/createBtn"
+        android:id="@+id/editBtn"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
         android:layout_gravity="center"
-        android:text="@string/create_an_event" />
+        android:layout_marginTop="10dp"
+        android:text="CHANGE EVENT!" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/deleteBtn"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="DELETE" />
+        android:text="DELETE EVENT!" />
 
 </LinearLayout>
