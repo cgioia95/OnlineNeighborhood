@@ -71,6 +71,7 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
     DatabaseReference databaseEvents;
     DatabaseReference databaseUsers;
     DatabaseReference databaseSuburb;
+    DatabaseReference databaseEvent;
     CheckBox addCal;
 
 
@@ -123,17 +124,19 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                     for (DataSnapshot eventSnapshot: dataSnapshot.getChildren()){
 
+                                        Log.d(TAG, "REFERENCE: " + eventSnapshot.getRef().toString());
+
                                         Log.d(TAG, eventSnapshot.toString());
 
                                         Log.d(TAG, eventSnapshot.child("id").toString());
 
                                         Log.d(TAG, eventSnapshot.child("id").getValue().toString());
 
-
-
-
                                         if (eventId.equals(eventSnapshot.child("id").getValue().toString())){
+
+                                            databaseEvent = eventSnapshot.getRef();
                                             Log.d(TAG, "MATCH");
+
                                         }
 
                                     }
@@ -405,7 +408,7 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
                     return;
                 }
                 if(editEventInSuburb(eventAddress, eventName, eventDesc, eventTime, eventDate, endTime, endDate, type)){
-                    Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "event changed! its party time", Toast.LENGTH_LONG).show();
                     if(addCal.isChecked()){
                         createCalenderEvent(eventName, eventDesc, eventAddress);
                     }
@@ -420,7 +423,7 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
                     return;
                 }
                 if(editEventInSuburb(eventAddress, eventName, eventDesc, eventTime, eventDate, endTime, endDate, type)){
-                    Toast.makeText(this, "event created! its party time", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "event changed! its party time", Toast.LENGTH_LONG).show();
 
                     if(addCal.isChecked()){
                         createCalenderEvent(eventName, eventDesc, eventAddress);
@@ -439,6 +442,18 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
     }
 
     public boolean editEventInSuburb(String eventAddress,String eventName,String eventDesc, String eventTime, String eventDate, String endTime, String endDate, String type){
+
+        databaseEvent.child("address").setValue(eventAddress);
+        databaseEvent.child("date").setValue(eventDate);
+        databaseEvent.child("description").setValue(eventDesc);
+        databaseEvent.child("date").setValue(eventDate);
+        databaseEvent.child("time").setValue(eventTime);
+        databaseEvent.child("endDate").setValue(endDate);
+        databaseEvent.child("endTime").setValue(endTime);
+        databaseEvent.child("name").setValue(eventName);
+        databaseEvent.child("type").setValue(type);
+
+
 
 
         return true;
