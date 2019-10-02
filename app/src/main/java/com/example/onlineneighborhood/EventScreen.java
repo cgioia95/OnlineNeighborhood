@@ -87,28 +87,29 @@ public class EventScreen extends AppCompatActivity {
             public void onFailure(@NonNull Exception exception) {
                 // Handle any errors
                 Log.d(TAG, "DOWNLOAD URL: FAILURE");
+                storageReference.child("profilePics/" + "default.png").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        // Got the download URL for 'users/me/profile.png' in uri
+                        Log.d(TAG, "DOWNLOAD URL: " + uri.toString());
+                        Picasso.get().load(uri).into(hostPic);
+                        return;
+
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle any errors
+                        Log.d(TAG, "DOWNLOAD URL: FAILURE");
+
+                    }
+                });
 
             }
         });
 
-        storageReference.child("profilePics/" + "default.png").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                // Got the download URL for 'users/me/profile.png' in uri
-                Log.d(TAG, "DOWNLOAD URL: " + uri.toString());
-                Picasso.get().load(uri).into(hostPic);
-                return;
 
-
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle any errors
-                Log.d(TAG, "DOWNLOAD URL: FAILURE");
-
-            }
-        });
     }
 
 

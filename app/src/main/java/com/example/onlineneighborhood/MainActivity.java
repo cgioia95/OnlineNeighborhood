@@ -1,13 +1,10 @@
 package com.example.onlineneighborhood;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -17,22 +14,20 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -45,12 +40,15 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     // Declare simple variables
-    private Button registerBtn, loginBtn, suburbBtn, getLocationBtn;
+    private Button registerBtn, loginBtn, getLocationBtn;
     private String suburb = "NO SUBURB FOUND";
     private String getLocat = "NO SUBURB FOUND";
     private Spinner suburbSpinner;
     private TextView tvSuburb;
-
+    private Toolbar searchBar;
+    private MaterialSearchView mMaterialSearchView;
+    private ArrayList<String> suburbList;
+    private String[] SUGGESTION;
     // Two components used to get user Location
     private LocationManager locationManager;
     private LocationListener locationListener;
@@ -66,16 +64,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         // Bind simple variables
-        suburbBtn = (Button) findViewById(R.id.chooseSuburbBtn);
         registerBtn = (Button) findViewById(R.id.registerBtn);
         getLocationBtn = (Button) findViewById(R.id.getLocationBtn);
         loginBtn = (Button) findViewById(R.id.loginBtn);
         suburbSpinner = findViewById(R.id.suburbSpinner);
         tvSuburb = findViewById(R.id.tvSuburb);
+        Toolbar toolbar = findViewById(R.id.searchBar);
         tvSuburb.setVisibility(View.INVISIBLE);
+        setSupportActionBar(toolbar);
+        toolbar.setTitleTextColor(Color.parseColor("#FFFFFF"));
+        suburbList = parseCSV();
+        SUGGESTION = convertArray(suburbList);
+        mMaterialSearchView = findViewById(R.id.searchView);
+        mMaterialSearchView.setSuggestions(SUGGESTION);
+        getSupportActionBar().setTitle("Search a Suburb");
+
 
         // Set on Click Listeners
-        suburbBtn.setOnClickListener(this);
         registerBtn.setOnClickListener(this);
         loginBtn.setOnClickListener(this);
         getLocationBtn.setOnClickListener(this);
@@ -142,6 +147,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
 
+        mMaterialSearchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if(newText != null && !newText.isEmpty()){
+                    suburb = newText;
+                    tvSuburb.setText(newText);
+                    tvSuburb.setVisibility(View.VISIBLE );
+                }
+                return false;
+            }
+        });
+
+
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.suburb_menu, menu);
+        MenuItem menuItem = menu.findItem(R.id.searchMenu);
+        mMaterialSearchView.setMenuItem(menuItem);
+        return super.onCreateOptionsMenu(menu);
 
     }
 
@@ -160,12 +192,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (view == registerBtn){
             startActivity(new Intent(this, Register.class));
-        }
-
-        if(view == suburbBtn){
-            suburb = suburbSpinner.getSelectedItem().toString();
-            tvSuburb.setText(suburbSpinner.getSelectedItem().toString());
-            tvSuburb.setVisibility(View.VISIBLE);
         }
 
         if(view == getLocationBtn){
@@ -197,6 +223,46 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         return suburb;
+    }
+
+    public ArrayList<String> parseCSV(){
+        ArrayList<String> suburbList = new ArrayList<String>();
+        try{
+            InputStream is = getResources().openRawResource(R.raw.melbourne_suburbs);
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(is, Charset.forName("UTF-8"))
+            );
+            String line = "";
+            int i = 0;
+            while ((line = reader.readLine()) != null) {
+                //spilt by ","
+                String [] tokens = line.split(",");
+
+                //read the data
+                System.out.println(tokens[0]);
+                String name = tokens[0];
+                suburbList.add(name);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return suburbList;
+    }
+
+    public String[] convertArray(ArrayList<String> arr){
+
+        // declaration and initialise String Array
+        String str[] = new String[arr.size()];
+
+        // ArrayList to Array Conversion
+        for (int j = 0; j < arr.size(); j++) {
+
+            // Assign each value to String array
+            str[j] = arr.get(j);
+        }
+
+        return str;
     }
 
 

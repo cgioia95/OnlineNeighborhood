@@ -27,6 +27,16 @@
         <item>Misc.</item>
     </string-array>
 
+
+    <string-array name="dates">
+        <item>Just Today</item>
+        <item>Next 2 days</item>
+        <item>This Weekend</item>
+        <item>This Week</item>
+        <item>This Month</item>
+        <item>All Time</item>
+    </string-array>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="create_an_event">Create an Event!</string>
