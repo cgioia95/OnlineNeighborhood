@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />
@@ -25,6 +26,12 @@
             android:name=".BottomNavigationActivity"
             android:label="Online Neighbourhood" />
         <activity android:name=".EventScreen" />
+        <activity
+            android:name=".otherProfile"
+            android:label = "otherProfile"
+            android:parentActivityName=".EventScreen"/>
+            />
+
         <activity
             android:name=".createEvent"
             android:theme="@style/AppTheme.PopUpTheme" />

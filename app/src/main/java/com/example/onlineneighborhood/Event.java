@@ -1,5 +1,6 @@
 package com.example.onlineneighborhood;
 
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -11,7 +12,8 @@ import java.util.ArrayList;
 public class Event implements Serializable {
     private String id;
     private UserInformation host;
-    private String address, eventName, description, time, date, endTime, endDate, type;
+    private String address, eventName, description, time, date, endTime, endDate, type, hostname;
+    private Uri uri;
   
 
     private ArrayList<UserInformation> attendees;
@@ -137,4 +139,9 @@ public class Event implements Serializable {
         this.attendees = attendees;
     }
 
+    public void setUri(Uri image){this.uri = image;}
+
+    public Uri getUri() {
+        return uri;
+    }
 }

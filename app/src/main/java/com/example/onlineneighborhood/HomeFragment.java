@@ -39,8 +39,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
 
     TextView suburbTextView;
 
-    //Button logoutBtn;
-    // private Button profileBtn;
+
     ImageView addEvent;
     String suburb;
     String currSuburb;
@@ -56,11 +55,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
     private ArrayList<Event> eventList = new ArrayList<>();
     Context applicationContext = BottomNavigationActivity.getContextOfApplication();
 
-//    @Override
-//    public void onCreate(Bundle savedInstanceState) {
-//
-//        super.onCreate(savedInstanceState);
-//    }
 
 
     @Nullable
@@ -77,17 +71,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
         fireBaseAuth = FirebaseAuth.getInstance();
         addEvent = mView.findViewById(R.id.addEvent);
         suburbTextView = mView.findViewById(R.id.textViewSuburb);
-//
-//        Button logoutBtn = mView.findViewById(R.id.logOutBtn);
-//
-//        logoutBtn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                fireBaseAuth.signOut();
-//                //finish();
-//                startActivity(new Intent(applicationContext, Login.class));
-//            }
-//        });
 
         Intent i = getActivity().getIntent();
         currSuburb=suburb = ((OnlineNeighborhood) getActivity().getApplication()).getsuburb();
