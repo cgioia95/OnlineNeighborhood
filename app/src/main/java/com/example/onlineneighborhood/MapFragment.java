@@ -138,15 +138,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
                         if (suburbName.equals(currentSuburb.getSubName())) {
 
-                            suburb = currentSuburb;
+                        suburb = currentSuburb;
 
-                            databaseSuburbChange = FirebaseDatabase.getInstance().getReference("suburbs").child(suburb.getId());
-
-
-                            Log.d("CHOSEN: ", "" + suburb + suburb.getSubName());
+                        databaseSuburbChange = FirebaseDatabase.getInstance().getReference("suburbs").child(suburb.getId());
 
 
-                        }
+                        Log.d("CHOSEN: ", "" + suburb + suburb.getSubName());
+
+
+                    }
 
             }
 
@@ -299,105 +299,96 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
                             if ((events = suburb.getEvents()) != null){
 
-                                for (final Event event: events){
+                                for (final Event event: events) {
 
 
-                                    String title = event.getName();
-                                    String address = event.getAddress();
-                                    String stringDate = event.getDate();
+                                    if (event != null) {
+
+                                        String title = event.getName();
+                                        String address = event.getAddress();
+                                        String stringDate = event.getDate();
 
 
+                                        Log.d("MAPTEST", title);
+                                        Log.d("MAPTEST", address);
 
 
-                                    Log.d("MAPTEST", title);
-                                    Log.d("MAPTEST", address);
+                                        Geocoder geocoder = new Geocoder(getActivity(), getDefault());
+                                        List<Address> addresses = null;
+                                        try {
+                                            addresses = geocoder.getFromLocationName(address, 1);
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                        Address add = addresses.get(0);
+                                        double longitude = add.getLongitude();
+                                        double latitude = add.getLatitude();
+
+                                        LatLng locat = new LatLng(latitude, longitude);
+
+                                        try {
+                                            Date testedDate = new SimpleDateFormat("dd/MM/yyyy").parse(stringDate);
+                                            Log.d("TESTED DATE", testedDate.toString());
+
+                                            if (!testedDate.before(todayDate)) {
+
+                                                Marker marker = mMap.addMarker(new MarkerOptions()
+                                                        .position(locat)
+                                                        .title(event.getName())
+                                                        .snippet(event.getDescription())
+                                                );
 
 
-                                    Geocoder geocoder = new Geocoder(getActivity(), getDefault());
-                                    List<Address> addresses = null;
-                                    try {
-                                        addresses = geocoder.getFromLocationName(address, 1);
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                    Address add = addresses.get(0);
-                                    double longitude = add.getLongitude();
-                                    double latitude = add.getLatitude();
+                                                String markerId = marker.getId();
 
-                                    LatLng locat = new LatLng(latitude, longitude);
+                                                markerToEvent.put(markerId, event);
 
-                                    try {
-                                        Date testedDate =new SimpleDateFormat("dd/MM/yyyy").parse(stringDate);
-                                        Log.d("TESTED DATE" , testedDate.toString());
+                                                defaultMarkers.add(marker);
 
-                                        if (!testedDate.before(todayDate)){
+                                                markerIDtoMarker.put(markerId, marker);
 
-                                            Marker marker = mMap.addMarker(new MarkerOptions()
-                                                    .position(locat)
-                                                    .title(event.getName())
-                                                    .snippet(event.getDescription())
-                                            );
+                                                if (filterType.equals("TODAY_FILTER")) {
 
+                                                    if (!(testedDate.compareTo(todayDate) == 0)) {
+                                                        marker.setVisible(false);
+                                                    }
 
+                                                } else if (filterType.equals("CALENDER_FILTER")) {
 
-                                            String markerId = marker.getId();
+                                                    if (testedDate.compareTo(calenderDate) != 0) {
 
-                                            markerToEvent.put(markerId, event);
+                                                        marker.setVisible(false);
 
-                                            defaultMarkers.add(marker);
-
-                                            markerIDtoMarker.put(markerId, marker);
-
-                                            if (filterType.equals("TODAY_FILTER")){
-
-                                                if (!(testedDate.compareTo(todayDate) == 0)){
-                                                    marker.setVisible(false);
+                                                    }
                                                 }
+
 
                                             }
 
-                                            else if (filterType.equals("CALENDER_FILTER")){
 
-                                                if (testedDate.compareTo(calenderDate) != 0){
+                                        } catch (ParseException e) {
+                                            e.printStackTrace();
+                                        }
 
-                                                    marker.setVisible(false);
 
-                                                }
+                                        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                                            @Override
+                                            public void onInfoWindowClick(Marker marker) {
+
+                                                Intent intent = new Intent(getActivity(), EventScreen.class);
+
+                                                intent.putExtra("MyObject", event);
+                                                startActivity(intent);
+
+
                                             }
+                                        });
 
 
-
-                                        }
-
-
-                                    } catch (ParseException e) {
-                                        e.printStackTrace();
+                                        Log.d("MAPTEST", "LONG: " + Double.toString(longitude) + " LAT: " + Double.toString(latitude));
+                                        
                                     }
-
-
-
-
-
-                                    mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-                                        @Override
-                                        public void onInfoWindowClick(Marker marker) {
-
-                                            Intent intent = new Intent(getActivity(), EventScreen.class);
-
-                                            intent.putExtra("MyObject", event);
-                                            startActivity(intent);
-
-
-                                        }
-                                    });
-
-
-                                    Log.d("MAPTEST", "LONG: " +  Double.toString(longitude) + " LAT: " + Double.toString(latitude));
-
-
                                 }
-
-
                             }
 
                         }
