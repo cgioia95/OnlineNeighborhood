@@ -201,6 +201,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                             Log.d("MATCHTEST" , "MATCH");
                         }
 
+                        if (todayDate.compareTo(testedDate) == 0 ){
+                            markerIDtoMarker.get(entry.getKey()).setVisible(true);
+
+                        }
+
 
                     } catch (ParseException e) {
                         e.printStackTrace();
