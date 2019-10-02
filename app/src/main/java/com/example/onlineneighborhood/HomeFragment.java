@@ -146,9 +146,47 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
                     mRecyclerView.setAdapter(mAdapter);
                     mRecyclerView.setAdapter(mAdapter);
 
+
+
+
+
+
                 }catch (NullPointerException e){
                     e.printStackTrace();
                 }
+
+
+                mAdapter.setOnEventLongClickListener(new EventAdapter.onEventLongClickListener() {
+                    @Override
+                    public void onEventLongClick(int position) {
+
+                        Event event = eventList.get(position);
+
+                        String hostId = event.getHost().getUid();
+
+                        String myId = fireBaseAuth.getCurrentUser().getUid();
+                        Log.d(TAG, "Long Click");
+
+
+                        if (myId.equals(hostId)){
+                            Log.d(TAG, "Permission Granted");
+
+                            Intent intent = new Intent(applicationContext, editDelete.class);
+                            intent.putExtra("MyObject", event);
+                            intent.putExtra("SUBURB", suburb);
+
+
+                            startActivity(intent);
+
+                        }
+
+                        else {
+                            Log.d(TAG, "Permission Denied");
+                        }
+
+
+                    }
+                });
 
                 mAdapter.setOnEventClickListener(new EventAdapter.onEventClickListener() {
                     @Override
@@ -157,9 +195,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
 
                         Intent intent = new Intent(getActivity(), EventScreen.class);
 
+                        Log.d(TAG, "Single Click");
+
                         intent.putExtra("MyObject", event);
                         startActivity(intent);
                     }
+
+
                 });
 
             }
