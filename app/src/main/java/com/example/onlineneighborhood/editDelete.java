@@ -310,11 +310,19 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
 
 
 
+
     }
 
     //adding functionality to the buttons
     @Override
     public void onClick(View view) {
+
+        if (view == deleteBtn ){
+            deleteEvent();
+
+            this.finish();
+        }
+
         if(view == btnGetLocation){
             eventTv.setText(locat);
             //if this is true then location services has been requested and we are allowed to use it
@@ -438,6 +446,68 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
         else{
             Toast.makeText(this, "please enter all fields", Toast.LENGTH_LONG).show();
         }
+
+    }
+
+    public void deleteEvent(){
+
+        databaseEvent.removeValue();
+
+        DatabaseReference userEvents = databaseUsers.child(firebaseAuth.getCurrentUser().getUid()).child("myEvents");
+
+        userEvents.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                for (DataSnapshot eventSnapshot : dataSnapshot.getChildren()) {
+
+                    String id = eventSnapshot.child("id").getValue().toString();
+
+                    if (eventId.equals(id)) {
+                        Log.d(TAG, "Event Reference: " + eventSnapshot.getRef().toString());
+                        Log.d(TAG, "Event ID: " +  id);
+                        eventSnapshot.getRef().removeValue();
+                    }
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        } );
+
+
+
+
+
+//        databaseUsers.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//
+//                for(DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+//
+//                    String id = userSnapshot.getKey().toString();
+//
+//                    if (id.equals(firebaseAuth.getCurrentUser().getUid())){
+//
+//                    }
+//
+//                    Log.d(TAG, id);
+//
+//
+//                }
+//
+//                }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
+
+
 
     }
 
