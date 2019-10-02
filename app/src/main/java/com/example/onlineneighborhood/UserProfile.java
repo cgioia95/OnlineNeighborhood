@@ -185,7 +185,7 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
     private void setSupportActionBar() {
     }
 
-    private void showDatePickerDialog(){
+    private void showDatePickerDialog(  ){
         DatePickerDialog datePickerDialog = new DatePickerDialog(this, this,
                 getInstance().get(YEAR),
                 getInstance().get(MONTH),
