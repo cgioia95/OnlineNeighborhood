@@ -180,6 +180,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
                         Log.d(TAG, "Single Click");
 
                         intent.putExtra("MyObject", event);
+                        intent.putExtra("SUBURB", suburb);
+
                         startActivity(intent);
                     }
 
