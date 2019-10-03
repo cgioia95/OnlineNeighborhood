@@ -32,6 +32,7 @@ public class EventScreen extends AppCompatActivity {
         setContentView(R.layout.activity_event_screen);
 
         final Event mEvent= (Event) getIntent().getSerializableExtra("MyObject");
+        final String suburb = getIntent().getStringExtra("SUBURB");
 
         mEventName = findViewById(R.id.eventName);
         mDescription = findViewById(R.id.eventDesc);
@@ -59,6 +60,8 @@ public class EventScreen extends AppCompatActivity {
 
                 Intent i = new Intent(getApplicationContext(), otherProfile.class);
                 i.putExtra("UID", mEvent.getHost().getUid());
+                i.putExtra("MyObject", mEvent);
+                i.putExtra("SUBURB", suburb);
                 startActivity(i);
 
 

@@ -2,12 +2,15 @@ package com.example.onlineneighborhood;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.FileProvider;
 
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
@@ -73,7 +76,7 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
     private DatabaseReference databaseReference;
     private FirebaseStorage storage;
     private StorageReference storageReference;
-    private static final int PICK_IMAGE = 1;
+    private static final int PICK_IMAGE = 1, REQUEST_CAMERA = 0;
     private static final String TAG = "My Profile";
     private String uid;
     Uri imageuri;
@@ -134,7 +137,6 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
                 gallery.setAction(Intent.ACTION_GET_CONTENT);
 
                 startActivityForResult(Intent.createChooser(gallery, "Select Picture"), PICK_IMAGE);
-
 
             }
 
@@ -240,15 +242,13 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == PICK_IMAGE && resultCode == RESULT_OK){
+        if(requestCode == PICK_IMAGE && resultCode == RESULT_OK) {
             imageuri = data.getData();
-            try{
+            try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageuri);
                 imageButtonPicture.setImageBitmap(bitmap);
-
-
                 uploadImage();
-            }catch(IOException e){
+            } catch (IOException e) {
                 e.printStackTrace();
 
             }
@@ -308,28 +308,28 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
                 public void onFailure(@NonNull Exception exception) {
                     // Handle any errors
                     Log.d(TAG, "DOWNLOAD URL: FAILURE");
+                    storageReference.child("profilePics/" + "default.png").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            // Got the download URL for 'users/me/profile.png' in uri
+                            Log.d(TAG, "DOWNLOAD URL: " + uri.toString());
+                            Picasso.get().load(uri).into(imageButtonPicture);
+                            return;
 
+
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Handle any errors
+                            Log.d(TAG, "DOWNLOAD URL: FAILURE");
+
+                        }
+                    });
                 }
             });
 
-        storageReference.child("profilePics/" + "default.png").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                // Got the download URL for 'users/me/profile.png' in uri
-                Log.d(TAG, "DOWNLOAD URL: " + uri.toString());
-                Picasso.get().load(uri).into(imageButtonPicture);
-                return;
 
-
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle any errors
-                Log.d(TAG, "DOWNLOAD URL: FAILURE");
-
-            }
-        });
 
 
 
