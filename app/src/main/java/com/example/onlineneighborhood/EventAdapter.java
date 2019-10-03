@@ -1,15 +1,28 @@
 package com.example.onlineneighborhood;
 
 import android.content.Context;
+import android.net.Uri;
 import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -55,14 +68,23 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         public TextView mUserName;
         public TextView mEventTime;
         public TextView mEventAddress;
+        public ImageView hostPic;
+        private FirebaseStorage storage;
+        private StorageReference storageReference;
+        private DatabaseReference databaseReference;
 
-        public EventViewHolder(@NonNull View itemView, final onEventClickListener listener , final  onEventLongClickListener listener2) {
+
+        public EventViewHolder(@NonNull View itemView, final onEventClickListener listener, final  onEventLongClickListener listener2) {
             super(itemView);
 
             mEvent = itemView.findViewById(R.id.eventName);
             mUserName = itemView.findViewById(R.id.userName);
             mEventTime = itemView.findViewById(R.id.eventTime);
             mEventAddress = itemView.findViewById(R.id.eventAddress);
+            hostPic = itemView.findViewById(R.id.imageView);
+            storage = FirebaseStorage.getInstance();
+            databaseReference = FirebaseDatabase.getInstance().getReference("Users");
+            storageReference=storage.getReference();
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -97,6 +119,75 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
                 }
             });
+
+
+        }
+
+        private void getUsername(String uid){
+            databaseReference.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Log.d("On DATA CHANGE ", "IN");
+                    Log.d("On DATA CHANGE", "Snapshot" + dataSnapshot);
+                    if (dataSnapshot.getValue() != null) {
+                        String name = dataSnapshot.child("name").getValue().toString();
+
+                        mUserName.setText(name);
+
+                    }
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+
+        }
+
+
+
+        protected void downloadImage(String uid) {
+            storageReference.child("profilePics/" + uid).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    // Got the download URL for 'users/me/profile.png' in uri
+                    Log.d(TAG, "DOWNLOAD URL: " + uri.toString());
+                    Picasso.get().load(uri).into(hostPic);
+                    return;
+
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle any errors
+                    Log.d(TAG, "DOWNLOAD URL: FAILURE");
+                    storageReference.child("profilePics/" + "default.png").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            // Got the download URL for 'users/me/profile.png' in uri
+                            Log.d(TAG, "DOWNLOAD URL: " + uri.toString());
+                            Picasso.get().load(uri).into(hostPic);
+                            return;
+
+
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Handle any errors
+                            Log.d(TAG, "DOWNLOAD URL: FAILURE");
+
+                        }
+                    });
+
+                }
+            });
+
+
+
+
         }
     }
 
@@ -113,16 +204,21 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         EventViewHolder viewholder = new EventViewHolder(v, mListener, mListener2);
         return viewholder;
 
+
     }
 
     @Override
     public void onBindViewHolder(@NonNull EventViewHolder holder, int position) {
         Event currentItem = eventList.get(position);
+
+        Log.d(TAG, "user id " + currentItem.getHost().getUid());
         holder.mEvent.setText(currentItem.getName());
-        //holder.mUserName.setText(currentItem.getHost().getName()); //TODO: get the name of the hostID
+        //TODO: get the name of the hostID - DONE
+        holder.getUsername(currentItem.getHost().getUid());
+
         holder.mEventTime.setText(currentItem.getTime());
         holder.mEventAddress.setText(currentItem.getAddress());
-
+        holder.downloadImage(currentItem.getHost().getUid());
 
 
 

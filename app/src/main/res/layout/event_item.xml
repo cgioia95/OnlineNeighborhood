@@ -18,7 +18,6 @@
             android:id="@+id/imageView"
             android:layout_width="54dp"
             android:layout_height="54dp"
-            android:src="@drawable/profile_image"
             android:layout_centerVertical="true"
             android:layout_marginRight="24dp"/>
 

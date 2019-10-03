@@ -4,11 +4,15 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.media.Image;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,10 +25,19 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
+
 public class EventScreen extends AppCompatActivity {
     private static final String TAG = "EventScreen";
 
     public TextView mEventName, mDescription, mTime, mDate, attendingTextView;
+    private FirebaseStorage storage;
+    private StorageReference storageReference;
+    public ImageView hostPic;
     public Button attendBtn;
     FirebaseAuth firebaseAuth;
 
@@ -46,9 +59,7 @@ public class EventScreen extends AppCompatActivity {
 
         Intent i = getIntent();
         final String intentSuburb = i.getStringExtra("SUBURB");
-
         firebaseAuth = FirebaseAuth.getInstance();
-
         databaseUsers = FirebaseDatabase.getInstance().getReference("Users");
 
 
@@ -58,6 +69,10 @@ public class EventScreen extends AppCompatActivity {
         mDescription = findViewById(R.id.eventDesc);
         mDate = findViewById(R.id.eventDate);
         mTime = findViewById(R.id.eventTime);
+        hostPic = findViewById(R.id.imageView);
+
+        storage = FirebaseStorage.getInstance();
+        storageReference=storage.getReference();
 
         attendingTextView = findViewById(R.id.attendingTextView);
 
@@ -139,6 +154,24 @@ public class EventScreen extends AppCompatActivity {
         mDescription.setText(mEvent.getDescription());
         mDate.setText(mEvent.getDate());
         mTime.setText(mEvent.getTime());
+        downloadImage(mEvent.getHost().getUid());
+        hostPic.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View view) {
+
+                Intent i = new Intent(getApplicationContext(), otherProfile.class);
+                i.putExtra("UID", mEvent.getHost().getUid());
+                i.putExtra("MyObject", mEvent);
+                i.putExtra("SUBURB", intentSuburb);
+                startActivity(i);
+
+
+
+            }
+
+        });
+
 
         String host = mEvent.getHost().getUid();
 
@@ -196,7 +229,8 @@ public class EventScreen extends AppCompatActivity {
                             Log.d(TAG, "ALREADY ATTENDING");
                             attending = true;
 
-                            Toast.makeText(getApplicationContext(), "Already attending the event!", Toast.LENGTH_SHORT);
+
+                        Toast.makeText(getApplicationContext(), "Already attending the event!" , Toast.LENGTH_SHORT ).show();
 
                             break;
 
@@ -257,7 +291,7 @@ public class EventScreen extends AppCompatActivity {
                     attendBtn.setText("UNATTEND");
                     attendingTextView.setText("ATTENDING");
 
-                    Toast.makeText(getApplicationContext(), "You're now attending the event!" , Toast.LENGTH_SHORT );
+                    Toast.makeText(getApplicationContext(), "You're now attending the event!" , Toast.LENGTH_SHORT ).show();
 
                     Log.d(TAG, "User now attending");
 
@@ -342,4 +376,51 @@ public class EventScreen extends AppCompatActivity {
 
 
     }
-}
+
+
+    protected void downloadImage(String uid) {
+        storageReference.child("profilePics/" + uid).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                // Got the download URL for 'users/me/profile.png' in uri
+                Log.d(TAG, "DOWNLOAD URL: " + uri.toString());
+                Picasso.get().load(uri).into(hostPic);
+                return;
+
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle any errors
+                Log.d(TAG, "DOWNLOAD URL: FAILURE");
+                storageReference.child("profilePics/" + "default.png").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        // Got the download URL for 'users/me/profile.png' in uri
+                        Log.d(TAG, "DOWNLOAD URL: " + uri.toString());
+                        Picasso.get().load(uri).into(hostPic);
+                        return;
+
+
+
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle any errors
+                        Log.d(TAG, "DOWNLOAD URL: FAILURE");
+
+                    }
+                });
+
+            }
+        });
+
+
+    }
+
+
+
+    }
