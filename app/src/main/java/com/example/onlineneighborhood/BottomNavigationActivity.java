@@ -41,6 +41,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toolbar;
 
@@ -57,6 +59,7 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
 
     private GoogleMap mMap;
     String intentSuburb, dateRange, typeFilter, time;
+    private ImageView profile;
     Bundle bundle = new Bundle();
     Suburb suburb;
     ArrayList<Event> events;
@@ -114,9 +117,21 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
 
         //Setting toolbar for adding profile icon
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
+        profile = toolbar.findViewById(R.id.profile);
+        downloadImage();
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Online Neighborhood");
 
+        profile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent i = new Intent(getApplicationContext(), UserProfile.class);
+                startActivity(i);
+
+            }
+
+        });
 
         //To load home screen automatically after logging it
         Bundle bundle = new Bundle();
@@ -145,11 +160,7 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
 
     //managing toolbar items
     public boolean onOptionsItemSelected(MenuItem item){
-        if(item.getItemId() == R.id.profile){
 
-            Intent i = new Intent(getApplicationContext(), UserProfile.class);
-            startActivity(i);
-        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -314,6 +325,51 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
 
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
+
+    }
+
+    protected void downloadImage(){
+
+        storageReference.child("profilePics/" + uid).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                // Got the download URL for 'users/me/profile.png' in uri
+                Log.d("Bottom Navigation", "DOWNLOAD URL: " + uri.toString());
+                Picasso.get().load(uri).into(profile);
+                return;
+
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle any errors
+                Log.d("Bottom Navigation", "DOWNLOAD URL: FAILURE");
+                storageReference.child("profilePics/" + "default.png").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        // Got the download URL for 'users/me/profile.png' in uri
+                        Log.d("Bottom Navigation", "DOWNLOAD URL: " + uri.toString());
+                        Picasso.get().load(uri).into(profile);
+                        return;
+
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle any errors
+                        Log.d("Bottom Navigation", "DOWNLOAD URL: FAILURE");
+
+                    }
+                });
+            }
+        });
+
+
+
+
+
 
     }
 
