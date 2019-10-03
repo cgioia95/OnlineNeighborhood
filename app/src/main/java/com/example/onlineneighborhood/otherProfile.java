@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -68,8 +69,12 @@ public class otherProfile extends AppCompatActivity {
         final Event mEvent= (Event) getIntent().getSerializableExtra("MyObject");
         final String suburb = getIntent().getStringExtra("SUBURB");
 
+
+
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        Intent intent = new Intent();
+        intent.putExtra("MyObject", mEvent);
         Log.d("user profile", "onCreate: " + toolbar);
         getSupportActionBar().setTitle("Online Neighborhood");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -105,6 +110,17 @@ public class otherProfile extends AppCompatActivity {
         });
 
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     protected void downloadImage(){

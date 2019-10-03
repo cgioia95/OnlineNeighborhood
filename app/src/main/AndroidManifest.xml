@@ -40,12 +40,13 @@
         <activity
             android:name=".BottomNavigationActivity"
             android:label="Online Neighbourhood" />
-        <activity android:name=".EventScreen" />
+        <activity android:name=".EventScreen"
+            android:parentActivityName=".BottomNavigationActivity"/>
 
         <activity
             android:name=".otherProfile"
             android:label = "otherProfile"
-            android:parentActivityName=".EventScreen"/>
+            />
 
 
         <activity

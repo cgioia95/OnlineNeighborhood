@@ -56,18 +56,22 @@ public class EventScreen extends AppCompatActivity {
         setContentView(R.layout.activity_event_screen);
 
         Intent i = getIntent();
-        final String intentSuburb = i.getStringExtra("SUBURB");
+        final String intentSuburb = ((OnlineNeighborhood) this.getApplication()).getsuburb();
+
         firebaseAuth = FirebaseAuth.getInstance();
         databaseUsers = FirebaseDatabase.getInstance().getReference("Users");
 
-
+        Log.d(TAG, "HERE");
         final Event mEvent= (Event) i.getSerializableExtra("MyObject");
-
+        Log.d(TAG, "onCreate: " + mEvent);
         mEventName = findViewById(R.id.eventName);
         mDescription = findViewById(R.id.eventDesc);
         mDate = findViewById(R.id.eventDate);
         mTime = findViewById(R.id.eventTime);
         hostPic = findViewById(R.id.imageView);
+
+       
+
 
         storage = FirebaseStorage.getInstance();
         storageReference=storage.getReference();
@@ -128,6 +132,7 @@ public class EventScreen extends AppCompatActivity {
         thisUserInformation = new UserInformation(thisUserString);
 
         attendBtn = findViewById(R.id.attendBtn);
+        Log.d(TAG, "onCreate: "+ mEvent);
 
         Log.d(TAG, "onCreate: eventName " + mEvent.getName());
         Log.d(TAG, "onCreate: eventDesc " + mEvent.getDescription());

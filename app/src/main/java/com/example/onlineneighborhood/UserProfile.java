@@ -7,11 +7,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -19,6 +22,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.view.Menu;
@@ -53,9 +57,12 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import static androidx.core.graphics.TypefaceCompatUtil.getTempFile;
@@ -66,19 +73,19 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
     private TextView textViewName, tvBio, tvDOB;
     private Spinner spinnerPreferences;
     private Button editProfileBtn;
-    private Button logoutBtn;
-    // private TextView textViewdob;
-    private EditText editTextdob;
-    private EditText editTextBio;
+    private EditText editTextdob, editTextBio;
     private ImageButton imageButtonPicture;
     private DatePickerDialog.OnDateSetListener DateSetListener;
     private FirebaseAuth fireBaseAuth;
     private DatabaseReference databaseReference;
     private FirebaseStorage storage;
     private StorageReference storageReference;
-    private static final int PICK_IMAGE = 1, REQUEST_CAMERA = 0;
+    private static final int PICK_IMAGE = 1;
+    private static final int CAMERA_REQUEST = 1888;
+    private static final int MY_CAMERA_PERMISSION_CODE = 100;
+    private static final int REQUEST_IMAGE_CAPTURE = 12, REQUEST_TAKE_PHOTO = 15;
     private static final String TAG = "My Profile";
-    private String uid;
+    private String uid, currentPhotoPath;
     Uri imageuri;
     private List<String> preferenceOptions = Arrays.asList("Sports", "Gigs", "Dating", "Misc.");
 
@@ -97,7 +104,6 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
         spinnerPreferences = (Spinner) findViewById(R.id.spinnerPreferences);
         editTextdob = findViewById(R.id.editTextdob);
         editTextBio = findViewById(R.id.editTextbio);
-        logoutBtn = findViewById(R.id.logOutBtn);
         imageButtonPicture = findViewById(R.id.imageButtonPicture);
         fireBaseAuth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference("Users");
@@ -128,23 +134,62 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
 
         });
 
-        imageButtonPicture.setOnClickListener(new View.OnClickListener(){
-
+        imageButtonPicture.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View view) {
-                Intent gallery = new Intent();
-                gallery.setType("image/*");
-                gallery.setAction(Intent.ACTION_GET_CONTENT);
+            public void onClick(View v)
+            {
+//                if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+//                {
+//                    requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_PERMISSION_CODE);
+//                }
+//                else
+//                {
+//                    Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+//                    startActivityForResult(cameraIntent, CAMERA_REQUEST);
+//                }
+                CharSequence[] items={"Camera", "Gallery"};
+                AlertDialog.Builder builder = new AlertDialog.Builder(UserProfile.this);
+                builder.setTitle("Pick an image from").setItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                       if (i==0){
+                           Log.d("Pick Image", "onClick: "+ "Camera");
+                           Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                           if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                               // Create the File where the photo should go
+                               File photoFile = null;
+                               try {
+                                   photoFile = createImageFile();
+                               } catch (IOException ex) {
+                                   // Error occurred while creating the File
+                               }
+                               // Continue only if the File was successfully created
+                               if (photoFile != null) {
+                                   Log.d(TAG, "onClick: "+ photoFile);
+                                   imageuri = FileProvider.getUriForFile(UserProfile.this,
+                                           "com.example.android.fileprovider",
+                                           photoFile);
+                                   takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageuri);
+                                   startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+                               }
+                           }
+                       }
+                       if (i==1){
+                           Intent gallery = new Intent();
+                            gallery.setType("image/*");
+                            gallery.setAction(Intent.ACTION_GET_CONTENT);
 
-                startActivityForResult(Intent.createChooser(gallery, "Select Picture"), PICK_IMAGE);
+                            startActivityForResult(Intent.createChooser(gallery, "Select Picture"), PICK_IMAGE);
 
+
+                       }
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
             }
-
         });
-
-
-
-
 
 
         databaseReference.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -242,7 +287,7 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == PICK_IMAGE && resultCode == RESULT_OK) {
+        if (requestCode == PICK_IMAGE && resultCode == RESULT_OK) {
             imageuri = data.getData();
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageuri);
@@ -253,11 +298,40 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
 
             }
         }
+
+        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            imageButtonPicture.setImageBitmap(imageBitmap);
+            uploadImage();
+
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == MY_CAMERA_PERMISSION_CODE)
+        {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            {
+                Toast.makeText(this, "camera permission granted", Toast.LENGTH_LONG).show();
+                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(cameraIntent, CAMERA_REQUEST);
+            }
+            else
+            {
+                Toast.makeText(this, "camera permission denied", Toast.LENGTH_LONG).show();
+            }
+        }
+
+
     }
 
 
     private void uploadImage() {
-
+        Log.d(TAG, "uploadImage: "+ imageuri);
         if(imageuri != null)
         {
             final ProgressDialog progressDialog = new ProgressDialog(this);
@@ -328,12 +402,22 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
                     });
                 }
             });
+    }
 
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
 
-
-
-
-
+        // Save a file: path for use with ACTION_VIEW intents
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
     }
 
 
