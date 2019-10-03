@@ -2,7 +2,9 @@ package com.example.onlineneighborhood;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.Intent;
 import android.media.Image;
 import android.net.Uri;
@@ -32,7 +34,10 @@ import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
 public class EventScreen extends AppCompatActivity {
-    private static final String TAG = "EventScreen";
+    private static final String TAG = "EventScreenTAG";
+
+    private static final String TAG2 = "EventScreenList";
+
 
     public TextView mEventName, mDescription, mTime, mDate, attendingTextView;
     private FirebaseStorage storage;
@@ -51,11 +56,20 @@ public class EventScreen extends AppCompatActivity {
 
     public boolean attending;
 
+    //Setting up recyclerview and adapter for displaying events
+    private RecyclerView recyclerViewUsers;
+    private EventAdapter mAdapterUsers;
+    private RecyclerView.LayoutManager mLayoutManager;
+    private ArrayList<UserInformation> userList = new ArrayList<>();
+    Context applicationContext = BottomNavigationActivity.getContextOfApplication();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_screen);
+
+        Log.d(TAG, "CREATE");
 
         Intent i = getIntent();
         final String intentSuburb = ((OnlineNeighborhood) this.getApplication()).getsuburb();
@@ -79,41 +93,6 @@ public class EventScreen extends AppCompatActivity {
         storageReference=storage.getReference();
 
         attendingTextView = findViewById(R.id.attendingTextView);
-
-        databaseSuburb =  FirebaseDatabase.getInstance().getReference("suburbs").child(intentSuburb);
-
-
-        databaseSuburb.child("events").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot eventSnapshot: dataSnapshot.getChildren()){
-
-
-                    if (mEvent.getId().equals(eventSnapshot.child("id").getValue().toString())){
-
-                        databaseEvent = eventSnapshot.getRef();
-
-
-
-                        Event event = eventSnapshot.getValue(Event.class);
-
-                        attendees = event.getAttendees();
-
-                        Log.d(TAG, eventSnapshot.toString());
-                        Log.d(TAG, "MATCH");
-
-
-                    }
-
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
 
         thisUserString = firebaseAuth.getCurrentUser().getUid();
 
@@ -152,6 +131,93 @@ public class EventScreen extends AppCompatActivity {
 
         thisUserInformation = new UserInformation(thisUserString);
 
+        databaseSuburb =  FirebaseDatabase.getInstance().getReference("suburbs").child(intentSuburb);
+
+
+        databaseSuburb.child("events").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot eventSnapshot: dataSnapshot.getChildren()){
+
+
+                    if (mEvent.getId().equals(eventSnapshot.child("id").getValue().toString())){
+
+                        databaseEvent = eventSnapshot.getRef();
+
+
+
+                        Event event = eventSnapshot.getValue(Event.class);
+
+                        attendees = event.getAttendees();
+
+
+                        attending = false;
+
+                        if (attendees != null) {
+                            for (UserInformation attendee : attendees) {
+
+                                if (attendee != null) {
+                                    Log.d(TAG2, attendee.getUid());
+                                    DatabaseReference user = databaseUsers.child(attendee.getUid());
+
+
+                                    user.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            Log.d(TAG2, "USERSNAPSHOT" + dataSnapshot.toString());
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
+
+                                    if (attendee.getUid().equals(thisUserString)) {
+                                        Log.d(TAG, "ALREADY ATTENDING");
+                                        attending = true;
+
+
+                                        break;
+
+                                    }
+
+                                }
+
+                            }
+
+                        }
+
+                        if (attending == true){
+
+                            attendBtn.setText("UNATTEND");
+                            attendingTextView.setText("ATTENDING");
+
+                        } else {
+                            attendBtn.setText("ATTEND");
+                            attendingTextView.setText("UNATTENDING");
+                        }
+
+                        Log.d(TAG, eventSnapshot.toString());
+                        Log.d(TAG, "MATCH");
+
+
+
+
+                    }
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
+
+
         attendBtn = findViewById(R.id.attendBtn);
         Log.d(TAG, "onCreate: "+ mEvent);
 
@@ -181,35 +247,13 @@ public class EventScreen extends AppCompatActivity {
         String host = mEvent.getHost().getUid();
 
 
-//        attendees = mEvent.getAttendees();
 
 
-        attending = false;
 
-        if (attendees != null) {
-            for (UserInformation user : attendees) {
 
-                if (user.getUid().equals(thisUserString)) {
-                    Log.d(TAG, "ALREADY ATTENDING");
-                    attending = true;
 
-                    break;
 
-                }
 
-            }
-
-        }
-
-        if (attending == true){
-
-            attendBtn.setText("UNATTEND");
-            attendingTextView.setText("ATTENDING");
-
-        } else {
-            attendBtn.setText("ATTEND");
-            attendingTextView.setText("UNATTENDING");
-        }
 
         // Logic to run if I'm the hosting accessing the event page
         // No Attend/Unattend button & Attendance status is just host
@@ -374,10 +418,45 @@ public class EventScreen extends AppCompatActivity {
         });
 
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        Log.d(TAG, "START");
+
+
+        Log.d(TAG2, "Acquiring attendee data");
+        if (attendees != null){
+
+            for (UserInformation attendee: attendees){
+
+                Log.d(TAG2, attendee.getUid());
+                DatabaseReference user =  databaseUser.child(attendee.getUid());
+
+
+                user.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        Log.d(TAG2, "USERSNAPSHOT" + dataSnapshot.toString());
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+
+            }
+
+        }
+
+        Log.d(TAG2, "No one attending!");
 
 
     }
-
 
     protected void downloadImage(String uid) {
         storageReference.child("profilePics/" + uid).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
