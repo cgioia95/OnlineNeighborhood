@@ -188,8 +188,6 @@ public class EventScreen extends AppCompatActivity {
                     Log.d(TAG, "ALREADY ATTENDING");
                     attending = true;
 
-                    Toast.makeText(getApplicationContext(), "Already attending the event!", Toast.LENGTH_SHORT);
-
                     break;
 
                 }
@@ -229,8 +227,6 @@ public class EventScreen extends AppCompatActivity {
                             Log.d(TAG, "ALREADY ATTENDING");
                             attending = true;
 
-
-                        Toast.makeText(getApplicationContext(), "Already attending the event!" , Toast.LENGTH_SHORT ).show();
 
                             break;
 
@@ -361,7 +357,7 @@ public class EventScreen extends AppCompatActivity {
                     attendBtn.setText("ATTEND");
                     attendingTextView.setText("NOT ATTENDING");
 
-                    Toast.makeText(getApplicationContext(), "You're no longer attending event!" , Toast.LENGTH_SHORT );
+                    Toast.makeText(getApplicationContext(), "You're no longer attending event!" , Toast.LENGTH_SHORT ).show();
 
                     Log.d(TAG, "User removed from attending");
 
