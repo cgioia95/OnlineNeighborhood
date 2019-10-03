@@ -27,15 +27,13 @@ public class EventScreen extends AppCompatActivity {
     public Button attendBtn;
     FirebaseAuth firebaseAuth;
 
-    DatabaseReference databaseUsers, databaseSuburb, databaseEvent;
+    DatabaseReference databaseUsers, databaseSuburb, databaseEvent, databaseUser;
 
     public String thisUserString;
 
-    public UserInformation thisUserInformation;
+    public UserInformation thisUserInformation, currentUser;
 
     public ArrayList<UserInformation> attendees;
-
-
 
 
     @Override
@@ -44,7 +42,7 @@ public class EventScreen extends AppCompatActivity {
         setContentView(R.layout.activity_event_screen);
 
         Intent i = getIntent();
-        String intentSuburb = i.getStringExtra("SUBURB");
+        final String intentSuburb = i.getStringExtra("SUBURB");
 
         firebaseAuth = FirebaseAuth.getInstance();
 
@@ -91,25 +89,25 @@ public class EventScreen extends AppCompatActivity {
 
         Log.d(TAG, "This User String found: " + this.thisUserString);
 
-//        databaseUsers.child(thisUserString).addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//
-//
-//                UserInformation currentUser = dataSnapshot.getValue(UserInformation.class);
-//
-//                thisUserInformation = new UserInformation(currentUser.getUid());
-//
-//
-//
-//                Log.d(TAG, "User Found: " + thisUserInformation.getUid());
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
+        databaseUsers.child(thisUserString).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+
+                currentUser = dataSnapshot.getValue(UserInformation.class);
+
+                databaseUser = dataSnapshot.getRef();
+
+                Log.d(TAG, "User Found: " + thisUserInformation.getUid());
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         thisUserInformation = new UserInformation(thisUserString);
 
@@ -158,6 +156,22 @@ public class EventScreen extends AppCompatActivity {
                     Event updatedEvent = new Event(mEvent.getId(), mEvent.getHost(), mEvent.getAddress(), mEvent.getEventName(), mEvent.getDescription(),
                             mEvent.getTime(), mEvent.getDate(), mEvent.getEndTime(), mEvent.getEndDate(), mEvent.getType(),attendees);
 
+                    Event userEvent = new Event(mEvent.getId(), intentSuburb);
+
+                    ArrayList<Event> userEvents = new ArrayList<Event>();
+
+                    userEvents.add(userEvent);
+
+
+                    ArrayList<Event> eventCheck = currentUser.getMyEventsAttending();
+
+                    if(eventCheck == null){
+                        currentUser.setMyEventsAttending(userEvents);
+                    }else{
+                        currentUser.getMyEventsAttending().add(userEvent);
+                    }
+
+                    databaseUser.setValue(currentUser);
 
                     Log.d(TAG, "ADDING attendeed : " + updatedEvent.toString());
 
