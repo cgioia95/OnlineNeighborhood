@@ -469,6 +469,7 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
             }
         } );
 
+        // delete the reference for all attendees
 
         ArrayList<UserInformation> attendees = preEvent.getAttendees();
 

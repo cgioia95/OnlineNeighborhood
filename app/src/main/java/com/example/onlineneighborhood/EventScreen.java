@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -141,13 +142,19 @@ public class EventScreen extends AppCompatActivity {
                     if (user.getUid().equals(thisUserString)){
                         Log.d(TAG, "ALREADY ATTENDING");
                         alreadyAttending = true;
+
+                        Toast.makeText(getApplicationContext(), "Already attending the event!" , Toast.LENGTH_SHORT );
+
                         break;
+
 
                     }
 
                 }
 
                 if (!alreadyAttending){
+
+
 
                     attendees.add(thisUserInformation);
 
@@ -177,6 +184,9 @@ public class EventScreen extends AppCompatActivity {
 
                     databaseEvent.setValue(updatedEvent);
                     // Need to place this new event in the subrb/events reference
+
+                    Toast.makeText(getApplicationContext(), "You're now attending the event!" , Toast.LENGTH_SHORT );
+
 
                 }
 
