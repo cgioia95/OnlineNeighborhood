@@ -414,6 +414,9 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
             userEvents.add(userEvent);
             ArrayList<Event> eventCheck = host.getMyEvents();
 
+            ArrayList<Event> eventCheck2 = host.getMyEventsAttending();
+
+
             //checks if a array exists, if it doesnt it creates one
             if(suburb.getEvents() == null){
                 suburb.setEvents(events);
@@ -421,10 +424,18 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
                 suburb.getEvents().add(event);
             }
 
+
+
             if(eventCheck == null){
                 host.setMyEvents(userEvents);
             }else{
                 host.getMyEvents().add(userEvent);
+            }
+
+            if(eventCheck2 == null){
+                host.setMyEventsAttending(userEvents);
+            }else{
+                host.getMyEventsAttending().add(userEvent);
             }
 
 
