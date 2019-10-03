@@ -8,6 +8,16 @@
     android:layout_marginTop="50dp"
     tools:context=".EventScreen">
 
+    <TextView
+        android:id="@+id/attendingTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/attendBtn"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="-95dp"
+        android:layout_marginEnd="6dp"
+        android:text="ATTENDING?" />
+
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="70dp"
