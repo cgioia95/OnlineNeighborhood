@@ -364,6 +364,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                                                 Intent intent = new Intent(getActivity(), EventScreen.class);
 
                                                 intent.putExtra("MyObject", event);
+                                                intent.putExtra("SUBURB", suburbName );
                                                 startActivity(intent);
 
 
