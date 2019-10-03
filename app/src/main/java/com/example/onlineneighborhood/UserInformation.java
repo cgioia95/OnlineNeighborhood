@@ -11,6 +11,7 @@ public class UserInformation implements Serializable {
     private String dob;
     private String bio;
     private ArrayList<Event> myEvents;
+    private ArrayList<Event> myEventsAttending;
 
     public UserInformation(){
 
@@ -34,6 +35,7 @@ public class UserInformation implements Serializable {
         this.dob = dob;
         this.bio = bio;
         this.myEvents = myEvents;
+        this.myEventsAttending = myEventsAttending;
     }
 
     public String getUid() {
@@ -83,4 +85,13 @@ public class UserInformation implements Serializable {
     public void setMyEvents(ArrayList<Event> myEvents) {
         this.myEvents = myEvents;
     }
+
+    public ArrayList<Event> getMyEventsAttending() {
+        return myEventsAttending;
+    }
+
+    public void setMyEventsAttending(ArrayList<Event> myEventsAttending) {
+        this.myEventsAttending = myEventsAttending;
+    }
+
 }
