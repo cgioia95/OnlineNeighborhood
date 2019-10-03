@@ -74,6 +74,8 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
     DatabaseReference databaseEvent;
     CheckBox addCal;
 
+    Event preEvent;
+
 
     //creating initialization variables
     //long and latitude
@@ -196,7 +198,7 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
         addCal = findViewById(R.id.addCal);
 
 
-        Event preEvent =  (Event)i.getSerializableExtra("MyObject");
+         preEvent =  (Event)i.getSerializableExtra("MyObject");
 
         eventId = preEvent.getId();
 
@@ -439,7 +441,10 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
 
         databaseEvent.removeValue();
 
+        // Removes the myEvents hosting section of the user deleting this event
+
         DatabaseReference userEvents = databaseUsers.child(firebaseAuth.getCurrentUser().getUid()).child("myEvents");
+
 
         userEvents.addValueEventListener(new ValueEventListener() {
             @Override
@@ -464,6 +469,46 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
             }
         } );
 
+
+        ArrayList<UserInformation> attendees = preEvent.getAttendees();
+
+        for (UserInformation attendee: attendees){
+
+            String attendeeString = attendee.getUid();
+
+
+            DatabaseReference userEventsAttending = databaseUsers.child(attendeeString).child("myEventsAttending");
+
+            userEventsAttending.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                    for (DataSnapshot eventSnapshot : dataSnapshot.getChildren()) {
+
+                        String id = eventSnapshot.child("id").getValue().toString();
+
+                        if (eventId.equals(id)) {
+                            Log.d(TAG, "Event Reference: " + eventSnapshot.getRef().toString());
+                            Log.d(TAG, "Event ID: " +  id);
+                            eventSnapshot.getRef().removeValue();
+                        }
+
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            } );
+
+
+
+
+
+        }
+
+        // Need to also cycle through the list of attendees, get their
 
 
 
