@@ -66,15 +66,11 @@ public class otherProfile extends AppCompatActivity {
 
         Intent i = getIntent();
         uid = i.getStringExtra("UID");
-        final Event mEvent= (Event) getIntent().getSerializableExtra("MyObject");
-        final String suburb = getIntent().getStringExtra("SUBURB");
-
 
 
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Intent intent = new Intent();
-        intent.putExtra("MyObject", mEvent);
         Log.d("user profile", "onCreate: " + toolbar);
         getSupportActionBar().setTitle("Online Neighborhood");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
