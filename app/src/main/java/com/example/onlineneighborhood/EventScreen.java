@@ -145,16 +145,11 @@ public class EventScreen extends AppCompatActivity {
 
                         databaseEvent = eventSnapshot.getRef();
 
-
-
                         Event event = eventSnapshot.getValue(Event.class);
 
                         attendees = event.getAttendees();
 
-
                         attending = false;
-
-                        userList.clear();
 
 
                         if (attendees != null) {
@@ -163,96 +158,40 @@ public class EventScreen extends AppCompatActivity {
 
                             Log.d(TAG2, "SIZE IS " + Integer.toString(size) );
 
+                            try{
 
+                                Log.d("TEST" , "Attempting Recycle View ");
+                                mRecyclerView = findViewById(R.id.recyclerViewUsers);
+                                mLayoutManager = new LinearLayoutManager( getApplicationContext()  );
+                                mAdapter = new UserAdapter(attendees,   getApplicationContext() );
 
-                            for (UserInformation attendee : attendees) {
-
-
-
-                                if (attendee != null) {
-
-
-
-                                    Log.d(TAG2, attendee.getUid());
-                                    DatabaseReference user = databaseUsers.child(attendee.getUid());
-
-
-                                    user.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                                            UserInformation userInfo = dataSnapshot.getValue(UserInformation.class);
-
-                                            Log.d(TAG2, "USERSNAPSHOT: " + userInfo.getName());
-                                            userList.add(userInfo);
+                                mRecyclerView.setLayoutManager(mLayoutManager);
+                                mRecyclerView.setAdapter(mAdapter);
+                                mRecyclerView.setAdapter(mAdapter);
 
 
 
-                                            Log.d(TAG2, "USERSNAPSHOT " + dataSnapshot.toString());
-
-                                            Log.d(TAG2, "USERSNAPSHOT " + userList.size());
-
-                                            if (size == userList.size()){
-                                                Log.d(TAG2, "PERFORM LIST LOGIC");
-
-                                                try{
-
-                                                    Log.d("TEST" , "Attempting Recycle View ");
-                                                    mRecyclerView = findViewById(R.id.recyclerViewUsers);
-                                                    mLayoutManager = new LinearLayoutManager( getApplicationContext()  );
-                                                    mAdapter = new UserAdapter(userList,   getApplicationContext() );
-
-                                                    mRecyclerView.setLayoutManager(mLayoutManager);
-                                                    mRecyclerView.setAdapter(mAdapter);
-                                                    mRecyclerView.setAdapter(mAdapter);
+                                Log.d("TEST" , "Finishing Recycle View ");
 
 
 
-                                                    Log.d("TEST" , "Finishing Recycle View ");
+                            }catch (NullPointerException e){
+                                e.printStackTrace();
+                            }
 
 
-
-                                                }catch (NullPointerException e){
-                                                    e.printStackTrace();
-                                                }
+                            for (UserInformation attendee: attendees) {
 
 
-                                            }
-
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                        }
-                                    });
-
-                                    Log.d("ISITRUNNING" , "HELLO");
-                                    Log.d("ISITRUNNING"  , Integer.toString(userList.size()));
-
-                                    if (attendee.getUid().equals(thisUserString)) {
-                                        Log.d(TAG, "ALREADY ATTENDING");
-                                        attending = true;
+                                if (attendee.getUid().equals(thisUserString)) {
+                                    Log.d(TAG, "ALREADY ATTENDING");
+                                    attending = true;
 
 
-//                                        break;
-
-                                    }
-
-                                    Log.d("ISITRUNNING" , "HELLO");
-                                    Log.d("ISITRUNNING"  , Integer.toString(userList.size()));
-
-
+                                     break;
 
                                 }
 
-                            }
-
-                            Log.d("ISITRUNNING" , "HELLO");
-                            Log.d("ISITRUNNING"  , Integer.toString(userList.size()));
-
-                            for (UserInformation user2: userList){
-                                Log.d("ISITRUNNING ", user2.getName());
                             }
 
 
@@ -316,13 +255,6 @@ public class EventScreen extends AppCompatActivity {
 
 
         String host = mEvent.getHost().getUid();
-
-
-
-
-
-
-
 
 
 

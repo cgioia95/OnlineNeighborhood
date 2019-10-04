@@ -49,9 +49,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
         public TextView mUserName;
         public TextView mUserBio;
-//        public ImageView hostPic;
-//        private FirebaseStorage storage;
-//        private StorageReference storageReference;
+        public ImageView hostPic;
+        private FirebaseStorage storage;
+        private StorageReference storageReference;
         private DatabaseReference databaseReference;
 
 
@@ -62,11 +62,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             mUserBio = itemView.findViewById(R.id.userBioU);
 
 
-//            hostPic = itemView.findViewById(R.id.imageViewU);
+            hostPic = itemView.findViewById(R.id.imageViewU);
 
-//            storage = FirebaseStorage.getInstance();
+            storage = FirebaseStorage.getInstance();
             databaseReference = FirebaseDatabase.getInstance().getReference("Users");
-//            storageReference=storage.getReference();
+            storageReference=storage.getReference();
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -86,72 +86,51 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
         }
 
-//        private void getUsername(String uid){
-//            databaseReference.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(DataSnapshot dataSnapshot) {
-//                    Log.d("On DATA CHANGE ", "IN");
-//                    Log.d("On DATA CHANGE", "Snapshot" + dataSnapshot);
-//                    if (dataSnapshot.getValue() != null) {
-//                        String name = dataSnapshot.child("name").getValue().toString();
-//
-//                        mUserName.setText(name);
-//
-//                    }
-//
-//                }
-//
-//                @Override
-//                public void onCancelled(DatabaseError databaseError) {
-//                }
-//            });
-//
-//        }
 
 
+        protected void downloadImage(String uid) {
 
-//        protected void downloadImage(String uid) {
-//            storageReference.child("profilePics/" + uid).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-//                @Override
-//                public void onSuccess(Uri uri) {
-//                    // Got the download URL for 'users/me/profile.png' in uri
-//                    Log.d(TAG, "DOWNLOAD URL: " + uri.toString());
-//                    Picasso.get().load(uri).into(hostPic);
-//                    return;
-//
-//
-//                }
-//            }).addOnFailureListener(new OnFailureListener() {
-//                @Override
-//                public void onFailure(@NonNull Exception exception) {
-//                    // Handle any errors
-//                    Log.d(TAG, "DOWNLOAD URL: FAILURE");
-//                    storageReference.child("profilePics/" + "default.png").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-//                        @Override
-//                        public void onSuccess(Uri uri) {
-//                            // Got the download URL for 'users/me/profile.png' in uri
-//                            Log.d(TAG, "DOWNLOAD URL: " + uri.toString());
-//                            Picasso.get().load(uri).into(hostPic);
-//                            return;
-//
-//
-//                        }
-//                    }).addOnFailureListener(new OnFailureListener() {
-//                        @Override
-//                        public void onFailure(@NonNull Exception exception) {
-//                            // Handle any errors
-//                            Log.d(TAG, "DOWNLOAD URL: FAILURE");
-//
-//                        }
-//                    });
-//
-//                }
-//            });
-//
-//
-//
-//
-//        }
+            Log.d(TAG, "Attempting to download image of  user with id: " + uid);
+
+            storageReference.child("profilePics/" + uid).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    // Got the download URL for 'users/me/profile.png' in uri
+                    Log.d(TAG, "DOWNLOAD URL: " + uri.toString());
+                    Picasso.get().load(uri).into(hostPic);
+                    return;
+
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle any errors
+                    Log.d(TAG, "DOWNLOAD URL: FAILURE");
+                    storageReference.child("profilePics/" + "default.png").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            // Got the download URL for 'users/me/profile.png' in uri
+                            Log.d(TAG, "DOWNLOAD URL: " + uri.toString());
+                            Picasso.get().load(uri).into(hostPic);
+                            return;
+
+
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Handle any errors
+                            Log.d(TAG, "DOWNLOAD URL: FAILURE");
+
+                        }
+                    });
+
+                }
+            });
+
+
+        }
     }
 
     public UserAdapter(ArrayList<UserInformation> userList, Context context) {
@@ -172,19 +151,49 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     }
 
     @Override
-    public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final UserViewHolder holder, int position) {
 
-        UserInformation currentItem = userList.get(position);
+        final UserInformation currentItem = userList.get(position);
+
+        String uid = currentItem.getUid();
+
+        Log.d(TAG, "BIND VIEW ID IS: " +  uid);
 
         Log.d(TAG, "user id " + currentItem.getUid());
 
-        holder.mUserName.setText(currentItem.getName());
 
-        holder.mUserBio.setText(currentItem.getBio());
+        DatabaseReference userReference = FirebaseDatabase.getInstance().getReference("Users").child(uid);
 
-//        holder.downloadImage(currentItem.getUid());
+        userReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-//        holder.getUsername(currentItem.getUid());
+
+                UserInformation user = dataSnapshot.getValue(UserInformation.class);
+
+                String name = user.getName();
+                String bio = user.getBio();
+
+
+                holder.mUserName.setText(name);
+
+                holder.mUserBio.setText(bio);
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
+
+
+//
+        holder.downloadImage(currentItem.getUid());
+
 
 
 

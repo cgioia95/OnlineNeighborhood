@@ -38,6 +38,8 @@ public class UserInformation implements Serializable {
         this.myEventsAttending = myEventsAttending;
     }
 
+
+
     public String getUid() {
         return uid;
     }
