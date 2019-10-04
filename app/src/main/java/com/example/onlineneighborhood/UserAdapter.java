@@ -40,7 +40,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     }
 
 
-    public void setOnEventClickListener(onUserClickListener listener) {
+    public void setOnUserClickListener(onUserClickListener listener) {
         mListener = listener;
     }
 
@@ -49,9 +49,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
         public TextView mUserName;
         public TextView mUserBio;
-        public ImageView hostPic;
-        private FirebaseStorage storage;
-        private StorageReference storageReference;
+//        public ImageView hostPic;
+//        private FirebaseStorage storage;
+//        private StorageReference storageReference;
         private DatabaseReference databaseReference;
 
 
@@ -62,11 +62,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             mUserBio = itemView.findViewById(R.id.userBioU);
 
 
-            hostPic = itemView.findViewById(R.id.imageViewU);
+//            hostPic = itemView.findViewById(R.id.imageViewU);
 
-            storage = FirebaseStorage.getInstance();
+//            storage = FirebaseStorage.getInstance();
             databaseReference = FirebaseDatabase.getInstance().getReference("Users");
-            storageReference=storage.getReference();
+//            storageReference=storage.getReference();
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -86,72 +86,72 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
         }
 
-        private void getUsername(String uid){
-            databaseReference.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    Log.d("On DATA CHANGE ", "IN");
-                    Log.d("On DATA CHANGE", "Snapshot" + dataSnapshot);
-                    if (dataSnapshot.getValue() != null) {
-                        String name = dataSnapshot.child("name").getValue().toString();
-
-                        mUserName.setText(name);
-
-                    }
-
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                }
-            });
-
-        }
-
-
-
-        protected void downloadImage(String uid) {
-            storageReference.child("profilePics/" + uid).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                @Override
-                public void onSuccess(Uri uri) {
-                    // Got the download URL for 'users/me/profile.png' in uri
-                    Log.d(TAG, "DOWNLOAD URL: " + uri.toString());
-                    Picasso.get().load(uri).into(hostPic);
-                    return;
-
-
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    // Handle any errors
-                    Log.d(TAG, "DOWNLOAD URL: FAILURE");
-                    storageReference.child("profilePics/" + "default.png").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-                            // Got the download URL for 'users/me/profile.png' in uri
-                            Log.d(TAG, "DOWNLOAD URL: " + uri.toString());
-                            Picasso.get().load(uri).into(hostPic);
-                            return;
-
-
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            // Handle any errors
-                            Log.d(TAG, "DOWNLOAD URL: FAILURE");
-
-                        }
-                    });
-
-                }
-            });
+//        private void getUsername(String uid){
+//            databaseReference.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(DataSnapshot dataSnapshot) {
+//                    Log.d("On DATA CHANGE ", "IN");
+//                    Log.d("On DATA CHANGE", "Snapshot" + dataSnapshot);
+//                    if (dataSnapshot.getValue() != null) {
+//                        String name = dataSnapshot.child("name").getValue().toString();
+//
+//                        mUserName.setText(name);
+//
+//                    }
+//
+//                }
+//
+//                @Override
+//                public void onCancelled(DatabaseError databaseError) {
+//                }
+//            });
+//
+//        }
 
 
 
-
-        }
+//        protected void downloadImage(String uid) {
+//            storageReference.child("profilePics/" + uid).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+//                @Override
+//                public void onSuccess(Uri uri) {
+//                    // Got the download URL for 'users/me/profile.png' in uri
+//                    Log.d(TAG, "DOWNLOAD URL: " + uri.toString());
+//                    Picasso.get().load(uri).into(hostPic);
+//                    return;
+//
+//
+//                }
+//            }).addOnFailureListener(new OnFailureListener() {
+//                @Override
+//                public void onFailure(@NonNull Exception exception) {
+//                    // Handle any errors
+//                    Log.d(TAG, "DOWNLOAD URL: FAILURE");
+//                    storageReference.child("profilePics/" + "default.png").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+//                        @Override
+//                        public void onSuccess(Uri uri) {
+//                            // Got the download URL for 'users/me/profile.png' in uri
+//                            Log.d(TAG, "DOWNLOAD URL: " + uri.toString());
+//                            Picasso.get().load(uri).into(hostPic);
+//                            return;
+//
+//
+//                        }
+//                    }).addOnFailureListener(new OnFailureListener() {
+//                        @Override
+//                        public void onFailure(@NonNull Exception exception) {
+//                            // Handle any errors
+//                            Log.d(TAG, "DOWNLOAD URL: FAILURE");
+//
+//                        }
+//                    });
+//
+//                }
+//            });
+//
+//
+//
+//
+//        }
     }
 
     public UserAdapter(ArrayList<UserInformation> userList, Context context) {
@@ -166,7 +166,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.user_item, parent, false);
-        UserAdapter.UserViewHolder viewholder = new UserAdapter.UserViewHolder(v, mListener);
+        UserViewHolder viewholder = new UserViewHolder(v, mListener);
         return viewholder;
 
     }
@@ -182,9 +182,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
         holder.mUserBio.setText(currentItem.getBio());
 
-        holder.downloadImage(currentItem.getUid());
+//        holder.downloadImage(currentItem.getUid());
 
-        holder.getUsername(currentItem.getUid());
+//        holder.getUsername(currentItem.getUid());
 
 
 

@@ -154,9 +154,15 @@ public class EventScreen extends AppCompatActivity {
 
                         attending = false;
 
+                        userList.clear();
+
+
                         if (attendees != null) {
 
-                            userList.clear();
+                            final int size = attendees.size();
+
+                            Log.d(TAG2, "SIZE IS " + Integer.toString(size) );
+
 
 
                             for (UserInformation attendee : attendees) {
@@ -180,7 +186,39 @@ public class EventScreen extends AppCompatActivity {
                                             Log.d(TAG2, "USERSNAPSHOT: " + userInfo.getName());
                                             userList.add(userInfo);
 
-                                            Log.d(TAG2, "USERSNAPSHOT" + dataSnapshot.toString());
+
+
+                                            Log.d(TAG2, "USERSNAPSHOT " + dataSnapshot.toString());
+
+                                            Log.d(TAG2, "USERSNAPSHOT " + userList.size());
+
+                                            if (size == userList.size()){
+                                                Log.d(TAG2, "PERFORM LIST LOGIC");
+
+                                                try{
+
+                                                    Log.d("TEST" , "Attempting Recycle View ");
+                                                    mRecyclerView = findViewById(R.id.recyclerViewUsers);
+                                                    mLayoutManager = new LinearLayoutManager( getApplicationContext()  );
+                                                    mAdapter = new UserAdapter(userList,   getApplicationContext() );
+
+                                                    mRecyclerView.setLayoutManager(mLayoutManager);
+                                                    mRecyclerView.setAdapter(mAdapter);
+                                                    mRecyclerView.setAdapter(mAdapter);
+
+
+
+                                                    Log.d("TEST" , "Finishing Recycle View ");
+
+
+
+                                                }catch (NullPointerException e){
+                                                    e.printStackTrace();
+                                                }
+
+
+                                            }
+
                                         }
 
                                         @Override
@@ -189,10 +227,8 @@ public class EventScreen extends AppCompatActivity {
                                         }
                                     });
 
-
-
-
-
+                                    Log.d("ISITRUNNING" , "HELLO");
+                                    Log.d("ISITRUNNING"  , Integer.toString(userList.size()));
 
                                     if (attendee.getUid().equals(thisUserString)) {
                                         Log.d(TAG, "ALREADY ATTENDING");
@@ -203,36 +239,23 @@ public class EventScreen extends AppCompatActivity {
 
                                     }
 
+                                    Log.d("ISITRUNNING" , "HELLO");
+                                    Log.d("ISITRUNNING"  , Integer.toString(userList.size()));
+
+
+
                                 }
 
                             }
 
-
+                            Log.d("ISITRUNNING" , "HELLO");
+                            Log.d("ISITRUNNING"  , Integer.toString(userList.size()));
 
                             for (UserInformation user2: userList){
-                                Log.d("ATTENDEETEST ", user2.getName());
+                                Log.d("ISITRUNNING ", user2.getName());
                             }
 
-//                            try{
-//
-//                                Log.d("TEST" , "Attempting Recycle View ");
-//                                mRecyclerView = findViewById(R.id.recyclerViewUsers);
-//
-//
-//                                mLayoutManager = new LinearLayoutManager( getApplicationContext()  );
-//                                mAdapter = new UserAdapter(userList,   getApplicationContext() );
-//
-//                                mRecyclerView.setLayoutManager(mLayoutManager);
-//                                mRecyclerView.setAdapter(mAdapter);
-//                                mRecyclerView.setAdapter(mAdapter);
-//
-//                                Log.d("TEST" , "Finishing Recycle View ");
-//
-//
-//
-//                            }catch (NullPointerException e){
-//                                e.printStackTrace();
-//                            }
+
 
                         }
 
