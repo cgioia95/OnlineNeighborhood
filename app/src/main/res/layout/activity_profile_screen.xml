@@ -114,6 +114,7 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:text="SAVE CHANGES"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/imageButtonPicture"
         app:layout_constraintStart_toStartOf="@+id/imageButtonPicture"
