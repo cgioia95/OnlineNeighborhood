@@ -32,8 +32,7 @@ public class MyEvents extends Fragment {
     DatabaseReference myEvents, SuburbEvents;
     String userid;
     private ArrayList<Event> eventList = new ArrayList<>();
-    private String suburbid;
-    String eventid;
+
 
 
     public MyEvents() {
@@ -45,12 +44,15 @@ public class MyEvents extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         fireBaseAuth = FirebaseAuth.getInstance();
-        userid = fireBaseAuth.getCurrentUser().toString();
+        userid = fireBaseAuth.getCurrentUser().getUid();
         return inflater.inflate(R.layout.fragment_my_events, container, false);
     }
 
     public void onStart() {
         super.onStart();
+
+        boolean completed = false;
+
 
         myEvents = FirebaseDatabase.getInstance().getReference("Users").child(userid);
 
@@ -59,6 +61,33 @@ public class MyEvents extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 UserInformation user = dataSnapshot.getValue(UserInformation.class);
                 eventList = user.getMyEvents();
+                for(Event event: eventList){
+                    String suburbid = event.getSuburbId();
+                    final String eventid = event.getId();
+
+                    SuburbEvents = FirebaseDatabase.getInstance().getReference("suburbs").child(suburbid);
+                    SuburbEvents.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            Suburb suburb = dataSnapshot.getValue(Suburb.class);
+                            //make sure you acount for nullpointers
+                            if(suburb.getEvents() != null){
+                                ArrayList<Event> events = suburb.getEvents();
+                                for(Event event : events){
+                                    if(event.getId().equals(eventid)){
+                                        //add to event list that you will show on the recycler view.
+                                        Log.d("EVENT FOUND: ", ""+event.getName());
+                                    }
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
             }
 
 
@@ -67,32 +96,6 @@ public class MyEvents extends Fragment {
 
             }
         });
-
-        for(Event event: eventList){
-            suburbid = event.getSuburbId();
-            eventid = event.getId();
-            SuburbEvents = FirebaseDatabase.getInstance().getReference("Suburbs").child(suburbid);
-            SuburbEvents.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    Suburb suburb = dataSnapshot.getValue(Suburb.class);
-                    //make sure you acount for nullpointers
-                    ArrayList<Event> events = suburb.getEvents();
-                    for(Event event : events){
-                        if(event.getId().equals(eventid)){
-                            //add to event list that you will show on the recycler view.
-                            Log.d("EVENT FOUND: ", ""+event.getName());
-                        }
-                    }
-
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-        }
     }
 }
 
