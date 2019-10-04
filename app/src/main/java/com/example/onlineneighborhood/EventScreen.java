@@ -185,9 +185,9 @@ public class EventScreen extends AppCompatActivity {
 
                                         Log.d("ONEVENTCLICK" , attendee.getUid());
 
-//                                        Intent i = new Intent(getApplicationContext(), otherProfile.class);
-//                                        i.putExtra("UID", attendee.getUid());
-//                                        getApplicationContext().startActivity(i);
+                                        Intent i = new Intent( getApplicationContext(), otherProfile.class);
+                                        i.putExtra("UID", attendee.getUid());
+                                        startActivity(i);
                                     }
 
 
