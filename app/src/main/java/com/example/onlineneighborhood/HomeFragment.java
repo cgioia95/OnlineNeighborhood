@@ -41,7 +41,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
 
     //Button logoutBtn;
     // private Button profileBtn;
-    ImageView addEvent;
+    ImageView addEvent, filterButton;
     String suburb;
     String currSuburb;
     private static final String TAG = "HomeScreen";
@@ -77,6 +77,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
         fireBaseAuth = FirebaseAuth.getInstance();
         addEvent = mView.findViewById(R.id.addEvent);
         suburbTextView = mView.findViewById(R.id.textViewSuburb);
+        filterButton = mView.findViewById(R.id.buttonFilter);
 //
 //        Button logoutBtn = mView.findViewById(R.id.logOutBtn);
 //
@@ -221,6 +222,12 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
 
         if (view == addEvent){
             Intent i = new Intent(applicationContext, createEvent.class);
+            i.putExtra("SUBURB", suburb);
+            startActivity(i);
+        }
+
+        if(view == filterButton){
+            Intent i = new Intent(applicationContext, FilterEvents.class);
             i.putExtra("SUBURB", suburb);
             startActivity(i);
         }
