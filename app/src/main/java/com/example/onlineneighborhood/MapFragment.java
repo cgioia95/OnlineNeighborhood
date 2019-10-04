@@ -58,6 +58,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     SupportMapFragment mapFragment;
 
     String suburbName;
+
+    String currentSuburbName;
     Suburb suburb;
     ArrayList<Event> events;
 
@@ -130,7 +132,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     Suburb currentSuburb = dataSnapshot.getValue(Suburb.class);
                     suburb = currentSuburb;
-
+                    currentSuburbName = currentSuburb.getSubName();
             }
 
             @Override
@@ -257,9 +259,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
-        LatLng MELBOURNE = new LatLng(-37.814, 144.96);
+        Log.d("SUBURB", "SUBURB IS " + suburbName);
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(MELBOURNE, 10));
+        LatLng MELBOURNE = new LatLng(-37.814, 144.96332);
+
+        LatLng SUBURB = getSuburbLocat();
+
+        if (SUBURB != null){
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(SUBURB, 13));
+        }
+
+        else {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(MELBOURNE, 10));
+
+
+        }
 
 
 
@@ -388,7 +402,36 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         });
 
 
+
+
                 }
+
+    public LatLng getSuburbLocat() {
+
+        Geocoder coder = new Geocoder(getContext());
+        List<Address> address;
+        LatLng LatLan= null;
+
+        try {
+            // May throw an IOException
+            address = coder.getFromLocationName(currentSuburbName + " Melbourne", 5);
+            if (address == null) {
+                return null;
+            }
+
+            Address location = address.get(0);
+
+            Log.d("LOCATION" , location.toString());
+            LatLan= new LatLng(location.getLatitude(), location.getLongitude() );
+
+        } catch (IOException ex) {
+
+            ex.printStackTrace();
+        }
+
+        return LatLan;
+    }
+
 
     // NEED TO REFERENCE THIS
     public static class SelectDateFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
