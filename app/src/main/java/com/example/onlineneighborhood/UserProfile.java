@@ -9,6 +9,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 
 import android.Manifest;
+import java.util.*;
+
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
@@ -62,11 +64,14 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import static androidx.core.graphics.TypefaceCompatUtil.getTempFile;
 import static java.util.Calendar.*;
@@ -322,11 +327,9 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
                     tvBio.setVisibility(View.VISIBLE);
                     Toast.makeText(UserProfile.this, "Saved Succesfully!!", Toast.LENGTH_SHORT).show();
 
-
                 }
 
             });
-
 
 
         }
