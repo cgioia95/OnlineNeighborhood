@@ -3,6 +3,7 @@ package com.example.onlineneighborhood;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
@@ -25,6 +27,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.Console;
+
+import static java.util.Calendar.DAY_OF_MONTH;
+import static java.util.Calendar.MONTH;
+import static java.util.Calendar.YEAR;
+import static java.util.Calendar.getInstance;
 
 // REGISTER activity takes some user details, creates a user, authenticating in Firebase and uploading their details to a database
 public class Register extends AppCompatActivity implements View.OnClickListener {
@@ -71,6 +78,7 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
         // Assign Click Listeners to Register Button and Link to Sign In Button
         buttonRegister.setOnClickListener(this);
         textViewSignIn.setOnClickListener(this);
+//        editDob.setOnClickListener(this);
     }
 
     // Parses editText inputs, registers the user with FireBase Authentication
@@ -161,6 +169,25 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
                 });
     }
 
+
+//    private void showDatePickerDialog(){
+//        DatePickerDialog datePickerDialog = new DatePickerDialog(this, this,
+//                getInstance().get(YEAR),
+//                getInstance().get(MONTH),
+//                getInstance().get(DAY_OF_MONTH)
+//        );
+//
+//        datePickerDialog.show();
+//
+//    }
+//
+//    @Override
+//    public void onDateSet(DatePicker datePicker, int year, int month, int dayOfMonth) {
+//        month++;
+//        String date = dayOfMonth +"/" + month + "/" + year;
+//        editDob.setText(date);
+//    }
+
     // Assigning functions to the two buttons
     @Override
     public void onClick(View view) {
@@ -173,6 +200,16 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
             startActivity(new Intent(this, Login.class));
         }
 
+//        if(view == editDob){
+//
+//            showDatePickerDialog();
+//        }
+//
+
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
 
     }
 }

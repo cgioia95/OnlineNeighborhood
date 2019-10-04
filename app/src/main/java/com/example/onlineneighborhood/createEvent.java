@@ -62,6 +62,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     private boolean clicked = false;
     UserInformation hostID;
     UserInformation host;
+    String intentSuburb;
 
 
 
@@ -102,18 +103,11 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     protected void onStart() {
 
         super.onStart();
-        databaseUsers.addValueEventListener(new ValueEventListener() {
+        databaseUsers.child(firebaseAuth.getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                String checkCurUser = firebaseAuth.getCurrentUser().getUid();
-                for(DataSnapshot hostSnapshot : dataSnapshot.getChildren()){
-                    Log.d("TAG: ", "HOST: "+hostSnapshot);
-                    if(hostSnapshot.getKey().equals(checkCurUser)){
-                        UserInformation currentUser = hostSnapshot.getValue(UserInformation.class);
-                        host = currentUser;
-                        break;
-                    }
-                }
+                UserInformation currentUser = dataSnapshot.getValue(UserInformation.class);
+                host = currentUser;
             }
 
             @Override
@@ -125,27 +119,8 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         databaseSuburb.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot suburbSnapshot : dataSnapshot.getChildren()) {
-                   Suburb currentSuburb = suburbSnapshot.getValue(Suburb.class);
-                   Intent i = getIntent();
-                   String intentSuburb = i.getStringExtra("SUBURB");
-                    Log.d("SUBURB", "" + suburbSnapshot);
-                    try{
-
-                        if (intentSuburb.equals(currentSuburb.getSubName())) {
-                            suburb = currentSuburb;
-                            break;
-                        }
-
-                    } catch (NullPointerException e){
-                        //this catches null pointer exceptions, it happens alot
-                        //TODO: I need to find a better way to loop through all the suburbs
-                        //if you look at the log you can see the 'null pointer' still gets the suburb name. weird.
-                        Log.d("ERROR VALUES", "" + currentSuburb.getSubName());
-                    }
-
-
-                }
+                Suburb currSuburb = dataSnapshot.getValue(Suburb.class);
+                suburb = currSuburb;
             }
 
             @Override
@@ -161,6 +136,8 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Intent i = getIntent();
+        intentSuburb = i.getStringExtra("SUBURB");
 
 
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -169,7 +146,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
         databaseEvents = FirebaseDatabase.getInstance().getReference("events");
         databaseUsers = FirebaseDatabase.getInstance().getReference("Users");
-        databaseSuburb =  FirebaseDatabase.getInstance().getReference("suburbs");
+        databaseSuburb =  FirebaseDatabase.getInstance().getReference("suburbs").child(intentSuburb);
 
         //Metrics of the popup window. Currently setting it to 90% of screen width and height
         DisplayMetrics dm = new DisplayMetrics();
@@ -437,6 +414,9 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
             userEvents.add(userEvent);
             ArrayList<Event> eventCheck = host.getMyEvents();
 
+            ArrayList<Event> eventCheck2 = host.getMyEventsAttending();
+
+
             //checks if a array exists, if it doesnt it creates one
             if(suburb.getEvents() == null){
                 suburb.setEvents(events);
@@ -444,10 +424,18 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
                 suburb.getEvents().add(event);
             }
 
+
+
             if(eventCheck == null){
                 host.setMyEvents(userEvents);
             }else{
                 host.getMyEvents().add(userEvent);
+            }
+
+            if(eventCheck2 == null){
+                host.setMyEventsAttending(userEvents);
+            }else{
+                host.getMyEventsAttending().add(userEvent);
             }
 
 
@@ -580,10 +568,8 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
                 Address address = addresses.get(0);
                 String testedSuburb = address.getLocality();
 
-                Intent i = getIntent();
-                String intentSuburb = i.getStringExtra("SUBURB");
 
-                if (!intentSuburb.equals(testedSuburb)) {
+                if (!suburb.getSubName().equals(testedSuburb)) {
                     Log.d("VALIDATOR", "NOT IN SUBURB");
                     Log.d("VALIDATOR", "We are in " + intentSuburb + " You have entered: " + testedSuburb);
                     Toast.makeText(this, "Address not in suburb", Toast.LENGTH_LONG).show();

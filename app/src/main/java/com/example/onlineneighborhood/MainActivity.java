@@ -1,10 +1,5 @@
 package com.example.onlineneighborhood;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
@@ -26,18 +21,15 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -49,42 +41,51 @@ import java.util.Locale;
 // MAIN activity where user chooses to Register or Login
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private static final String TAG = "ACTVITY MAIN";
     // Declare simple variables
     private Button registerBtn, loginBtn, getLocationBtn;
-    private String suburb = "NO SUBURB FOUND";
-    private String getLocat = "NO SUBURB FOUND";
-    private Spinner suburbSpinner;
+    private final String NOSUBURB = "NO SUBURB FOUND";
+    private String suburb = NOSUBURB;
+    private String getLocat = NOSUBURB;
     private TextView tvSuburb;
+    private String suburbid = NOSUBURB;
+
     private Toolbar searchBar;
     private MaterialSearchView mMaterialSearchView;
-    private ArrayList<String> suburbList;
+    private ArrayList<String[]> suburbList;
     private String[] SUGGESTION;
     // Two components used to get user Location
     private LocationManager locationManager;
     private LocationListener locationListener;
+    DatabaseReference databaseSuburb;
     private double lon;
     private double lat;
 
+    @Override
+    protected void onStart() {
+        super.onStart();
 
-    final static String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/onlineNeighbourhood/melbourneSuburbs.csv" ;
+    }
+
+    final static String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/onlineNeighbourhood/melbourneSuburbs.csv";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        databaseSuburb =  FirebaseDatabase.getInstance().getReference("suburbs");
 
         // Bind simple variables
         registerBtn = (Button) findViewById(R.id.registerBtn);
         getLocationBtn = (Button) findViewById(R.id.getLocationBtn);
         loginBtn = (Button) findViewById(R.id.loginBtn);
-        suburbSpinner = findViewById(R.id.suburbSpinner);
         tvSuburb = findViewById(R.id.tvSuburb);
         Toolbar toolbar = findViewById(R.id.searchBar);
         tvSuburb.setVisibility(View.INVISIBLE);
         setSupportActionBar(toolbar);
         toolbar.setTitleTextColor(Color.parseColor("#FFFFFF"));
         suburbList = parseCSV();
-        SUGGESTION = convertArray(suburbList);
+        SUGGESTION = convertArray(suburbList, 0);
         mMaterialSearchView = findViewById(R.id.searchView);
         mMaterialSearchView.setSuggestions(SUGGESTION);
         getSupportActionBar().setTitle("Search a Suburb");
@@ -168,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if(newText != null && !newText.isEmpty()){
                     suburb = newText;
                     tvSuburb.setText(newText);
-                    tvSuburb.setVisibility(View.VISIBLE );
+                    tvSuburb.setVisibility(View.VISIBLE);
                 }
                 return false;
             }
@@ -192,12 +193,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
 
         if (view == loginBtn && !suburb.equals("NO SUBURB FOUND")) {
-            Intent i = new Intent(this, Login.class);
-            i.putExtra("SUBURB", suburb);
-            startActivity(i);
-
+            if(findSuburbId(suburbList,suburb)){
+                Intent i = new Intent(this, Login.class);
+                i.putExtra("SUBURB", suburbid);
+                startActivity(i);
+            }else {
+                Toast.makeText(this, "please try again", Toast.LENGTH_LONG).show();
+                Log.d(TAG, ""+suburbid);
+            }
         } else if(view == loginBtn && suburb.equals("NO SUBURB FOUND")) {
             Toast.makeText(this, "we need a suburb before you can enter", Toast.LENGTH_LONG).show();
+
         }
 
         if (view == registerBtn){
@@ -235,23 +241,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return suburb;
     }
 
-    public ArrayList<String> parseCSV(){
-        ArrayList<String> suburbList = new ArrayList<String>();
+    public ArrayList<String[]> parseCSV(){
+        ArrayList<String[]> suburbList = new ArrayList<String[]>();
         try{
             InputStream is = getResources().openRawResource(R.raw.melbourne_suburbs);
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader(is, Charset.forName("UTF-8"))
             );
             String line = "";
-            int i = 0;
             while ((line = reader.readLine()) != null) {
                 //spilt by ","
                 String [] tokens = line.split(",");
-
                 //read the data
-                System.out.println(tokens[0]);
-                String name = tokens[0];
-                suburbList.add(name);
+                suburbList.add(tokens);
             }
         } catch (Exception e){
             e.printStackTrace();
@@ -260,20 +262,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return suburbList;
     }
 
-    public String[] convertArray(ArrayList<String> arr){
+    public String[] convertArray(ArrayList<String[]> arr, int index){
 
         // declaration and initialise String Array
         String str[] = new String[arr.size()];
 
         // ArrayList to Array Conversion
         for (int j = 0; j < arr.size(); j++) {
-
             // Assign each value to String array
-            str[j] = arr.get(j);
+            String[] strings = arr.get(j);
+            str[j] = strings[index];
         }
 
         return str;
     }
 
+    private boolean findSuburbId(ArrayList<String[]> idList, String suburb){
+        boolean successfulFind = false;
+        for(int i = 0; i < idList.size(); i++){
+            String[] details = idList.get(i);
+            if(details[0].equals(suburb)){
+                suburbid = details[2];
+                successfulFind = true;
+                break;
+            }
+        }
+
+        return successfulFind;
+    }
 
 }

@@ -69,7 +69,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     ArrayList<Marker> defaultMarkers;
 
-    DatabaseReference databaseSuburbChange;
 
     Button filterButton, todayFilterButton, dateButton, calenderFilterButton;
     EditText editTextDays;
@@ -95,13 +94,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
 
 
+        Intent i = getActivity().getIntent();
+        suburbName = i.getStringExtra("SUBURB");
+
         // Inflate the layout for this fragment
         View v =  inflater.inflate(R.layout.fragment_map, container, false);
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
 
         databaseEvents = FirebaseDatabase.getInstance().getReference("events");
         databaseUsers = FirebaseDatabase.getInstance().getReference("Users");
-        databaseSuburb =  FirebaseDatabase.getInstance().getReference("suburbs");
+        databaseSuburb =  FirebaseDatabase.getInstance().getReference("suburbs").child(suburbName);
 
         todayDate = new Date();
         int year = todayDate.getYear();
@@ -110,10 +112,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         todayDate = new Date(year, month, date);
 
         defaultMarkers = new ArrayList<Marker>();
-
-
-        Intent i = getActivity().getIntent();
-        suburbName = i.getStringExtra("SUBURB");
 
         Log.d("MAGFRAGMENT",""+ suburbName);
 
@@ -130,25 +128,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         databaseSuburb.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                for(DataSnapshot suburbSnapshot : dataSnapshot.getChildren()) {
-                    Suburb currentSuburb = suburbSnapshot.getValue(Suburb.class);
-                    Log.d("SUBURB", "" + suburbSnapshot);
-
-
-                        if (suburbName.equals(currentSuburb.getSubName())) {
-
-                        suburb = currentSuburb;
-
-                        databaseSuburbChange = FirebaseDatabase.getInstance().getReference("suburbs").child(suburb.getId());
-
-
-                        Log.d("CHOSEN: ", "" + suburb + suburb.getSubName());
-
-
-                    }
-
-            }
+                    Suburb currentSuburb = dataSnapshot.getValue(Suburb.class);
+                    suburb = currentSuburb;
 
             }
 
@@ -199,6 +180,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
                             markerIDtoMarker.get(entry.getKey()).setVisible(false);
                             Log.d("MATCHTEST" , "MATCH");
+                        }
+
+                        if (todayDate.compareTo(testedDate) == 0 ){
+                            markerIDtoMarker.get(entry.getKey()).setVisible(true);
+
                         }
 
 
@@ -277,7 +263,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
 
 
-        databaseSuburbChange.addValueEventListener(new ValueEventListener() {
+        databaseSuburb.addValueEventListener(new ValueEventListener() {
 
 
             @Override
@@ -378,6 +364,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                                                 Intent intent = new Intent(getActivity(), EventScreen.class);
 
                                                 intent.putExtra("MyObject", event);
+                                                intent.putExtra("SUBURB", suburbName );
                                                 startActivity(intent);
 
 

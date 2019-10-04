@@ -74,6 +74,8 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
     DatabaseReference databaseEvent;
     CheckBox addCal;
 
+    Event preEvent;
+
 
     //creating initialization variables
     //long and latitude
@@ -107,52 +109,38 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
 
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for(DataSnapshot suburbSnapshot : dataSnapshot.getChildren()) {
-                    Suburb currentSuburb = suburbSnapshot.getValue(Suburb.class);
-                    Intent i = getIntent();
-                    String intentSuburb = i.getStringExtra("SUBURB");
-                    Log.d("SUBURB", "" + suburbSnapshot);
+                Suburb currSuburb = dataSnapshot.getValue(Suburb.class);
+                            suburb = currSuburb;
 
+                databaseSuburb.child("events").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for (DataSnapshot eventSnapshot: dataSnapshot.getChildren()){
 
-                        if (intentSuburb.equals(currentSuburb.getSubName())) {
-                            suburb = currentSuburb;
+                            Log.d(TAG, "REFERENCE: " + eventSnapshot.getRef().toString());
 
-                            DatabaseReference databaseSuburbEvents = FirebaseDatabase.getInstance().getReference("suburbs").child(suburb.getId()).child("events");
+                            Log.d(TAG, eventSnapshot.toString());
 
-                            databaseSuburbEvents.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    for (DataSnapshot eventSnapshot: dataSnapshot.getChildren()){
+                            Log.d(TAG, eventSnapshot.child("id").toString());
 
-                                        Log.d(TAG, "REFERENCE: " + eventSnapshot.getRef().toString());
+                            Log.d(TAG, eventSnapshot.child("id").getValue().toString());
 
-                                        Log.d(TAG, eventSnapshot.toString());
+                            if (eventId.equals(eventSnapshot.child("id").getValue().toString())){
 
-                                        Log.d(TAG, eventSnapshot.child("id").toString());
+                                databaseEvent = eventSnapshot.getRef();
+                                Log.d(TAG, "MATCH");
 
-                                        Log.d(TAG, eventSnapshot.child("id").getValue().toString());
-
-                                        if (eventId.equals(eventSnapshot.child("id").getValue().toString())){
-
-                                            databaseEvent = eventSnapshot.getRef();
-                                            Log.d(TAG, "MATCH");
-
-                                        }
-
-                                    }
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                }
-                            });
+                            }
 
                         }
+                    }
 
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
 
+                    }
+                });
 
-                }
             }
 
             @Override
@@ -171,13 +159,14 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        Intent i = getIntent();
+        String intentSuburb = i.getStringExtra("SUBURB");
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         setContentView(R.layout.activity_edit_delete);
 
         databaseUsers = FirebaseDatabase.getInstance().getReference("Users");
-        databaseSuburb =  FirebaseDatabase.getInstance().getReference("suburbs");
+        databaseSuburb =  FirebaseDatabase.getInstance().getReference("suburbs").child(intentSuburb);
 
         //getting authentication info to link the event to the user creating it
         firebaseAuth = FirebaseAuth.getInstance();
@@ -209,8 +198,7 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
         addCal = findViewById(R.id.addCal);
 
 
-        Intent i = getIntent();
-        Event preEvent =  (Event)i.getSerializableExtra("MyObject");
+         preEvent =  (Event)i.getSerializableExtra("MyObject");
 
         eventId = preEvent.getId();
 
@@ -453,7 +441,10 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
 
         databaseEvent.removeValue();
 
+        // Removes the myEvents hosting section of the user deleting this event
+
         DatabaseReference userEvents = databaseUsers.child(firebaseAuth.getCurrentUser().getUid()).child("myEvents");
+
 
         userEvents.addValueEventListener(new ValueEventListener() {
             @Override
@@ -478,6 +469,26 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
             }
         } );
 
+        // delete the reference for all attendees
+
+        ArrayList<UserInformation> attendees = preEvent.getAttendees();
+
+        for (UserInformation attendee: attendees){
+
+            String attendeeString = attendee.getUid();
+
+
+            DatabaseReference userEventsAttending = databaseUsers.child(attendeeString).child("myEventsAttending");
+
+
+
+
+
+
+
+        }
+
+        // Need to also cycle through the list of attendees, get their
 
 
 
@@ -520,7 +531,7 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
         databaseEvent.child("time").setValue(eventTime);
         databaseEvent.child("endDate").setValue(endDate);
         databaseEvent.child("endTime").setValue(endTime);
-        databaseEvent.child("name").setValue(eventName);
+        databaseEvent.child("eventName").setValue(eventName);
         databaseEvent.child("type").setValue(type);
 
 
@@ -647,12 +658,10 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
                 Address address = addresses.get(0);
                 String testedSuburb = address.getLocality();
 
-                Intent i = getIntent();
-                String intentSuburb = i.getStringExtra("SUBURB");
 
-                if (!intentSuburb.equals(testedSuburb)) {
+                if (!suburb.getSubName().equals(testedSuburb)) {
                     Log.d("VALIDATOR", "NOT IN SUBURB");
-                    Log.d("VALIDATOR", "We are in " + intentSuburb + " You have entered: " + testedSuburb);
+                    Log.d("VALIDATOR", "We are in " + suburb.getSubName() + " You have entered: " + testedSuburb);
                     Toast.makeText(this, "Address not in suburb", Toast.LENGTH_LONG).show();
                     return "NOT_IN_SUBURB";
                 }

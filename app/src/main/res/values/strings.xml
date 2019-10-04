@@ -51,6 +51,7 @@
     <string name="start_time">Start Time?</string>
     <string name="end_time">End Time?</string>
     <string name="picture_here">PICTURE HERE</string>
+    <string name="pick_image_intent_text">Select Image</string>
 
 
 </resources>

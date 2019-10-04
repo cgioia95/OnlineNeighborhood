@@ -8,11 +8,20 @@
     android:layout_marginTop="50dp"
     tools:context=".EventScreen">
 
+    <TextView
+        android:id="@+id/attendingTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/attendBtn"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="-95dp"
+        android:layout_marginEnd="6dp"
+        android:text="ATTENDING?" />
+
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="70dp"
         android:layout_height="70dp"
-        android:src="@drawable/profile_image"
         android:layout_alignParentStart="true"
         android:layout_marginRight="24dp"/>
 
