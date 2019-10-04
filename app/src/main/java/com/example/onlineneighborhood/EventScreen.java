@@ -27,6 +27,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -149,7 +150,11 @@ public class EventScreen extends AppCompatActivity {
 
                         attendees = event.getAttendees();
 
+
+
                         attending = false;
+
+
 
 
                         if (attendees != null) {
@@ -165,9 +170,29 @@ public class EventScreen extends AppCompatActivity {
                                 mLayoutManager = new LinearLayoutManager( getApplicationContext()  );
                                 mAdapter = new UserAdapter(attendees,   getApplicationContext() );
 
+
                                 mRecyclerView.setLayoutManager(mLayoutManager);
                                 mRecyclerView.setAdapter(mAdapter);
                                 mRecyclerView.setAdapter(mAdapter);
+
+                                mAdapter.setOnUserClickListener(new UserAdapter.onUserClickListener() {
+
+
+                                    @Override
+                                    public void onEventClick(int position) {
+
+                                        UserInformation attendee = attendees.get(position);
+
+                                        Log.d("ONEVENTCLICK" , attendee.getUid());
+
+//                                        Intent i = new Intent(getApplicationContext(), otherProfile.class);
+//                                        i.putExtra("UID", attendee.getUid());
+//                                        getApplicationContext().startActivity(i);
+                                    }
+
+
+                                });
+
 
 
 
@@ -296,20 +321,29 @@ public class EventScreen extends AppCompatActivity {
 
 
                     if (currentUser.getMyEventsAttending()!= null) {
+
                         for (Event event : currentUser.getMyEventsAttending()) {
 
-                            Log.d(TAG, event.getId().toString());
+                            if (event != null) {
+
+                                Log.d(TAG, event.getId().toString());
+
+                            }
 
                         }
 
                     }
 
-                    attendees.add(thisUserInformation);
+                    ArrayList<UserInformation> addList = attendees;
+
+                    addList.add(thisUserInformation);
+
+//                    attendees.add(thisUserInformation);
 
 
 
                     Event updatedEvent = new Event(mEvent.getId(), mEvent.getHost(), mEvent.getAddress(), mEvent.getEventName(), mEvent.getDescription(),
-                            mEvent.getTime(), mEvent.getDate(), mEvent.getEndTime(), mEvent.getEndDate(), mEvent.getType(),attendees);
+                            mEvent.getTime(), mEvent.getDate(), mEvent.getEndTime(), mEvent.getEndDate(), mEvent.getType(),addList);
 
                     Event userEvent = new Event(mEvent.getId(), intentSuburb);
 
@@ -383,19 +417,39 @@ public class EventScreen extends AppCompatActivity {
                     } );
 
 
+                    ArrayList<UserInformation> removeList = attendees;
+////                    attendees.remove(thisUserInformation);
+//
+//                    int i = 0;
+//                    for (UserInformation attendee: attendees){
+//
+//                        if (attendee.getUid().equals(thisUserString)){
+//
+//
+//                            removeList.remove(i);
+//
+//                            Log.d(TAG, "FOUND ME, THE USER TO BE REMOVED: " + attendee.getUid());
+//
+//                        }
+//
+//                        i++;
+//                    }
 
-                    attendees.remove(thisUserInformation);
+                    Iterator<UserInformation> iter = removeList.iterator();
 
-                    for (UserInformation attendee: attendees){
-                        if (attendee.getUid().equals(thisUserString)){
-                            attendees.remove(attendee);
-                        }
+                    while (iter.hasNext()) {
+                        UserInformation user = iter.next();
+
+                        if (user.getUid().equals(thisUserString))
+                            iter.remove();
                     }
 
                     Event updatedEvent = new Event(mEvent.getId(), mEvent.getHost(), mEvent.getAddress(), mEvent.getEventName(), mEvent.getDescription(),
-                            mEvent.getTime(), mEvent.getDate(), mEvent.getEndTime(), mEvent.getEndDate(), mEvent.getType(),attendees);
+                            mEvent.getTime(), mEvent.getDate(), mEvent.getEndTime(), mEvent.getEndDate(), mEvent.getType(),removeList);
 
                     databaseEvent.setValue(updatedEvent);
+
+
 
 
 

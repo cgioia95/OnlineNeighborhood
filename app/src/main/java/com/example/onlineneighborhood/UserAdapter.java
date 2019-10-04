@@ -1,6 +1,7 @@
 package com.example.onlineneighborhood;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -155,7 +156,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
         final UserInformation currentItem = userList.get(position);
 
-        String uid = currentItem.getUid();
+        final String uid = currentItem.getUid();
 
         Log.d(TAG, "BIND VIEW ID IS: " +  uid);
 
@@ -193,6 +194,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
 //
         holder.downloadImage(currentItem.getUid());
+
+
+
 
 
 
