@@ -71,21 +71,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
         fireBaseAuth = FirebaseAuth.getInstance();
         addEvent = mView.findViewById(R.id.addEvent);
         suburbTextView = mView.findViewById(R.id.textViewSuburb);
-<<<<<<< HEAD
-        filterButton = mView.findViewById(R.id.buttonFilter);
-//
-//        Button logoutBtn = mView.findViewById(R.id.logOutBtn);
-//
-//        logoutBtn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                fireBaseAuth.signOut();
-//                //finish();
-//                startActivity(new Intent(applicationContext, Login.class));
-//            }
-//        });
-=======
->>>>>>> 945a87d14739520044d8b13efff475633cb0f666
 
         Intent i = getActivity().getIntent();
         currSuburb=suburb = ((OnlineNeighborhood) getActivity().getApplication()).getsuburb();
