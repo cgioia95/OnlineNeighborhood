@@ -359,6 +359,9 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
                     if(addCal.isChecked()){
                         createCalenderEvent(eventName, eventDesc, eventAddress);
                     }
+
+                    this.finish();
+
                 }else{
                     Toast.makeText(this, "sorry, something went wrong, please try again", Toast.LENGTH_LONG).show();
                 }
@@ -375,6 +378,8 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
                     if(addCal.isChecked()){
                         createCalenderEvent(eventName, eventDesc, eventAddress);
                     }
+
+                    this.finish();
 
                 }else{
                     Toast.makeText(this, "sorry, something went wrong, please try again", Toast.LENGTH_LONG).show();
