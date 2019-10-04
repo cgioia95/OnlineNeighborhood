@@ -15,29 +15,29 @@
         >
 
         <ImageView
-            android:id="@+id/imageView"
+            android:id="@+id/imageViewU"
             android:layout_width="54dp"
             android:layout_height="54dp"
             android:layout_centerVertical="true"
             android:layout_marginRight="24dp"/>
 
         <TextView
-            android:id="@+id/userName"
+            android:id="@+id/userNameU"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/imageView"
+            android:layout_toEndOf="@id/imageViewU"
             android:text="UserName"
             android:textSize="18sp"
             />
 
         <TextView
-            android:id="@+id/userBio"
+            android:id="@+id/userBioU"
             android:layout_marginTop="2dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/userName"
+            android:layout_below="@id/userNameU"
             android:textSize="12sp"
-            android:layout_toEndOf="@id/imageView"
+            android:layout_toEndOf="@id/imageViewU"
             android:text="UserName" />
 
 

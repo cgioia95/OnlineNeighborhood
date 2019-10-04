@@ -2,6 +2,7 @@ package com.example.onlineneighborhood;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
@@ -57,11 +58,11 @@ public class EventScreen extends AppCompatActivity {
     public boolean attending;
 
     //Setting up recyclerview and adapter for displaying events
-    private RecyclerView recyclerViewUsers;
-    private EventAdapter mAdapterUsers;
+    private RecyclerView mRecyclerView;
+    private UserAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private ArrayList<UserInformation> userList = new ArrayList<>();
-    Context applicationContext = BottomNavigationActivity.getContextOfApplication();
+
 
 
     @Override
@@ -154,9 +155,18 @@ public class EventScreen extends AppCompatActivity {
                         attending = false;
 
                         if (attendees != null) {
+
+                            userList.clear();
+
+
                             for (UserInformation attendee : attendees) {
 
+
+
                                 if (attendee != null) {
+
+
+
                                     Log.d(TAG2, attendee.getUid());
                                     DatabaseReference user = databaseUsers.child(attendee.getUid());
 
@@ -164,6 +174,12 @@ public class EventScreen extends AppCompatActivity {
                                     user.addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                                            UserInformation userInfo = dataSnapshot.getValue(UserInformation.class);
+
+                                            Log.d(TAG2, "USERSNAPSHOT: " + userInfo.getName());
+                                            userList.add(userInfo);
+
                                             Log.d(TAG2, "USERSNAPSHOT" + dataSnapshot.toString());
                                         }
 
@@ -173,18 +189,50 @@ public class EventScreen extends AppCompatActivity {
                                         }
                                     });
 
+
+
+
+
+
                                     if (attendee.getUid().equals(thisUserString)) {
                                         Log.d(TAG, "ALREADY ATTENDING");
                                         attending = true;
 
 
-                                        break;
+//                                        break;
 
                                     }
 
                                 }
 
                             }
+
+
+
+                            for (UserInformation user2: userList){
+                                Log.d("ATTENDEETEST ", user2.getName());
+                            }
+
+//                            try{
+//
+//                                Log.d("TEST" , "Attempting Recycle View ");
+//                                mRecyclerView = findViewById(R.id.recyclerViewUsers);
+//
+//
+//                                mLayoutManager = new LinearLayoutManager( getApplicationContext()  );
+//                                mAdapter = new UserAdapter(userList,   getApplicationContext() );
+//
+//                                mRecyclerView.setLayoutManager(mLayoutManager);
+//                                mRecyclerView.setAdapter(mAdapter);
+//                                mRecyclerView.setAdapter(mAdapter);
+//
+//                                Log.d("TEST" , "Finishing Recycle View ");
+//
+//
+//
+//                            }catch (NullPointerException e){
+//                                e.printStackTrace();
+//                            }
 
                         }
 
