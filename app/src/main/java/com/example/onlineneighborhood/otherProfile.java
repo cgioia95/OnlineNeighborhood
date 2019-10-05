@@ -29,6 +29,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
+import java.time.LocalDate;
+import java.time.Year;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 
@@ -91,9 +94,15 @@ public class otherProfile extends AppCompatActivity {
                     String dob = dataSnapshot.child("dob").getValue().toString();
                     String bio = dataSnapshot.child("bio").getValue().toString();
 
+                    String[] dates = dob.split("/", 3);
+                    LocalDate today             = LocalDate.now();
+                    LocalDate birthday          = LocalDate.of(Integer.parseInt(dates[2]), Integer.parseInt(dates[1]), Integer.parseInt(dates[0]));
+                    //LocalDate thisYearsBirthday = birthday.with(Year.now());
+
+                    int age = (int) ChronoUnit.YEARS.between(birthday, today);
                     textViewName.setText(name);
                     editTextPreferences.setText(preference);
-                    editTextdob.setText(dob);
+                    editTextdob.setText(Integer.toString(age));
                     editTextBio.setText(bio);
                     downloadImage();
                 }

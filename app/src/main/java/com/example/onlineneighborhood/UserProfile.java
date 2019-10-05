@@ -287,7 +287,7 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
 
     //managing toolbar items
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
+    public boolean onOptionsItemSelected(final MenuItem item){
         if(item.getItemId() == R.id.logout){
 
             fireBaseAuth.signOut();
@@ -327,9 +327,15 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
                     tvBio.setVisibility(View.VISIBLE);
                     Toast.makeText(UserProfile.this, "Saved Succesfully!!", Toast.LENGTH_SHORT).show();
 
+
+                    editTextBio.setEnabled(false);
+                    editTextdob.setEnabled(false);
+                    spinnerPreferences.setEnabled(false);
+                    editProfileBtn.setVisibility(View.INVISIBLE);
                 }
 
             });
+
 
 
         }
