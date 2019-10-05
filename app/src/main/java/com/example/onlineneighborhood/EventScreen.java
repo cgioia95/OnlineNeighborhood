@@ -71,10 +71,6 @@ public class EventScreen extends AppCompatActivity {
         mDate = findViewById(R.id.eventDate);
         mTime = findViewById(R.id.eventTime);
         hostPic = findViewById(R.id.imageView);
-
-       
-
-
         storage = FirebaseStorage.getInstance();
         storageReference=storage.getReference();
 
