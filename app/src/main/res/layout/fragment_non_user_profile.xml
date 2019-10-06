@@ -28,6 +28,8 @@
 
         <TextView
             android:id="@+id/userName"
+            android:textColor="@color/textPrimary"
+            android:textStyle="bold"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
