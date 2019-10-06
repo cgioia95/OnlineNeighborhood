@@ -5,7 +5,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -23,6 +22,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 /*
 This class is displayed when a user clicks on a user profile which is not their own
  */
@@ -30,7 +31,7 @@ public class nonUserProfile extends AppCompatActivity {
 
     private TextView textViewName;
     private TextView dateOfBirth, bio, Preferences;
-    private ImageButton imageButtonPicture;
+    private CircleImageView profileImage;
     private FirebaseAuth fireBaseAuth;
     private DatabaseReference databaseReference;
     private FirebaseStorage storage;
@@ -41,13 +42,13 @@ public class nonUserProfile extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_other_profile);
+        setContentView(R.layout.fragment_non_user_profile);
 
-        textViewName = findViewById(R.id.textViewName);
-        dateOfBirth = findViewById(R.id.editTextdob);
-        bio = findViewById(R.id.editTextbio);
-        Preferences = findViewById(R.id.Preferences);
-        imageButtonPicture = findViewById(R.id.imageButtonPicture);
+        textViewName = findViewById(R.id.userName);
+        dateOfBirth = findViewById(R.id.dateOfBirth);
+        bio = findViewById(R.id.bio);
+        Preferences = findViewById(R.id.preferences);
+        profileImage = findViewById(R.id.profileImage);
         fireBaseAuth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference("Users");
         storage = FirebaseStorage.getInstance();
@@ -110,7 +111,7 @@ public class nonUserProfile extends AppCompatActivity {
             public void onSuccess(Uri uri) {
                 // Got the download URL for 'users/me/profile.png' in uri
                 Log.d(TAG, "DOWNLOAD URL: " + uri.toString());
-                Picasso.get().load(uri).into(imageButtonPicture);
+                Picasso.get().load(uri).into(profileImage);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -122,7 +123,7 @@ public class nonUserProfile extends AppCompatActivity {
                     public void onSuccess(Uri uri) {
                         // Got the download URL for 'users/me/profile.png' in uri
                         Log.d(TAG, "DOWNLOAD URL: " + uri.toString());
-                        Picasso.get().load(uri).into(imageButtonPicture);
+                        Picasso.get().load(uri).into(profileImage);
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override

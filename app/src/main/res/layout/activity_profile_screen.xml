@@ -27,7 +27,7 @@
         tools:srcCompat="@tools:sample/avatars" />
 
     <TextView
-        android:id="@+id/textViewName"
+        android:id="@+id/userName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
@@ -58,7 +58,7 @@
         android:textAlignment="center" />
 
     <EditText
-        android:id="@+id/editTextdob"
+        android:id="@+id/dateOfBirth"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
@@ -68,13 +68,13 @@
         android:ems="10"
         android:hint="DOB"
         android:inputType="textPersonName"
-        app:layout_constraintEnd_toEndOf="@+id/editTextbio"
-        app:layout_constraintStart_toStartOf="@+id/editTextbio"
-        app:layout_constraintTop_toBottomOf="@+id/textViewName"
+        app:layout_constraintEnd_toEndOf="@+id/bio"
+        app:layout_constraintStart_toStartOf="@+id/bio"
+        app:layout_constraintTop_toBottomOf="@+id/userName"
         android:importantForAutofill="no" />
 
     <EditText
-        android:id="@+id/editTextbio"
+        android:id="@+id/bio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
@@ -100,10 +100,10 @@
         android:layout_marginRight="20dp"
         android:layout_marginBottom="59dp"
         android:entries="@array/preferences"
-        app:layout_constraintBottom_toTopOf="@+id/editTextbio"
+        app:layout_constraintBottom_toTopOf="@+id/bio"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextdob" />
+        app:layout_constraintTop_toBottomOf="@+id/dateOfBirth" />
 
     <Button
         android:id="@+id/editProfileBtn"
@@ -117,7 +117,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/imageButtonPicture"
         app:layout_constraintStart_toStartOf="@+id/imageButtonPicture"
-        app:layout_constraintTop_toBottomOf="@+id/editTextbio" />
+        app:layout_constraintTop_toBottomOf="@+id/bio" />
 
 
 </LinearLayout>
