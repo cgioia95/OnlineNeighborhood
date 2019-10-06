@@ -1,18 +1,12 @@
 package com.example.onlineneighborhood;
 
-import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,24 +23,20 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
-import java.util.Arrays;
-import java.util.List;
-
-public class otherProfile extends AppCompatActivity {
+/*
+This class is displayed when a user clicks on a user profile which is not their own
+ */
+public class nonUserProfile extends AppCompatActivity {
 
     private TextView textViewName;
-    private Button editProfileBtn;
-    private TextView editTextdob, editTextBio, editTextPreferences;
+    private TextView dateOfBirth, bio, Preferences;
     private ImageButton imageButtonPicture;
     private FirebaseAuth fireBaseAuth;
     private DatabaseReference databaseReference;
     private FirebaseStorage storage;
     private StorageReference storageReference;
-    private static final int PICK_IMAGE = 1;
-    private static final String TAG = "Other Profile";
+    private static final String TAG = "Non user profile";
     private String uid;
-    Uri imageuri;
-    private List<String> preferenceOptions = Arrays.asList("Sports", "Gigs", "Dating", "Misc.");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,32 +44,27 @@ public class otherProfile extends AppCompatActivity {
         setContentView(R.layout.activity_other_profile);
 
         textViewName = findViewById(R.id.textViewName);
-        editTextdob = findViewById(R.id.editTextdob);
-        editTextBio = findViewById(R.id.editTextbio);
-        editTextPreferences = findViewById(R.id.Preferences);
+        dateOfBirth = findViewById(R.id.editTextdob);
+        bio = findViewById(R.id.editTextbio);
+        Preferences = findViewById(R.id.Preferences);
         imageButtonPicture = findViewById(R.id.imageButtonPicture);
         fireBaseAuth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference("Users");
         storage = FirebaseStorage.getInstance();
         storageReference=storage.getReference();
 
-
+        //Get user ID from intent
         Intent i = getIntent();
         uid = i.getStringExtra("UID");
 
-
+        //Set toolbar text to display UserProfile to show user where they are in the app
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        Intent intent = new Intent();
-        Log.d("user profile", "onCreate: " + toolbar);
-        getSupportActionBar().setTitle("Online Neighborhood");
+        getSupportActionBar().setTitle("User Profile");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
-
-
-
-
+        //Get user information from DB based on their user ID
         databaseReference.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -92,9 +77,9 @@ public class otherProfile extends AppCompatActivity {
                     String bio = dataSnapshot.child("bio").getValue().toString();
 
                     textViewName.setText(name);
-                    editTextPreferences.setText(preference);
-                    editTextdob.setText(dob);
-                    editTextBio.setText(bio);
+                    Preferences.setText(preference);
+                    dateOfBirth.setText(dob);
+                    nonUserProfile.this.bio.setText(bio);
                     downloadImage();
                 }
 
@@ -120,16 +105,12 @@ public class otherProfile extends AppCompatActivity {
     }
 
     protected void downloadImage(){
-
         storageReference.child("profilePics/" + uid).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
                 // Got the download URL for 'users/me/profile.png' in uri
                 Log.d(TAG, "DOWNLOAD URL: " + uri.toString());
                 Picasso.get().load(uri).into(imageButtonPicture);
-
-
-
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -142,9 +123,6 @@ public class otherProfile extends AppCompatActivity {
                         // Got the download URL for 'users/me/profile.png' in uri
                         Log.d(TAG, "DOWNLOAD URL: " + uri.toString());
                         Picasso.get().load(uri).into(imageButtonPicture);
-
-
-
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -154,14 +132,7 @@ public class otherProfile extends AppCompatActivity {
 
                     }
                 });
-
-
             }
         });
-
-
-
-
-
     }
 }

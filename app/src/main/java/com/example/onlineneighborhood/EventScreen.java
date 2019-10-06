@@ -5,16 +5,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Context;
 import android.content.Intent;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -185,7 +181,7 @@ public class EventScreen extends AppCompatActivity {
 
                                         Log.d("ONEVENTCLICK" , attendee.getUid());
 
-                                        Intent i = new Intent( getApplicationContext(), otherProfile.class);
+                                        Intent i = new Intent( getApplicationContext(), nonUserProfile.class);
                                         i.putExtra("UID", attendee.getUid());
                                         startActivity(i);
                                     }
@@ -266,7 +262,7 @@ public class EventScreen extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                Intent i = new Intent(getApplicationContext(), otherProfile.class);
+                Intent i = new Intent(getApplicationContext(), nonUserProfile.class);
                 i.putExtra("UID", mEvent.getHost().getUid());
                 i.putExtra("MyObject", mEvent);
                 i.putExtra("SUBURB", intentSuburb);

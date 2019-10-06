@@ -44,7 +44,7 @@
             android:parentActivityName=".BottomNavigationActivity"/>
 
         <activity
-            android:name=".otherProfile"
+            android:name=".nonUserProfile"
             android:label = "otherProfile"
             />
 
