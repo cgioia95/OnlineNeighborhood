@@ -34,7 +34,7 @@ public class MyEvents extends Fragment implements View.OnClickListener {
     DatabaseReference databaseUserReference, suburbEvents;
     String userID;
 
-    // Auxillary lists for retrieving final 'Attending' and 'Hosting' lists for user
+    // Auxiliary lists for retrieving final 'Attending' and 'Hosting' lists for user
     private ArrayList<Event> userMyEvents = new ArrayList<>();
     private ArrayList<Event> userMyEventsAttending = new ArrayList<>();
 
@@ -49,7 +49,6 @@ public class MyEvents extends Fragment implements View.OnClickListener {
 
     Button attending;
     Button hosting;
-
 
     public MyEvents() {
         // Required empty public constructor
@@ -140,8 +139,10 @@ public class MyEvents extends Fragment implements View.OnClickListener {
                                     ArrayList<Event> events = suburb.getEvents();
                                     for (Event event : events) {
                                         //Accounting for deleted events
-                                        if (event != null) {
-                                            if (event.getId().equals(eventid)) {
+                                        if (event != null && event.getId().equals(eventid)) {
+                                            // Only add events not being hosted by the user
+                                            String hostID = event.getHost().getUid();
+                                            if (!hostID.equals(userID)) {
                                                 userAttendingList.add(event);
                                             }
                                         }
