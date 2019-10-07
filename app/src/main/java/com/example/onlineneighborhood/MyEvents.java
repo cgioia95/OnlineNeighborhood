@@ -160,6 +160,12 @@ public class MyEvents extends Fragment implements View.OnClickListener {
                     }
                 }
 
+                mRecyclerView = getActivity().findViewById(R.id.recyclerView);
+                mLayoutManager = new LinearLayoutManager(getActivity());
+                mAdapter = new EventAdapter(userHostingList, getActivity());
+                mRecyclerView.setLayoutManager(mLayoutManager);
+                mRecyclerView.setAdapter(mAdapter);
+
 
             }
 
@@ -175,12 +181,6 @@ public class MyEvents extends Fragment implements View.OnClickListener {
     public void onStart() {
 
         super.onStart();
-
-        mRecyclerView = getActivity().findViewById(R.id.recyclerView);
-        mLayoutManager = new LinearLayoutManager(getActivity());
-        mAdapter = new EventAdapter(userHostingList, getActivity());
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setAdapter(mAdapter);
 
     }
 
