@@ -88,13 +88,16 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
     private DatabaseReference databaseReference;
     private FirebaseStorage storage;
     private StorageReference storageReference;
-    private static final int PICK_IMAGE = 1;
-    private static final int MY_CAMERA_PERMISSION_CODE = 100;
-    private static final int EXTERNAL_STORAGE_PERMISSION_CONSTANT = 120;
+    private ProgressDialog progressDialog;
 
-    private static final int REQUEST_PERMISSION_SETTING = 101;
-    private boolean sentToSettings = false;
-    private SharedPreferences permissionStatus;
+
+    private static final int PICK_IMAGE = 1, CAMERA_REQUEST_CODE=2;
+//    private static final int MY_CAMERA_PERMISSION_CODE = 100;
+//    private static final int EXTERNAL_STORAGE_PERMISSION_CONSTANT = 120;
+//
+//    private static final int REQUEST_PERMISSION_SETTING = 101;
+//    private boolean sentToSettings = false;
+//    private SharedPreferences permissionStatus;
 
     private static final int  REQUEST_TAKE_PHOTO = 15;
     private static final String TAG = "My Profile";
@@ -133,7 +136,7 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
         getSupportActionBar().setTitle("Online Neighborhood");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        permissionStatus = getSharedPreferences("permissionStatus",MODE_PRIVATE);
+//        permissionStatus = getSharedPreferences("permissionStatus",MODE_PRIVATE);
 
 
 
@@ -165,66 +168,7 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                        if (i==0){
-
-                           if (ActivityCompat.checkSelfPermission(UserProfile.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                               if (ActivityCompat.shouldShowRequestPermissionRationale(UserProfile.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                                   //Show Information about why you need the permission
-                                   AlertDialog.Builder builder = new AlertDialog.Builder(UserProfile.this);
-                                   builder.setTitle("Need Storage Permission");
-                                   builder.setMessage("This app needs storage permission.");
-                                   builder.setPositiveButton("Grant", new DialogInterface.OnClickListener() {
-                                       @Override
-                                       public void onClick(DialogInterface dialog, int which) {
-                                           dialog.cancel();
-                                           ActivityCompat.requestPermissions(UserProfile.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_PERMISSION_CONSTANT);
-                                       }
-                                   });
-                                   builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                       @Override
-                                       public void onClick(DialogInterface dialog, int which) {
-                                           dialog.cancel();
-                                       }
-                                   });
-                                   builder.show();
-                               } else if (permissionStatus.getBoolean(Manifest.permission.WRITE_EXTERNAL_STORAGE,false)) {
-                                   //Previously Permission Request was cancelled with 'Dont Ask Again',
-                                   // Redirect to Settings after showing Information about why you need the permission
-                                   AlertDialog.Builder builder = new AlertDialog.Builder(UserProfile.this);
-                                   builder.setTitle("Need Storage Permission");
-                                   builder.setMessage("This app needs storage permission.");
-                                   builder.setPositiveButton("Grant", new DialogInterface.OnClickListener() {
-                                       @Override
-                                       public void onClick(DialogInterface dialog, int which) {
-                                           dialog.cancel();
-                                           sentToSettings = true;
-                                           Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                           Uri uri = Uri.fromParts("package", getPackageName(), null);
-                                           intent.setData(uri);
-                                           startActivityForResult(intent, REQUEST_PERMISSION_SETTING);
-                                           Toast.makeText(getBaseContext(), "Go to Permissions to Grant Storage", Toast.LENGTH_LONG).show();
-                                       }
-                                   });
-                                   builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                       @Override
-                                       public void onClick(DialogInterface dialog, int which) {
-                                           dialog.cancel();
-                                       }
-                                   });
-                                   builder.show();
-                               } else {
-                                   //just request the permission
-                                   ActivityCompat.requestPermissions(UserProfile.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_PERMISSION_CONSTANT);
-                               }
-
-                               SharedPreferences.Editor editor = permissionStatus.edit();
-                               editor.putBoolean(Manifest.permission.WRITE_EXTERNAL_STORAGE,true);
-                               editor.commit();
-
-
-                           } else {
-                               //You already have the permission, just go ahead.
-                               proceedAfterPermission();
-                           }
+                           dispatchTakePictureIntent();
 
 
                        }
@@ -380,42 +324,44 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
             }
         }
 
-        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
+        if(requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK){
+            progressDialog.setMessage("Uploading...");
+            progressDialog.show();
+            Uri uri = data.getData();
 
-            imageButtonPicture.setImageURI(Uri.parse(currentPhotoPath));
-            imageuri=Uri.parse(currentPhotoPath);
-            uploadImage();
 
 
+            StorageReference filepath = storageReference.child("Photos").child(uri.getLastPathSegment());
+            filepath.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    Toast.makeText(UserProfile.this, "Upload Successful!", Toast.LENGTH_SHORT).show();
+                    progressDialog.dismiss();
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(UserProfile.this, "Upload Failed!", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
-        if (requestCode == REQUEST_PERMISSION_SETTING) {
-            if (ActivityCompat.checkSelfPermission(UserProfile.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                //Got Permission
-                proceedAfterPermission();
-            }
-        }
-    }
 
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
-//    {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//        if (requestCode == MY_CAMERA_PERMISSION_CODE)
-//        {
-//            if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
-//            {
-//                Toast.makeText(this, "camera permission granted", Toast.LENGTH_LONG).show();
-//                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-//                startActivityForResult(cameraIntent, CAMERA_REQUEST);
-//            }
-//            else
-//            {
-//                Toast.makeText(this, "camera permission denied", Toast.LENGTH_LONG).show();
+//        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
+//
+//            imageButtonPicture.setImageURI(Uri.parse(currentPhotoPath));
+//            imageuri=Uri.parse(currentPhotoPath);
+//            uploadImage();
+//
+//
+//        }
+//        if (requestCode == REQUEST_PERMISSION_SETTING) {
+//            if (ActivityCompat.checkSelfPermission(UserProfile.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+//                //Got Permission
+//                proceedAfterPermission();
 //            }
 //        }
-//
-//
-//    }
+    }
+
 
 
     private void uploadImage() {
@@ -509,64 +455,27 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
         return image;
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == EXTERNAL_STORAGE_PERMISSION_CONSTANT) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                //The External Storage Write Permission is granted to you... Continue your left job...
-                proceedAfterPermission();
-            } else {
-                if (ActivityCompat.shouldShowRequestPermissionRationale(UserProfile.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    //Show Information about why you need the permission
-                    AlertDialog.Builder builder = new AlertDialog.Builder(UserProfile.this);
-                    builder.setTitle("Need Storage Permission");
-                    builder.setMessage("This app needs storage permission");
-                    builder.setPositiveButton("Grant", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
 
-
-                            ActivityCompat.requestPermissions(UserProfile.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_PERMISSION_CONSTANT);
-
-
-                        }
-                    });
-                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
-                        }
-                    });
-                    builder.show();
-                } else {
-                    Toast.makeText(getBaseContext(),"Unable to get Permission",Toast.LENGTH_LONG).show();
-                }
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File...
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        "com.example.android.fileprovider",
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, CAMERA_REQUEST_CODE);
             }
         }
     }
 
-    private void proceedAfterPermission() {
-        //We've got the permission, now we can proceed further
-        Toast.makeText(getBaseContext(), "We got the Storage Permission", Toast.LENGTH_LONG).show();
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        try {
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(UserProfile.this, BuildConfig.APPLICATION_ID + ".provider", createImageFile()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        startActivityForResult(intent, REQUEST_TAKE_PHOTO);
-    }
-
-    @Override
-    protected void onPostResume() {
-        super.onPostResume();
-        if (sentToSettings) {
-            if (ActivityCompat.checkSelfPermission(UserProfile.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                //Got Permission
-                proceedAfterPermission();
-            }
-        }
-    }
-}
+ }
