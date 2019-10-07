@@ -14,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -59,7 +58,7 @@ public class MyEvents extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View mView = inflater.inflate(R.layout.activity_my_events, null);
+        View mView = inflater.inflate(R.layout.fragment_my_events, null);
 
         // Set 'Attending' and 'Hosting' buttons
         attending = mView.findViewById(R.id.my_events_attending_button);
@@ -160,12 +159,13 @@ public class MyEvents extends Fragment implements View.OnClickListener {
                     }
                 }
 
+                // Adapters for default view
+                // THIS IS NOT CURRENTLY WORKING FOR EACH TIME COMING BACK TO MYEVENTS SCREEN
                 mRecyclerView = getActivity().findViewById(R.id.recyclerView);
                 mLayoutManager = new LinearLayoutManager(getActivity());
                 mAdapter = new EventAdapter(userHostingList, getActivity());
                 mRecyclerView.setLayoutManager(mLayoutManager);
                 mRecyclerView.setAdapter(mAdapter);
-
 
             }
 
@@ -194,18 +194,14 @@ public class MyEvents extends Fragment implements View.OnClickListener {
                 mRecyclerView.setLayoutManager(mLayoutManager);
                 mRecyclerView.setAdapter(mAdapter);
 
+                // Listener to go to 'attending' event if clicked
                 mAdapter.setOnEventClickListener(new EventAdapter.onEventClickListener() {
                     @Override
                     public void onEventClick(int position) {
                         Event event = userAttendingList.get(position);
-
                         Intent intent = new Intent(getActivity(), EventScreen.class);
-
-                        Log.d("MyEvents", "Test Click");
-
                         intent.putExtra("MyObject", event);
                         intent.putExtra("SUBURB", event.getSuburbId());
-
                         startActivity(intent);
                     }
 
@@ -219,18 +215,14 @@ public class MyEvents extends Fragment implements View.OnClickListener {
                 mRecyclerView.setLayoutManager(mLayoutManager);
                 mRecyclerView.setAdapter(mAdapter);
 
+                // Listener to go to 'hosting' event if clicked
                 mAdapter.setOnEventClickListener(new EventAdapter.onEventClickListener() {
                     @Override
                     public void onEventClick(int position) {
                         Event event = userHostingList.get(position);
-
                         Intent intent = new Intent(getActivity(), EventScreen.class);
-
-                        Log.d("MyEvents", "Test Click");
-
                         intent.putExtra("MyObject", event);
                         intent.putExtra("SUBURB", event.getSuburbId());
-
                         startActivity(intent);
                     }
 
