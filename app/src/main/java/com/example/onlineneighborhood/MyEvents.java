@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -70,118 +71,14 @@ public class MyEvents extends Fragment implements View.OnClickListener {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         fireBaseAuth = FirebaseAuth.getInstance();
         userID = fireBaseAuth.getCurrentUser().getUid();
         databaseUserReference = FirebaseDatabase.getInstance().getReference("Users").child(userID);
 
-        databaseUserReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                userHostingList.clear();
-                userAttendingList.clear();
-                UserInformation user = dataSnapshot.getValue(UserInformation.class);
-
-                // Retrieve user's 'Hosting' list
-                if (dataSnapshot.child("myEvents").exists()){
-                    userMyEvents = user.getMyEvents();
-
-                    for (Event event : userMyEvents) {
-                        String suburbID = event.getSuburbId();
-                        final String eventID = event.getId();
-
-                        // Retrieve full event details from 'Suburbs'
-                        suburbEvents = FirebaseDatabase.getInstance().getReference("suburbs").child(suburbID);
-                        suburbEvents.addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                Suburb suburb = dataSnapshot.getValue(Suburb.class);
-                                // Accounting for suburbs without existing events
-                                if (suburb.getEvents() != null) {
-                                    ArrayList<Event> events = suburb.getEvents();
-                                    for (Event event : events) {
-                                        //Accounting for deleted events
-                                        if (event != null) {
-                                            if (event.getId().equals(eventID)) {
-                                                userHostingList.add(event);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            }
-                        });
-                    }
-                }
-
-                // Retrieve user's 'Attending' list
-                if (dataSnapshot.child("myEventsAttending").exists()){
-                    userMyEventsAttending = user.getMyEventsAttending();
-                    for (Event event : userMyEventsAttending) {
-                        String suburbid = event.getSuburbId();
-                        final String eventid = event.getId();
-
-                        // Retrieve full event details from 'Suburbs'
-                        suburbEvents = FirebaseDatabase.getInstance().getReference("suburbs").child(suburbid);
-                        suburbEvents.addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                Suburb suburb = dataSnapshot.getValue(Suburb.class);
-                                // Accounting for suburbs without existing events
-                                if (suburb.getEvents() != null) {
-                                    ArrayList<Event> events = suburb.getEvents();
-                                    for (Event event : events) {
-                                        //Accounting for deleted events
-                                        if (event != null && event.getId().equals(eventid)) {
-                                            // Only add events not being hosted by the user
-                                            String hostID = event.getHost().getUid();
-                                            if (!hostID.equals(userID)) {
-                                                userAttendingList.add(event);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                            }
-                        });
-
-                    }
-                }
-
-                // Adapters for default view
-                // THIS IS NOT CURRENTLY WORKING FOR EACH TIME COMING BACK TO MYEVENTS SCREEN
-                mRecyclerView = getActivity().findViewById(R.id.recyclerView);
-                mLayoutManager = new LinearLayoutManager(getActivity());
-                mAdapter = new EventAdapter(userHostingList, getActivity());
-                mRecyclerView.setLayoutManager(mLayoutManager);
-                mRecyclerView.setAdapter(mAdapter);
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-    }
-
-    @Override
-    public void onStart() {
-
-        super.onStart();
-
+        initialiseAttendingEvents();
+        initialiseHostingEvents();
     }
 
     @Override
@@ -235,5 +132,127 @@ public class MyEvents extends Fragment implements View.OnClickListener {
         }
 
     }
-}
 
+    public void initialiseHostingEvents(){
+
+        databaseUserReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                userHostingList.clear();
+                userAttendingList.clear();
+                UserInformation user = dataSnapshot.getValue(UserInformation.class);
+
+                // Retrieve user's 'Hosting' list
+                if (dataSnapshot.child("myEvents").exists()) {
+                    userMyEvents = user.getMyEvents();
+
+                    for (Event event : userMyEvents) {
+                        if (event != null) {
+                            String suburbID = event.getSuburbId();
+                            final String eventID = event.getId();
+
+                            // Retrieve full event details from 'Suburbs'
+                            suburbEvents = FirebaseDatabase.getInstance().getReference("suburbs").child(suburbID);
+                            suburbEvents.addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    Suburb suburb = dataSnapshot.getValue(Suburb.class);
+                                    // Accounting for suburbs without existing events
+                                    if (suburb.getEvents() != null) {
+                                        ArrayList<Event> events = suburb.getEvents();
+                                        for (Event event : events) {
+                                            //Accounting for deleted events
+                                            if (event != null) {
+                                                if (event.getId().equals(eventID)) {
+                                                    userHostingList.add(event);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+                        }
+                    }
+                }
+                mRecyclerView = getActivity().findViewById(R.id.recyclerView);
+                mLayoutManager = new LinearLayoutManager(getActivity());
+                mAdapter = new EventAdapter(userHostingList, getActivity());
+                mRecyclerView.setLayoutManager(mLayoutManager);
+                mRecyclerView.setAdapter(mAdapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void initialiseAttendingEvents(){
+
+        databaseUserReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                userHostingList.clear();
+                userAttendingList.clear();
+                UserInformation user = dataSnapshot.getValue(UserInformation.class);
+
+                // Retrieve user's 'Attending' list
+                if (dataSnapshot.child("myEventsAttending").exists()) {
+                    userMyEventsAttending = user.getMyEventsAttending();
+                    for (Event event : userMyEventsAttending) {
+                        if (event != null) {
+                            String suburbID = event.getSuburbId();
+                            final String eventID = event.getId();
+
+                            // Retrieve full event details from 'Suburbs'
+                            suburbEvents = FirebaseDatabase.getInstance().getReference("suburbs").child(suburbID);
+                            suburbEvents.addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    Suburb suburb = dataSnapshot.getValue(Suburb.class);
+                                    // Accounting for suburbs without existing events
+                                    if (suburb.getEvents() != null) {
+                                        ArrayList<Event> events = suburb.getEvents();
+                                        for (Event event : events) {
+                                            //Accounting for deleted events
+                                            if (event != null && event.getId().equals(eventID)) {
+                                                // Only add events not being hosted by the user
+                                                String hostID = event.getHost().getUid();
+                                                if (!hostID.equals(userID)) {
+                                                    userAttendingList.add(event);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+                        }
+                    }
+                }
+                mRecyclerView = getActivity().findViewById(R.id.recyclerView);
+                mLayoutManager = new LinearLayoutManager(getActivity());
+                mAdapter = new EventAdapter(userHostingList, getActivity());
+                mRecyclerView.setLayoutManager(mLayoutManager);
+                mRecyclerView.setAdapter(mAdapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+
+        });
+    }
+}
