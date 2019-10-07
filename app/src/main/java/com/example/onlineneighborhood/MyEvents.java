@@ -1,6 +1,7 @@
 package com.example.onlineneighborhood;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -60,9 +61,6 @@ public class MyEvents extends Fragment implements View.OnClickListener {
         // Inflate the layout for this fragment
         View mView = inflater.inflate(R.layout.activity_my_events, null);
 
-        fireBaseAuth = FirebaseAuth.getInstance();
-        userID = fireBaseAuth.getCurrentUser().getUid();
-
         // Set 'Attending' and 'Hosting' buttons
         attending = mView.findViewById(R.id.my_events_attending_button);
         attending.setOnClickListener(this);
@@ -72,9 +70,12 @@ public class MyEvents extends Fragment implements View.OnClickListener {
         return mView;
     }
 
-    public void onStart() {
-        super.onStart();
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
+        fireBaseAuth = FirebaseAuth.getInstance();
+        userID = fireBaseAuth.getCurrentUser().getUid();
         databaseUserReference = FirebaseDatabase.getInstance().getReference("Users").child(userID);
 
         databaseUserReference.addValueEventListener(new ValueEventListener() {
@@ -90,11 +91,11 @@ public class MyEvents extends Fragment implements View.OnClickListener {
                     userMyEvents = user.getMyEvents();
 
                     for (Event event : userMyEvents) {
-                        String suburbid = event.getSuburbId();
-                        final String eventid = event.getId();
+                        String suburbID = event.getSuburbId();
+                        final String eventID = event.getId();
 
                         // Retrieve full event details from 'Suburbs'
-                        suburbEvents = FirebaseDatabase.getInstance().getReference("suburbs").child(suburbid);
+                        suburbEvents = FirebaseDatabase.getInstance().getReference("suburbs").child(suburbID);
                         suburbEvents.addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -105,7 +106,7 @@ public class MyEvents extends Fragment implements View.OnClickListener {
                                     for (Event event : events) {
                                         //Accounting for deleted events
                                         if (event != null) {
-                                            if (event.getId().equals(eventid)) {
+                                            if (event.getId().equals(eventID)) {
                                                 userHostingList.add(event);
                                             }
                                         }
@@ -155,8 +156,11 @@ public class MyEvents extends Fragment implements View.OnClickListener {
 
                             }
                         });
+
                     }
                 }
+
+
             }
 
             @Override
@@ -168,25 +172,70 @@ public class MyEvents extends Fragment implements View.OnClickListener {
     }
 
     @Override
+    public void onStart() {
+
+        super.onStart();
+
+        mRecyclerView = getActivity().findViewById(R.id.recyclerView);
+        mLayoutManager = new LinearLayoutManager(getActivity());
+        mAdapter = new EventAdapter(userHostingList, getActivity());
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setAdapter(mAdapter);
+
+    }
+
+    @Override
     public void onClick(View v) {
 
         switch (v.getId()) {
 
             case R.id.my_events_attending_button:
-                mRecyclerView = getActivity().findViewById(R.id.recyclerView);
-                mLayoutManager = new LinearLayoutManager(getActivity());
                 mAdapter = new EventAdapter(userAttendingList, getActivity());
                 mRecyclerView.setLayoutManager(mLayoutManager);
                 mRecyclerView.setAdapter(mAdapter);
 
+                mAdapter.setOnEventClickListener(new EventAdapter.onEventClickListener() {
+                    @Override
+                    public void onEventClick(int position) {
+                        Event event = userAttendingList.get(position);
+
+                        Intent intent = new Intent(getActivity(), EventScreen.class);
+
+                        Log.d("MyEvents", "Test Click");
+
+                        intent.putExtra("MyObject", event);
+                        intent.putExtra("SUBURB", event.getSuburbId());
+
+                        startActivity(intent);
+                    }
+
+
+                });
+
                 break;
 
             case R.id.my_events_hosting_button:
-                mRecyclerView = getActivity().findViewById(R.id.recyclerView);
-                mLayoutManager = new LinearLayoutManager(getActivity());
                 mAdapter = new EventAdapter(userHostingList, getActivity());
                 mRecyclerView.setLayoutManager(mLayoutManager);
                 mRecyclerView.setAdapter(mAdapter);
+
+                mAdapter.setOnEventClickListener(new EventAdapter.onEventClickListener() {
+                    @Override
+                    public void onEventClick(int position) {
+                        Event event = userHostingList.get(position);
+
+                        Intent intent = new Intent(getActivity(), EventScreen.class);
+
+                        Log.d("MyEvents", "Test Click");
+
+                        intent.putExtra("MyObject", event);
+                        intent.putExtra("SUBURB", event.getSuburbId());
+
+                        startActivity(intent);
+                    }
+
+
+                });
                 break;
 
             default:
