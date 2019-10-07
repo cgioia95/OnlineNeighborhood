@@ -33,7 +33,7 @@ import static com.example.onlineneighborhood.editDelete.TAG;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MyEvents extends Fragment {
+public class MyEvents extends Fragment implements View.OnClickListener {
 
     // Current issues:
     // 1. Events not appearing after clicking out of my events and coming back
@@ -61,6 +61,8 @@ public class MyEvents extends Fragment {
     Button attending;
     Button hosting;
 
+    TextView stringTextView;
+
     public MyEvents() {
         // Required empty public constructor
     }
@@ -73,11 +75,11 @@ public class MyEvents extends Fragment {
 
         fireBaseAuth = FirebaseAuth.getInstance();
         userid = fireBaseAuth.getCurrentUser().getUid();
+
         attending = mView.findViewById(R.id.my_events_attending_button);
+        attending.setOnClickListener(this);
         hosting = mView.findViewById(R.id.my_events_hosting_button);
-
-
-
+        hosting.setOnClickListener(this);
 
         return mView;
     }
@@ -131,7 +133,7 @@ public class MyEvents extends Fragment {
                     }
                 }
 
-                // Set up for list of events hosting
+                // Set up for list of events attending
                 if (dataSnapshot.child("myEventsAttending").exists()){
                     userMyEventsAttending = user.getMyEventsAttending();
                     for (Event event : userMyEventsAttending) {
@@ -152,8 +154,8 @@ public class MyEvents extends Fragment {
                                             if (event.getId().equals(eventid)) {
                                                 userMyEventsAttendingToView.add(event);
                                                 Log.d("EVENT ATTENDING FOUND ", "" + event.getName());
-                                                TextView stringTextView = getActivity().findViewById(R.id.textViewList);
-                                                stringTextView.setText(stringTextView.getText() + event.getName());
+                                                //TextView stringTextView = getActivity().findViewById(R.id.textViewList);
+                                                //stringTextView.setText(stringTextView.getText() + event.getName());
                                             }
                                         }
                                     }
@@ -183,69 +185,6 @@ public class MyEvents extends Fragment {
                 */
 
 
-//                mAdapterForHosting.setOnEventLongClickListener(new EventAdapter.onEventLongClickListener() {
-//                    @Override
-//                    public void onEventLongClick(int position) {
-//
-//                        Event event = userMyEventsToView.get(position);
-//
-//                        String hostId = event.getHost().getUid();
-//
-//                        String myId = fireBaseAuth.getCurrentUser().getUid();
-//                        //Log.d(TAG, "Long Click");
-//
-//
-//                        if (myId.equals(hostId)){
-//                            Log.d(TAG, "Permission Granted");
-//
-//                            Intent intent = new Intent(applicationContext, editDelete.class);
-//                            intent.putExtra("MyObject", event);
-//                            intent.putExtra("SUBURB", event.getSuburbId());
-//
-//
-//                            startActivity(intent);
-//
-//                        }
-//
-//                        else {
-//                            Log.d(TAG, "Permission Denied");
-//                        }
-//
-//
-//                    }
-//                });
-//
-//                mAdapterForHosting.setOnEventClickListener(new EventAdapter.onEventClickListener() {
-//                    @Override
-//                    public void onEventClick(int position) {
-//                        Event event = userMyEventsToView.get(position);
-//
-//                        Intent intent = new Intent(getActivity(), EventScreen.class);
-//
-//                        Log.d(TAG, "Single Click");
-//
-//                        intent.putExtra("MyObject", event);
-//                        intent.putExtra("SUBURB", event.getSuburbId());
-//
-//                        startActivity(intent);
-//                    }
-//                });
-
-//                mAdapterForAttending.setOnEventClickListener(new EventAdapter.onEventClickListener() {
-//                    @Override
-//                    public void onEventClick(int position) {
-//                        Event event = userMyEventsAttendingToView.get(position);
-//
-//                        Intent intent = new Intent(getActivity(), EventScreen.class);
-//
-//                        Log.d(TAG, "Single Click");
-//
-//                        intent.putExtra("MyObject", event);
-//                        intent.putExtra("SUBURB", event.getSuburbId());
-//
-//                        startActivity(intent);
-//                    }
-//                });
             }
 
 
@@ -257,17 +196,37 @@ public class MyEvents extends Fragment {
 
     }
 
-//    public void onClick(View view) {
-//
-//        if (view == hosting){
-//            mRecyclerView.setAdapter(mAdapterForHosting);
-//        }
-//
-//        if (view == attending){
-//            mRecyclerView.setAdapter(mAdapterForAttending);
-//        }
-//
-//
-//    }
+    @Override
+    public void onClick(View v) {
+
+        TextView stringTextView = getActivity().findViewById(R.id.textViewList);
+
+        switch (v.getId()) {
+
+            case R.id.my_events_attending_button:
+                mRecyclerView = getActivity().findViewById(R.id.recyclerView);
+                mLayoutManager = new LinearLayoutManager(getActivity());
+                mAdapterForHosting = new EventAdapter(userMyEventsAttendingToView, getActivity());
+                //mAdapterForAttending = new EventAdapter(userMyEventsAttendingToView, getActivity());
+
+                mRecyclerView.setLayoutManager(mLayoutManager);
+                mRecyclerView.setAdapter(mAdapterForHosting);
+                break;
+
+            case R.id.my_events_hosting_button:
+                mRecyclerView = getActivity().findViewById(R.id.recyclerView);
+                mLayoutManager = new LinearLayoutManager(getActivity());
+                mAdapterForHosting = new EventAdapter(userMyEventsToView, getActivity());
+                //mAdapterForAttending = new EventAdapter(userMyEventsAttendingToView, getActivity());
+
+                mRecyclerView.setLayoutManager(mLayoutManager);
+                mRecyclerView.setAdapter(mAdapterForHosting);
+                break;
+
+            default:
+                break;
+        }
+
+    }
 }
 
