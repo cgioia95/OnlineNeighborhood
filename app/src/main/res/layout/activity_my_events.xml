@@ -28,8 +28,20 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/my_events_attending" />
+        <TextView
+            android:id="@+id/textViewList"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/linearLayout"
+            android:layout_marginTop="27dp"
+            android:layout_centerHorizontal="true"
+            android:text=""
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:gravity="center" />
 
     </LinearLayout>
+
+
 
     <FrameLayout
         android:id="@+id/events_container"

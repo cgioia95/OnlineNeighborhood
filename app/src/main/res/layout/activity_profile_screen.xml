@@ -5,7 +5,6 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="10dp"
     android:fillViewport="false">
 
     <include
@@ -114,6 +113,7 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:text="SAVE CHANGES"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/imageButtonPicture"
         app:layout_constraintStart_toStartOf="@+id/imageButtonPicture"

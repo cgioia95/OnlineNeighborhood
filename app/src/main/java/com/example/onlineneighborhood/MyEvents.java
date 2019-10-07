@@ -25,6 +25,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.example.onlineneighborhood.editDelete.TAG;
 
@@ -45,6 +46,9 @@ public class MyEvents extends Fragment {
 
     private ArrayList<Event> userMyEventsToView = new ArrayList<>();
     private ArrayList<Event> userMyEventsAttendingToView = new ArrayList<>();
+    List<String> stringData = new ArrayList<String>();
+
+
 
 
     //Setting up recyclerview and adapter for displaying events
@@ -52,6 +56,7 @@ public class MyEvents extends Fragment {
     private EventAdapter mAdapterForHosting, mAdapterForAttending;
     private RecyclerView.LayoutManager mLayoutManager;
     Context applicationContext = BottomNavigationActivity.getContextOfApplication();
+
 
     Button attending;
     Button hosting;
@@ -70,6 +75,9 @@ public class MyEvents extends Fragment {
         userid = fireBaseAuth.getCurrentUser().getUid();
         attending = mView.findViewById(R.id.my_events_attending_button);
         hosting = mView.findViewById(R.id.my_events_hosting_button);
+
+
+
 
         return mView;
     }
@@ -143,7 +151,9 @@ public class MyEvents extends Fragment {
                                         if (event != null) {
                                             if (event.getId().equals(eventid)) {
                                                 userMyEventsAttendingToView.add(event);
-                                                //Log.d("EVENT ATTENDING FOUND ", "" + event.getName());
+                                                Log.d("EVENT ATTENDING FOUND ", "" + event.getName());
+                                                TextView stringTextView = getActivity().findViewById(R.id.textViewList);
+                                                stringTextView.setText(stringTextView.getText() + event.getName());
                                             }
                                         }
                                     }
@@ -160,6 +170,7 @@ public class MyEvents extends Fragment {
 
                 Log.d("myEvents RV ", "pass");
 
+/*
                 // Recycler view set up and adaption
                 mRecyclerView = getActivity().findViewById(R.id.recyclerView);
                 mLayoutManager = new LinearLayoutManager(getActivity());
@@ -168,6 +179,9 @@ public class MyEvents extends Fragment {
 
                 mRecyclerView.setLayoutManager(mLayoutManager);
                 mRecyclerView.setAdapter(mAdapterForHosting);
+
+                */
+
 
 //                mAdapterForHosting.setOnEventLongClickListener(new EventAdapter.onEventLongClickListener() {
 //                    @Override
