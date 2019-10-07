@@ -107,12 +107,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
                 //TODO: NEED TO FIX THIS ASAP. (turns out it still crashes even with this)
                 try{
                     mRecyclerView = getActivity().findViewById(R.id.recyclerView);
-                    mRecyclerView = getActivity().findViewById(R.id.recyclerView);
                     mLayoutManager = new LinearLayoutManager(getActivity());
                     mAdapter = new EventAdapter(eventList, getActivity());
 
                     mRecyclerView.setLayoutManager(mLayoutManager);
-                    mRecyclerView.setAdapter(mAdapter);
                     mRecyclerView.setAdapter(mAdapter);
 
 
