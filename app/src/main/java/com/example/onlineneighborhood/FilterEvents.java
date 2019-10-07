@@ -88,8 +88,9 @@ public class FilterEvents extends AppCompatActivity implements View.OnClickListe
         intent.putExtra("DATE",  dateRange);
         intent.putExtra("TYPE", typeFilter);
         intent.putExtra("TIME", time);
-        finish();
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+        finish();
     }
 
     public static class TimePickerFragment extends DialogFragment

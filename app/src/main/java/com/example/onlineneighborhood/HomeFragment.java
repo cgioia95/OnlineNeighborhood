@@ -40,9 +40,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
     TextView suburbTextView;
 
 
-    ImageView addEvent, filterButton;
+    ImageView addEvent;
+    Button filterButton;
     String suburb;
-    String currSuburb;
+    String currSuburb, date, type, time = "";
     private static final String TAG = "HomeScreen";
 
     private FirebaseAuth fireBaseAuth;
@@ -63,6 +64,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
         View mView = inflater.inflate(R.layout.activity_home_screen, null);
         if(getArguments() != null){
             currSuburb = getArguments().getString("SUBURB");
+            date = getArguments().getString("DATE");
+            type = getArguments().getString("TYPE");
+            time = getArguments().getString("TIME");
+
+            Log.d(TAG, "LOOK HERE: "+ date + type+time);
 
         }
 
@@ -71,6 +77,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
         fireBaseAuth = FirebaseAuth.getInstance();
         addEvent = mView.findViewById(R.id.addEvent);
         suburbTextView = mView.findViewById(R.id.textViewSuburb);
+        filterButton = mView.findViewById(R.id.filterButton);
 
         Intent i = getActivity().getIntent();
         currSuburb=suburb = ((OnlineNeighborhood) getActivity().getApplication()).getsuburb();
@@ -78,6 +85,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
 
         suburbTextView.setText(suburb);
         addEvent.setOnClickListener(this);
+        filterButton.setOnClickListener(this);
         return mView;
     }
     @Override
@@ -96,8 +104,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
                     ArrayList<Event> events = currSuburb.getEvents();
                     for(Event event:events){
                         if(event != null) {
-                            Log.d(TAG, "HOST ID: "+event.getHost());
-                            eventList.add(event);
+                            if(type != null){
+                                if(event.getType().equals(type)){
+                                    Log.d(TAG, "HOST ID: "+event.getHost());
+                                    eventList.add(event); }
+                            }else {
+                                Log.d(TAG, "HOST ID: "+event.getHost());
+                                eventList.add(event);
+                            }
                         }
                     }
                 }
@@ -199,5 +213,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
         }
 
     }
+
 
 }
