@@ -90,7 +90,7 @@ public class EventScreen extends AppCompatActivity {
         storage = FirebaseStorage.getInstance();
         storageReference=storage.getReference();
 
-        attendingTextView = findViewById(R.id.attendingTextView);
+        //attendingTextView = findViewById(R.id.attendingTextView);
 
         thisUserString = firebaseAuth.getCurrentUser().getUid();
 
@@ -222,11 +222,11 @@ public class EventScreen extends AppCompatActivity {
                         if (attending == true){
 
                             attendBtn.setText("UNATTEND");
-                            attendingTextView.setText("ATTENDING");
+                            //attendingTextView.setText("ATTENDING");
 
                         } else {
                             attendBtn.setText("ATTEND");
-                            attendingTextView.setText("UNATTENDING");
+                            //attendingTextView.setText("UNATTENDING");
                         }
 
                         Log.d(TAG, eventSnapshot.toString());
@@ -367,7 +367,7 @@ public class EventScreen extends AppCompatActivity {
 
                     attending = true;
                     attendBtn.setText("UNATTEND");
-                    attendingTextView.setText("ATTENDING");
+                    //attendingTextView.setText("ATTENDING");
 
                     Toast.makeText(getApplicationContext(), "You're now attending the event!" , Toast.LENGTH_SHORT ).show();
 
@@ -457,7 +457,7 @@ public class EventScreen extends AppCompatActivity {
 
                     attending = false;
                     attendBtn.setText("ATTEND");
-                    attendingTextView.setText("NOT ATTENDING");
+                    //attendingTextView.setText("NOT ATTENDING");
 
                     Toast.makeText(getApplicationContext(), "You're no longer attending event!" , Toast.LENGTH_SHORT ).show();
 
