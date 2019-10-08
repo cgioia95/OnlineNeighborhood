@@ -25,6 +25,8 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
 
     private static final String TAG = "User Adapter";
@@ -47,7 +49,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     public static class UserViewHolder extends RecyclerView.ViewHolder {
 
         public TextView mUserName;
-        public ImageView hostPic;
+        public CircleImageView hostPic;
         private FirebaseStorage storage;
         private StorageReference storageReference;
         private DatabaseReference databaseReference;
