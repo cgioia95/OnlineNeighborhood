@@ -46,8 +46,13 @@ public class MyEvents extends Fragment implements View.OnClickListener {
 
     // Setting up recycler-view and adapter for displaying events
     private RecyclerView mRecyclerView;
-    private EventAdapter mAdapter;
+    private MyEventAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+
+    //second
+    private RecyclerView mAttendRecyclerView;
+    private MyEventAdapter mAttendAdapter;
+    private RecyclerView.LayoutManager mAttendLayoutManager;
 
     Button attending;
     Button hosting;
@@ -68,6 +73,11 @@ public class MyEvents extends Fragment implements View.OnClickListener {
         hosting = mView.findViewById(R.id.my_events_hosting_button);
         hosting.setOnClickListener(this);
 
+        mRecyclerView = mView.findViewById(R.id.recyclerView);
+        mLayoutManager = new LinearLayoutManager(getActivity());
+        mAdapter = new MyEventAdapter(getActivity());
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setAdapter(mAdapter);
         return mView;
     }
 
@@ -82,6 +92,7 @@ public class MyEvents extends Fragment implements View.OnClickListener {
         databaseUserReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                mAdapter.clearData();
 
 
                 //TODO: see if these are needed /Emma
@@ -114,11 +125,17 @@ public class MyEvents extends Fragment implements View.OnClickListener {
                                         if (event != null) {
                                             if (event.getId().equals(eventID)) {
                                                 userHostingList.add(event);
+                                                mAdapter.addDataAndUpdate(event);
+
                                             }
                                         }
                                     }
+
+
                                 }
                             }
+
+
 
                             @Override
                             public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -178,12 +195,12 @@ public class MyEvents extends Fragment implements View.OnClickListener {
 
                 // Adapters for default view
                 // THIS IS NOT CURRENTLY WORKING FOR EACH TIME COMING BACK TO MYEVENTS SCREEN
-
+/*
 
                 try{
                     mRecyclerView = getActivity().findViewById(R.id.recyclerView);
                     mLayoutManager = new LinearLayoutManager(getActivity());
-                    mAdapter = new EventAdapter(userHostingList, getActivity());
+                    mAdapter = new MyEventAdapter(userHostingList, getActivity());
                     mRecyclerView.setLayoutManager(mLayoutManager);
                     mRecyclerView.setAdapter(mAdapter);
 
@@ -191,7 +208,7 @@ public class MyEvents extends Fragment implements View.OnClickListener {
                 }catch (NullPointerException e){
                     e.printStackTrace();
                 }
-
+*/
 
             }
 
@@ -210,39 +227,207 @@ public class MyEvents extends Fragment implements View.OnClickListener {
 
     }
 
+    public void getDataHost() {
+
+        mAdapter.clearData();
+
+        fireBaseAuth = FirebaseAuth.getInstance();
+        userID = fireBaseAuth.getCurrentUser().getUid();
+        databaseUserReference = FirebaseDatabase.getInstance().getReference("Users").child(userID);
+
+        databaseUserReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                mAdapter.clearData();
+
+
+                //TODO: see if these are needed /Emma
+                userMyEvents.clear();
+                userMyEventsAttending.clear();
+                userHostingList.clear();
+                userAttendingList.clear();
+
+                UserInformation user = dataSnapshot.getValue(UserInformation.class);
+
+                if (dataSnapshot.child("myEvents").exists()){
+                    userMyEvents = user.getMyEvents();
+
+                    for (Event event : userMyEvents) {
+                        String suburbID = event.getSuburbId();
+                        final String eventID = event.getId();
+
+                        // Retrieve full event details from 'Suburbs'
+                        suburbEvents = FirebaseDatabase.getInstance().getReference("suburbs").child(suburbID);
+                        suburbEvents.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                Suburb suburb = dataSnapshot.getValue(Suburb.class);
+                                // Accounting for suburbs without existing events
+                                if (suburb.getEvents() != null) {
+                                    ArrayList<Event> events = suburb.getEvents();
+                                    for (Event event : events) {
+                                        //Accounting for deleted events
+                                        if (event != null) {
+                                            if (event.getId().equals(eventID)) {
+                                                userHostingList.add(event);
+                                                mAdapter.addDataAndUpdate(event);
+
+                                            }
+                                        }
+                                    }
+
+
+                                }
+                            }
+
+
+
+
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                    mAdapter.setOnEventClickListener(new MyEventAdapter.onEventClickListener() {
+                        @Override
+                        public void onEventClick(int position) {
+                            Event event = userAttendingList.get(position);
+                            Intent intent = new Intent(getActivity(), EventScreen.class);
+                            intent.putExtra("MyObject", event);
+                            intent.putExtra("SUBURB", event.getSuburbId());
+                            startActivity(intent);
+                        }
+
+
+                    });
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    public void getData() {
+
+        mAdapter.clearData();
+
+        fireBaseAuth = FirebaseAuth.getInstance();
+        userID = fireBaseAuth.getCurrentUser().getUid();
+        databaseUserReference = FirebaseDatabase.getInstance().getReference("Users").child(userID);
+
+        databaseUserReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                mAdapter.clearData();
+
+
+                //TODO: see if these are needed /Emma
+                userMyEvents.clear();
+                userMyEventsAttending.clear();
+                userHostingList.clear();
+                userAttendingList.clear();
+
+                UserInformation user = dataSnapshot.getValue(UserInformation.class);
+
+                // Retrieve user's 'Attending' list
+                if (dataSnapshot.child("myEventsAttending").exists()){
+                    userMyEventsAttending = user.getMyEventsAttending();
+                    for (Event event : userMyEventsAttending) {
+
+                        //TODO: is this working?
+                        if(event!=null)  {
+                            Log.d(TAG, "onDataChange: event" + event);
+                            String suburbid = event.getSuburbId();
+                            Log.d(TAG, "onDataChange: suburbid" + suburbid);
+
+
+
+                            final String eventid = event.getId();
+
+                            // Retrieve full event details from 'Suburbs'
+                            suburbEvents = FirebaseDatabase.getInstance().getReference("suburbs").child(suburbid);
+                            suburbEvents.addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    Suburb suburb = dataSnapshot.getValue(Suburb.class);
+                                    // Accounting for suburbs without existing events
+                                    if (suburb.getEvents() != null) {
+                                        ArrayList<Event> events = suburb.getEvents();
+                                        for (Event event : events) {
+                                            //Accounting for deleted events
+                                            if (event != null && event.getId().equals(eventid)) {
+                                                // Only add events not being hosted by the user
+                                                String hostID = event.getHost().getUid();
+                                                if (!hostID.equals(userID)) {
+                                                    userAttendingList.add(event);
+                                                    mAdapter.addDataAndUpdate(event);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                }
+                            });
+                        }
+
+                    }
+
+                }
+
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
     @Override
     public void onClick(View v) {
 
         switch (v.getId()) {
 
             case R.id.my_events_attending_button:
-                mAdapter = new EventAdapter(userAttendingList, getActivity());
+                getData();
+               /* mAdapter = new MyEventAdapter( getActivity());
                 mRecyclerView.setLayoutManager(mLayoutManager);
-                mRecyclerView.setAdapter(mAdapter);
+                mRecyclerView.setAdapter(mAdapter);*/
+
+              // mAdapter.clearData();
+               //mAdapter.addDataAndUpdate(userAttendingList);
 
                 // Listener to go to 'attending' event if clicked
-                mAdapter.setOnEventClickListener(new EventAdapter.onEventClickListener() {
-                    @Override
-                    public void onEventClick(int position) {
-                        Event event = userAttendingList.get(position);
-                        Intent intent = new Intent(getActivity(), EventScreen.class);
-                        intent.putExtra("MyObject", event);
-                        intent.putExtra("SUBURB", event.getSuburbId());
-                        startActivity(intent);
-                    }
 
-
-                });
 
                 break;
 
             case R.id.my_events_hosting_button:
-                mAdapter = new EventAdapter(userHostingList, getActivity());
+                getDataHost();
+                /*mAdapter = new MyEventAdapter(userHostingList, getActivity());
                 mRecyclerView.setLayoutManager(mLayoutManager);
-                mRecyclerView.setAdapter(mAdapter);
+                mRecyclerView.setAdapter(mAdapter);*/
+
+                //mAdapter.clearData();
+                //mAdapter.addDataAndUpdate(userHostingList);
+
 
                 // Listener to go to 'hosting' event if clicked
-                mAdapter.setOnEventClickListener(new EventAdapter.onEventClickListener() {
+                mAdapter.setOnEventClickListener(new MyEventAdapter.onEventClickListener() {
                     @Override
                     public void onEventClick(int position) {
                         Event event = userHostingList.get(position);
