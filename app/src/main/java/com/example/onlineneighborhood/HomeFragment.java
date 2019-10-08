@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -33,7 +34,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public class HomeFragment extends Fragment implements View.OnClickListener, Serializable {
 
@@ -41,9 +46,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
 
 
     ImageView addEvent;
-    Button filterButton;
+    Button filterButton, clearFilter;
     String suburb;
-    String currSuburb, date, type, time = "";
+    String currSuburb, date, type, time;
     private static final String TAG = "HomeScreen";
 
     private FirebaseAuth fireBaseAuth;
@@ -68,7 +73,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
             type = getArguments().getString("TYPE");
             time = getArguments().getString("TIME");
 
-            Log.d(TAG, "LOOK HERE: "+ date + type+time);
+            Log.d(TAG, "filter VALUES: "+ date + type+time);
 
         }
 
@@ -78,10 +83,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
         addEvent = mView.findViewById(R.id.addEvent);
         suburbTextView = mView.findViewById(R.id.textViewSuburb);
         filterButton = mView.findViewById(R.id.filterButton);
+        clearFilter = mView.findViewById(R.id.clearFilter);
 
-        Intent i = getActivity().getIntent();
         currSuburb=suburb = ((OnlineNeighborhood) getActivity().getApplication()).getsuburb();
-//        suburb = i.getStringExtra("SUBURB");
 
         suburbTextView.setText(suburb);
         addEvent.setOnClickListener(this);
@@ -104,13 +108,15 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
                     ArrayList<Event> events = currSuburb.getEvents();
                     for(Event event:events){
                         if(event != null) {
-                            if(type != null){
-                                if(event.getType().equals(type)){
-                                    Log.d(TAG, "HOST ID: "+event.getHost());
-                                    eventList.add(event); }
-                            }else {
-                                Log.d(TAG, "HOST ID: "+event.getHost());
-                                eventList.add(event);
+                            try {
+                                if(filterApplied(date, time, type, event)){
+                                    Log.d(TAG, "FILTER APPLIED");
+                                }else{
+                                    eventList.add(event);
+                                    Log.d(TAG, "NOTHING TO FILTER");
+                                }
+                            } catch (ParseException e) {
+                                e.printStackTrace();
                             }
                         }
                     }
@@ -212,7 +218,45 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
             startActivity(i);
         }
 
+        if(view == clearFilter){
+            time = null;
+            date = null;
+            type = null;
+        }
+
     }
+
+    public boolean filterApplied(String date, String time, String type, Event event) throws ParseException {
+
+        if(date == null && time==null && type==null){
+            return false;
+        }else{
+            String totalDate = date+" "+time;
+            String eventStartDate = event.getDate() + " " + event.getTime();
+            String eventDateConcat = event.getEndDate() + " " + event.getEndTime();
+            Date testedDate = new SimpleDateFormat("dd/MM/yyyy h:m").parse(totalDate);
+            Calendar c = Calendar.getInstance();
+            int hour = c.get(Calendar.HOUR);
+            int min = c.get(Calendar.MINUTE);
+            String currentDate = c.get(Calendar.DATE) +"/"+(c.get(Calendar.MONTH)+1)+"/"+c.get(Calendar.YEAR) + " " + hour +":"+ min;
+            try{
+                Date currDate = new SimpleDateFormat("dd/MM/yyyy h:m").parse(currentDate);
+                Date eventDate = new SimpleDateFormat("dd/MM/yyyy h:m").parse(eventDateConcat);
+                Date eventStart = new SimpleDateFormat("dd/MM/yyyy h:m").parse(eventStartDate);
+                Log.d(TAG, "DATES: "+ eventDate +"|"+ testedDate+"|"+currDate);
+                if((eventDate.after(currDate)||eventDate.equals(currDate)) && (eventStart.before(testedDate)|| eventStart.equals(testedDate))&& event.getType().equals(type)){
+                    eventList.add(event);
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+                return false;
+            }
+            return true;
+        }
+    }
+
+
+
 
 
 }

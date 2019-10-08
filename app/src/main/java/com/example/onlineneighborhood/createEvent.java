@@ -126,21 +126,15 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
 
         //autofilling dates
-        Calendar c =  Calendar.getInstance();
 
-        int hour = c.get(Calendar.HOUR_OF_DAY);
-        int minute = c.get(Calendar.MINUTE);
-        int day = c.get(Calendar.DAY_OF_MONTH);
-        int month = c.get(Calendar.MONTH);
-        int year = c.get(Calendar.YEAR);
         evTime.setText(hour +":"+minute);
         if(hour > 23){
             evEndTime.setText((0)+":"+minute);
         }else{
             evEndTime.setText((hour+1)+":"+minute);
         }
-        evDate.setText(day+"/"+month+"/"+year);
-        evEndDate.setText(day+"/"+month+"/"+year);
+        evDate.setText(day+"/"+(month+1)+"/"+year);
+        evEndDate.setText(day+"/"+(month+1)+"/"+year);
     }
 
     @Override
