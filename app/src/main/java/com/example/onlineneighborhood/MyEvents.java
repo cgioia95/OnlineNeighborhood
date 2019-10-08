@@ -39,18 +39,10 @@ public class MyEvents extends Fragment implements View.OnClickListener {
     private ArrayList<Event> userMyEvents = new ArrayList<>();
     private ArrayList<Event> userMyEventsAttending = new ArrayList<>();
 
-    // Final 'Attending' and 'Hosting' lists for user
-
-
     // Setting up recycler-view and adapter for displaying events
     private RecyclerView mRecyclerView;
     private MyEventAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-
-    //second
-    private RecyclerView mAttendRecyclerView;
-    private MyEventAdapter mAttendAdapter;
-    private RecyclerView.LayoutManager mAttendLayoutManager;
 
     Button attending;
     Button hosting;
@@ -82,31 +74,21 @@ public class MyEvents extends Fragment implements View.OnClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getDataHost();
-    }
 
-    @Override
-    public void onStart() {
-
-        super.onStart();
-
-    }
-
-    public void getDataHost() {
-
-        //mAdapter.clearData();
-
+        // Firebase initialisation references
         fireBaseAuth = FirebaseAuth.getInstance();
         userID = fireBaseAuth.getCurrentUser().getUid();
         databaseUserReference = FirebaseDatabase.getInstance().getReference("Users").child(userID);
 
+        // Retrieve 'hosting' list and display it on default
+        getDataHost();
+    }
+
+    public void getDataHost() {
         databaseUserReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 mAdapter.clearData();
-
-
-                //TODO: see if these are needed /Emma
                 userMyEvents.clear();
                 userMyEventsAttending.clear();
 
@@ -138,6 +120,7 @@ public class MyEvents extends Fragment implements View.OnClickListener {
                                             }
                                         }
                                     }
+                                    // Allows for clicking into an event after short click
                                     mAdapter.setOnEventClickListener(new MyEventAdapter.onEventClickListener() {
                                         @Override
                                         public void onEventClick(int position) {
@@ -152,6 +135,7 @@ public class MyEvents extends Fragment implements View.OnClickListener {
 
                                     });
 
+                                    // Allows for clicking into an edit/delete screen after long click
                                     mAdapter.setOnEventLongClickListener(new MyEventAdapter.onEventLongClickListener() {
                                         @Override
                                         public void onEventLongClick(int position) {
@@ -161,6 +145,7 @@ public class MyEvents extends Fragment implements View.OnClickListener {
                                             String myId = fireBaseAuth.getCurrentUser().getUid();
                                             Log.d(TAG, "Long Click");
 
+                                            // Ensures that user is clicking as a host
                                             if (myId.equals(hostId)){
                                                 Log.d(TAG, "Permission Granted");
 
@@ -172,17 +157,10 @@ public class MyEvents extends Fragment implements View.OnClickListener {
                                             else {
                                                 Log.d(TAG, "Permission Denied");
                                             }
-
                                         }
                                     });
-
-
                                 }
                             }
-
-
-
-
 
                             @Override
                             public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -191,7 +169,6 @@ public class MyEvents extends Fragment implements View.OnClickListener {
                         });
                     }
                 }
-
             }
 
             @Override
@@ -205,10 +182,6 @@ public class MyEvents extends Fragment implements View.OnClickListener {
     public void getAttendingData() {
 
         mAdapter.clearData();
-
-        fireBaseAuth = FirebaseAuth.getInstance();
-        userID = fireBaseAuth.getCurrentUser().getUid();
-        databaseUserReference = FirebaseDatabase.getInstance().getReference("Users").child(userID);
 
         databaseUserReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -226,7 +199,6 @@ public class MyEvents extends Fragment implements View.OnClickListener {
                     userMyEventsAttending = user.getMyEventsAttending();
                     for (Event event : userMyEventsAttending) {
 
-                        //TODO: is this working?
                         if(event!=null)  {
                             Log.d(TAG, "onDataChange: event" + event);
                             String suburbid = event.getSuburbId();
@@ -253,8 +225,21 @@ public class MyEvents extends Fragment implements View.OnClickListener {
                                                 }
                                             }
                                         }
-                                    }
+                                        // Allows for clicking into an event after short click
+                                        mAdapter.setOnEventClickListener(new MyEventAdapter.onEventClickListener() {
+                                            @Override
+                                            public void onEventClick(int position) {
+                                                Log.d(TAG, "onEventClick: " + position);
+                                                Event event = mAdapter.getEventList().get(position);
+                                                Intent intent = new Intent(getActivity(), EventScreen.class);
+                                                intent.putExtra("MyObject", event);
+                                                intent.putExtra("SUBURB", event.getSuburbId());
+                                                startActivity(intent);
+                                            }
 
+
+                                        });
+                                    }
                                 }
 
                                 @Override
@@ -263,12 +248,8 @@ public class MyEvents extends Fragment implements View.OnClickListener {
                                 }
                             });
                         }
-
                     }
-
                 }
-
-
             }
 
             @Override
@@ -276,7 +257,6 @@ public class MyEvents extends Fragment implements View.OnClickListener {
 
             }
         });
-
     }
 
     @Override
@@ -286,7 +266,6 @@ public class MyEvents extends Fragment implements View.OnClickListener {
 
             case R.id.my_events_attending_button:
                 getAttendingData();
-
                 break;
 
             case R.id.my_events_hosting_button:
@@ -296,7 +275,5 @@ public class MyEvents extends Fragment implements View.OnClickListener {
             default:
                 break;
         }
-
     }
 }
-
