@@ -187,6 +187,8 @@ public class MyEventAdapter extends RecyclerView.Adapter<MyEventAdapter.EventVie
         }
     }
 
+
+
     public MyEventAdapter(Context context) {
         //this.eventList = eventList;
         this.mContext = context;
@@ -237,6 +239,11 @@ public class MyEventAdapter extends RecyclerView.Adapter<MyEventAdapter.EventVie
     @Override
     public int getItemCount() {
         return eventList.size();
+    }
+
+    public ArrayList<Event> getEventList() {
+        return eventList;
+
     }
 
 
