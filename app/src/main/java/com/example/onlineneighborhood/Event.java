@@ -25,6 +25,7 @@ public class Event implements Serializable {
         this.id = id;
         this.suburbId = suburbId;
     }
+
     public Event(String id, UserInformation host, String address, String eventName, String description, String time, String date, String endTime, String endDate, String type, ArrayList<UserInformation> attendees) {
         this.id = id;
         this.host = host;
