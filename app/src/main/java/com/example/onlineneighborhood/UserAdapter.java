@@ -1,7 +1,6 @@
 package com.example.onlineneighborhood;
 
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,7 +24,6 @@ import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
 
@@ -49,7 +47,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     public static class UserViewHolder extends RecyclerView.ViewHolder {
 
         public TextView mUserName;
-        public TextView mUserBio;
         public ImageView hostPic;
         private FirebaseStorage storage;
         private StorageReference storageReference;
@@ -60,7 +57,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             super(itemView);
 
             mUserName = itemView.findViewById(R.id.userNameU);
-            mUserBio = itemView.findViewById(R.id.userBioU);
 
 
             hostPic = itemView.findViewById(R.id.imageViewU);
@@ -145,7 +141,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     @Override
     public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.user_item, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.attending_user, parent, false);
         UserViewHolder viewholder = new UserViewHolder(v, mListener);
         return viewholder;
 
@@ -177,8 +173,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
 
                 holder.mUserName.setText(name);
-
-                holder.mUserBio.setText(bio);
 
 
             }
