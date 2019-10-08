@@ -132,6 +132,7 @@ public class MyEvents extends Fragment implements View.OnClickListener {
                                         //Accounting for deleted events
                                         if (event != null) {
                                             if (event.getId().equals(eventID)) {
+                                                event.setSuburbId(suburb.getId());
                                                 mAdapter.addDataAndUpdate(event);
 
                                             }
@@ -149,6 +150,30 @@ public class MyEvents extends Fragment implements View.OnClickListener {
                                         }
 
 
+                                    });
+
+                                    mAdapter.setOnEventLongClickListener(new MyEventAdapter.onEventLongClickListener() {
+                                        @Override
+                                        public void onEventLongClick(int position) {
+
+                                            Event event = mAdapter.getEventList().get(position);
+                                            String hostId = event.getHost().getUid();
+                                            String myId = fireBaseAuth.getCurrentUser().getUid();
+                                            Log.d(TAG, "Long Click");
+
+                                            if (myId.equals(hostId)){
+                                                Log.d(TAG, "Permission Granted");
+
+                                                Intent intent = new Intent(getActivity(), editDelete.class);
+                                                intent.putExtra("MyObject", event);
+                                                intent.putExtra("SUBURB", event.getSuburbId());
+                                                startActivity(intent);
+                                            }
+                                            else {
+                                                Log.d(TAG, "Permission Denied");
+                                            }
+
+                                        }
                                     });
 
 
