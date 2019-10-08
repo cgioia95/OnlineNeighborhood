@@ -161,11 +161,20 @@ public class MyEvents extends Fragment implements View.OnClickListener {
 
                 // Adapters for default view
                 // THIS IS NOT CURRENTLY WORKING FOR EACH TIME COMING BACK TO MYEVENTS SCREEN
-                mRecyclerView = getActivity().findViewById(R.id.recyclerView);
-                mLayoutManager = new LinearLayoutManager(getActivity());
-                mAdapter = new EventAdapter(userHostingList, getActivity());
-                mRecyclerView.setLayoutManager(mLayoutManager);
-                mRecyclerView.setAdapter(mAdapter);
+
+
+                try{
+                    mRecyclerView = getActivity().findViewById(R.id.recyclerView);
+                    mLayoutManager = new LinearLayoutManager(getActivity());
+                    mAdapter = new EventAdapter(userHostingList, getActivity());
+                    mRecyclerView.setLayoutManager(mLayoutManager);
+                    mRecyclerView.setAdapter(mAdapter);
+
+
+                }catch (NullPointerException e){
+                    e.printStackTrace();
+                }
+
 
             }
 
