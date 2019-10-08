@@ -163,7 +163,7 @@ public class EventScreen extends AppCompatActivity {
 
                                 Log.d("TEST" , "Attempting Recycle View ");
                                 mRecyclerView = findViewById(R.id.recyclerViewUsers);
-                                mLayoutManager = new LinearLayoutManager( getApplicationContext()  );
+                                mLayoutManager = new LinearLayoutManager( getApplicationContext(),LinearLayoutManager.HORIZONTAL, false  );
                                 mAdapter = new UserAdapter(attendees,   getApplicationContext() );
 
 
