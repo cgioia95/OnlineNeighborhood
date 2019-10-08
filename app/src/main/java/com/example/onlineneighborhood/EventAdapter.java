@@ -25,6 +25,7 @@ import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
 
@@ -33,7 +34,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     private static ArrayList<Event> eventList;
     private static Context mContext;
     private onEventClickListener mListener;
-
     private onEventLongClickListener mListener2;
 
 
@@ -211,6 +211,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     public void onBindViewHolder(@NonNull EventViewHolder holder, int position) {
         Event currentItem = eventList.get(position);
 
+        //FILTER LOGIC HERE
         Log.d(TAG, "user id " + currentItem.getHost().getUid());
         holder.mEvent.setText(currentItem.getName());
         //TODO: get the name of the hostID - DONE
@@ -224,8 +225,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
         Log.d(TAG, "onBindViewHolder: " + currentItem.getHost());
 
-
     }
+
 
     @Override
     public int getItemCount() {
