@@ -16,12 +16,15 @@
 
         <TextView
             android:id="@+id/userNameU"
-            android:layout_width="wrap_content"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:layout_below="@id/imageViewU"
             android:text="UserName"
             android:layout_centerHorizontal="true"
             android:textSize="14sp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:gravity="center"
             />
 
 
