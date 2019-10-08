@@ -53,5 +53,7 @@
     <string name="picture_here">PICTURE HERE</string>
     <string name="pick_image_intent_text">Select Image</string>
 
+    <string name="my_events_hosting">Hosting</string>
+    <string name="my_events_attending">Attending</string>
 
 </resources>
