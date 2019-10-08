@@ -2,6 +2,7 @@ package com.example.onlineneighborhood;
 
 
 import android.content.Intent;
+import android.nfc.Tag;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -33,6 +34,7 @@ public class MyEvents extends Fragment implements View.OnClickListener {
     private FirebaseAuth fireBaseAuth;
     DatabaseReference databaseUserReference, suburbEvents;
     String userID;
+    private static final String TAG = "MyEvents";
 
     // Auxiliary lists for retrieving final 'Attending' and 'Hosting' lists for user
     private ArrayList<Event> userMyEvents = new ArrayList<>();
@@ -81,8 +83,13 @@ public class MyEvents extends Fragment implements View.OnClickListener {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
+
+                //TODO: see if these are needed /Emma
+                userMyEvents.clear();
+                userMyEventsAttending.clear();
                 userHostingList.clear();
                 userAttendingList.clear();
+
                 UserInformation user = dataSnapshot.getValue(UserInformation.class);
 
                 // Retrieve user's 'Hosting' list
@@ -125,7 +132,15 @@ public class MyEvents extends Fragment implements View.OnClickListener {
                 if (dataSnapshot.child("myEventsAttending").exists()){
                     userMyEventsAttending = user.getMyEventsAttending();
                     for (Event event : userMyEventsAttending) {
+
+                        //TODO: is this working?
+                        if(event!=null)  {
+                        Log.d(TAG, "onDataChange: event" + event);
                         String suburbid = event.getSuburbId();
+                        Log.d(TAG, "onDataChange: suburbid" + suburbid);
+
+
+
                         final String eventid = event.getId();
 
                         // Retrieve full event details from 'Suburbs'
@@ -155,8 +170,10 @@ public class MyEvents extends Fragment implements View.OnClickListener {
 
                             }
                         });
+                        }
 
                     }
+
                 }
 
                 // Adapters for default view
