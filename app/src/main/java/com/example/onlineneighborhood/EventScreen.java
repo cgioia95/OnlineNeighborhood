@@ -31,6 +31,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class EventScreen extends AppCompatActivity {
     private static final String TAG = "EventScreenTAG";
 
@@ -40,7 +42,7 @@ public class EventScreen extends AppCompatActivity {
     public TextView mEventName, mDescription, mTime, mDate, attendingTextView;
     private FirebaseStorage storage;
     private StorageReference storageReference;
-    public ImageView hostPic;
+    public CircleImageView hostPic;
     public Button attendBtn;
     FirebaseAuth firebaseAuth;
 
@@ -82,7 +84,7 @@ public class EventScreen extends AppCompatActivity {
         mDescription = findViewById(R.id.eventDesc);
         mDate = findViewById(R.id.eventDate);
         mTime = findViewById(R.id.eventTime);
-        hostPic = findViewById(R.id.imageView);
+        hostPic = findViewById(R.id.hostImage);
 
        
 
