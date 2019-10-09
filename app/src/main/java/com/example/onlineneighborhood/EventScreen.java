@@ -283,7 +283,7 @@ public class EventScreen extends AppCompatActivity {
         // No Attend/Unattend button & Attendance status is just host
         if (host.equals(thisUserString)){
             attendBtn.setVisibility(View.INVISIBLE);
-            attendingTextView.setText("HOST");
+            //attendingTextView.setText("HOST");
         }
 
 
