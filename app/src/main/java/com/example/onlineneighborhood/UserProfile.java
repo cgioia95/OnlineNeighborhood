@@ -9,6 +9,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 
 import android.Manifest;
+
+import java.io.ByteArrayOutputStream;
 import java.util.*;
 
 import android.app.Activity;
@@ -73,6 +75,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import id.zelory.compressor.Compressor;
+
 import static androidx.core.graphics.TypefaceCompatUtil.getTempFile;
 import static java.util.Calendar.*;
 
@@ -89,10 +93,11 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
     private FirebaseStorage storage;
     private StorageReference storageReference;
     private ProgressDialog progressDialog;
+    private Bitmap photo;
 
 
-    private static final int PICK_IMAGE = 1, CAMERA_REQUEST_CODE=2;
-//    private static final int MY_CAMERA_PERMISSION_CODE = 100;
+    private static final int PICK_IMAGE = 1, CAMERA_REQUEST=2;
+    private static final int MY_CAMERA_PERMISSION_CODE = 100;
 //    private static final int EXTERNAL_STORAGE_PERMISSION_CONSTANT = 120;
 //
 //    private static final int REQUEST_PERMISSION_SETTING = 101;
@@ -129,6 +134,7 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
         editTextBio.setEnabled(false);
         editTextdob.setEnabled(false);
         spinnerPreferences.setEnabled(false);
+        imageButtonPicture.setAdjustViewBounds(true);
 
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -168,8 +174,15 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                        if (i==0){
-                           dispatchTakePictureIntent();
-
+                           if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+                           {
+                               requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_PERMISSION_CODE);
+                           }
+                           else
+                           {
+                               Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                               startActivityForResult(cameraIntent, CAMERA_REQUEST);
+                           }
 
                        }
                        if (i==1){
@@ -315,56 +328,67 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
         if (requestCode == PICK_IMAGE && resultCode == RESULT_OK) {
             imageuri = data.getData();
             try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageuri);
-                imageButtonPicture.setImageBitmap(bitmap);
-                uploadImage();
+                photo = MediaStore.Images.Media.getBitmap(getContentResolver(), imageuri);
+                submit();
+                imageButtonPicture.setImageBitmap(photo);
             } catch (IOException e) {
                 e.printStackTrace();
 
             }
         }
-
-        if(requestCode == CAMERA_REQUEST_CODE && resultCode == RESULT_OK){
-            progressDialog.setMessage("Uploading...");
-            progressDialog.show();
-            Uri uri = data.getData();
-
-
-
-            StorageReference filepath = storageReference.child("Photos").child(uri.getLastPathSegment());
-            filepath.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    Toast.makeText(UserProfile.this, "Upload Successful!", Toast.LENGTH_SHORT).show();
-                    progressDialog.dismiss();
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(UserProfile.this, "Upload Failed!", Toast.LENGTH_SHORT).show();
-                }
-            });
+        if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK)
+        {
+            photo = (Bitmap) data.getExtras().get("data");
+            submit();
+            imageButtonPicture.setImageBitmap(photo);
         }
 
-//        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
-//
-//            imageButtonPicture.setImageURI(Uri.parse(currentPhotoPath));
-//            imageuri=Uri.parse(currentPhotoPath);
-//            uploadImage();
-//
-//
-//        }
-//        if (requestCode == REQUEST_PERMISSION_SETTING) {
-//            if (ActivityCompat.checkSelfPermission(UserProfile.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-//                //Got Permission
-//                proceedAfterPermission();
-//            }
-//        }
+        }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == MY_CAMERA_PERMISSION_CODE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "camera permission granted", Toast.LENGTH_LONG).show();
+                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(cameraIntent, CAMERA_REQUEST);
+            } else {
+                Toast.makeText(this, "camera permission denied", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
 
+    public void submit(){
 
-    private void uploadImage() {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        photo.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+
+
+        byte[] b = stream.toByteArray();
+        StorageReference ref = storageReference.child("profilePics/"+ uid.toString());
+        //StorageReference filePath = FirebaseStorage.getInstance().getReference().child("profile_images").child(userID);
+        ref.putBytes(b).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Uri downloadUrl = taskSnapshot.getUploadSessionUri();
+                Toast.makeText(UserProfile.this, "uploaded", Toast.LENGTH_SHORT).show();
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(UserProfile.this,"failed",Toast.LENGTH_LONG).show();
+
+
+            }
+        });
+
+    }
+
+
+    private void uploadImage() throws IOException {
         Log.d(TAG, "uploadImage: "+ imageuri);
         if(imageuri != null)
         {
@@ -439,43 +463,6 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
             });
     }
 
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
 
-        // Save a file: path for use with ACTION_VIEW intents
-        currentPhotoPath = image.getAbsolutePath();
-        return image;
-    }
-
-
-    private void dispatchTakePictureIntent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Ensure that there's a camera activity to handle the intent
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            // Create the File where the photo should go
-            File photoFile = null;
-            try {
-                photoFile = createImageFile();
-            } catch (IOException ex) {
-                // Error occurred while creating the File...
-            }
-            // Continue only if the File was successfully created
-            if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(this,
-                        "com.example.android.fileprovider",
-                        photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, CAMERA_REQUEST_CODE);
-            }
-        }
-    }
 
  }
