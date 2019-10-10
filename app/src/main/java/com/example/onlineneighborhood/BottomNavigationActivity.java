@@ -94,6 +94,17 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
 
         Log.d("BUNDLEVALUES:", ""+intentSuburb
                 +dateRange+ typeFilter +time);
+
+        //To load home screen automatically after logging it
+        Bundle bundle = new Bundle();
+        bundle.putString("SUBURB", intentSuburb);
+        bundle.putString("DATE",  dateRange);
+        bundle.putString("TYPE", typeFilter);
+        bundle.putString("TIME", time);
+        HomeFragment home = new HomeFragment();
+        home.setArguments(bundle);
+        loadFragment(home);
+
     }
 
     @Override
@@ -132,17 +143,6 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
             }
 
         });
-
-        //To load home screen automatically after logging it
-        Bundle bundle = new Bundle();
-        bundle.putString("SUBURB", intentSuburb);
-        bundle.putString("DATE",  dateRange);
-        bundle.putString("TYPE", typeFilter);
-        bundle.putString("TIME", time);
-        HomeFragment home = new HomeFragment();
-        home.setArguments(bundle);
-        loadFragment(home);
-
 
     }
 

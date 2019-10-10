@@ -44,6 +44,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -64,22 +65,16 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     UserInformation host;
     String intentSuburb;
 
-
-
-
     //firebase variables
     private FirebaseAuth firebaseAuth;
     DatabaseReference databaseEvents;
     DatabaseReference databaseUsers;
     DatabaseReference databaseSuburb;
 
-
-
     //location variables
     private final String DEFAULT_LOCAL = "please wait a few seconds while we get your location";
     private String locat = DEFAULT_LOCAL;
     Button getLocation, createEvent;
-
 
     //TODO: add this loading dialog
     private ProgressDialog progressDialog;
@@ -130,18 +125,25 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         });
 
 
+        //autofilling dates
 
+        evTime.setText(hour +":"+minute);
+        if(hour > 23){
+            evEndTime.setText((0)+":"+minute);
+        }else{
+            evEndTime.setText((hour+1)+":"+minute);
+        }
+        evDate.setText(day+"/"+(month+1)+"/"+year);
+        evEndDate.setText(day+"/"+(month+1)+"/"+year);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         Intent i = getIntent();
         intentSuburb = i.getStringExtra("SUBURB");
-
-
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
         setContentView(R.layout.activity_create_event);
 
         databaseEvents = FirebaseDatabase.getInstance().getReference("events");
@@ -155,7 +157,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         int width = dm.widthPixels;
         int height = dm.heightPixels;
 
-        getWindow().setLayout((int)(width*.9), (int)(height*.9));
+        getWindow().setLayout((int)(width*.85), (int)(height*.85));
 
         // Bind Simple Variables
         users = new ArrayList<UserInformation>();
