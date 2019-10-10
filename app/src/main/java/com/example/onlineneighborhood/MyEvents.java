@@ -98,75 +98,78 @@ public class MyEvents extends Fragment implements View.OnClickListener {
                     userMyEvents = user.getMyEvents();
 
                     for (Event event : userMyEvents) {
-                        String suburbID = event.getSuburbId();
-                        final String eventID = event.getId();
+                        if (event != null) {
 
-                        // Retrieve full event details from 'Suburbs'
-                        suburbEvents = FirebaseDatabase.getInstance().getReference("suburbs").child(suburbID);
-                        suburbEvents.addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                Suburb suburb = dataSnapshot.getValue(Suburb.class);
-                                // Accounting for suburbs without existing events
-                                if (suburb.getEvents() != null) {
-                                    ArrayList<Event> events = suburb.getEvents();
-                                    for (Event event : events) {
-                                        //Accounting for deleted events
-                                        if (event != null) {
-                                            if (event.getId().equals(eventID)) {
-                                                event.setSuburbId(suburb.getId());
-                                                mAdapter.addDataAndUpdate(event);
 
+                            String suburbID = event.getSuburbId();
+                            final String eventID = event.getId();
+
+                            // Retrieve full event details from 'Suburbs'
+                            suburbEvents = FirebaseDatabase.getInstance().getReference("suburbs").child(suburbID);
+                            suburbEvents.addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    Suburb suburb = dataSnapshot.getValue(Suburb.class);
+                                    // Accounting for suburbs without existing events
+                                    if (suburb.getEvents() != null) {
+                                        ArrayList<Event> events = suburb.getEvents();
+                                        for (Event event : events) {
+                                            //Accounting for deleted events
+                                            if (event != null) {
+                                                if (event.getId().equals(eventID)) {
+                                                    event.setSuburbId(suburb.getId());
+                                                    mAdapter.addDataAndUpdate(event);
+
+                                                }
                                             }
                                         }
-                                    }
-                                    // Allows for clicking into an event after short click
-                                    mAdapter.setOnEventClickListener(new MyEventAdapter.onEventClickListener() {
-                                        @Override
-                                        public void onEventClick(int position) {
-                                            Log.d(TAG, "onEventClick: " + position);
-                                            Event event = mAdapter.getEventList().get(position);
-                                            Intent intent = new Intent(getActivity(), EventScreen.class);
-                                            intent.putExtra("MyObject", event);
-                                            intent.putExtra("SUBURB", event.getSuburbId());
-                                            startActivity(intent);
-                                        }
-
-
-                                    });
-
-                                    // Allows for clicking into an edit/delete screen after long click
-                                    mAdapter.setOnEventLongClickListener(new MyEventAdapter.onEventLongClickListener() {
-                                        @Override
-                                        public void onEventLongClick(int position) {
-
-                                            Event event = mAdapter.getEventList().get(position);
-                                            String hostId = event.getHost().getUid();
-                                            String myId = fireBaseAuth.getCurrentUser().getUid();
-                                            Log.d(TAG, "Long Click");
-
-                                            // Ensures that user is clicking as a host
-                                            if (myId.equals(hostId)){
-                                                Log.d(TAG, "Permission Granted");
-
-                                                Intent intent = new Intent(getActivity(), editDelete.class);
+                                        // Allows for clicking into an event after short click
+                                        mAdapter.setOnEventClickListener(new MyEventAdapter.onEventClickListener() {
+                                            @Override
+                                            public void onEventClick(int position) {
+                                                Log.d(TAG, "onEventClick: " + position);
+                                                Event event = mAdapter.getEventList().get(position);
+                                                Intent intent = new Intent(getActivity(), EventScreen.class);
                                                 intent.putExtra("MyObject", event);
                                                 intent.putExtra("SUBURB", event.getSuburbId());
                                                 startActivity(intent);
                                             }
-                                            else {
-                                                Log.d(TAG, "Permission Denied");
+
+
+                                        });
+
+                                        // Allows for clicking into an edit/delete screen after long click
+                                        mAdapter.setOnEventLongClickListener(new MyEventAdapter.onEventLongClickListener() {
+                                            @Override
+                                            public void onEventLongClick(int position) {
+
+                                                Event event = mAdapter.getEventList().get(position);
+                                                String hostId = event.getHost().getUid();
+                                                String myId = fireBaseAuth.getCurrentUser().getUid();
+                                                Log.d(TAG, "Long Click");
+
+                                                // Ensures that user is clicking as a host
+                                                if (myId.equals(hostId)) {
+                                                    Log.d(TAG, "Permission Granted");
+
+                                                    Intent intent = new Intent(getActivity(), editDelete.class);
+                                                    intent.putExtra("MyObject", event);
+                                                    intent.putExtra("SUBURB", event.getSuburbId());
+                                                    startActivity(intent);
+                                                } else {
+                                                    Log.d(TAG, "Permission Denied");
+                                                }
                                             }
-                                        }
-                                    });
+                                        });
+                                    }
                                 }
-                            }
 
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                            }
-                        });
+                                }
+                            });
+                        }
                     }
                 }
             }
