@@ -99,8 +99,6 @@ public class MyEvents extends Fragment implements View.OnClickListener {
 
                     for (Event event : userMyEvents) {
                         if (event != null) {
-
-
                             String suburbID = event.getSuburbId();
                             final String eventID = event.getId();
 
