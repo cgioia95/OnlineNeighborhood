@@ -199,6 +199,7 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
         switch (menuItem.getItemId()){
 
             case R.id.navigation_events:
+                fragment = new MyEvents();
 //              Add "My events" fragment here
                 menuItem.setChecked(true);
 

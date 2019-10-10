@@ -57,7 +57,6 @@ public class HomeScreen extends AppCompatActivity implements View.OnClickListene
 
         fireBaseAuth = FirebaseAuth.getInstance();
         addEvent = findViewById(R.id.addEvent);
-        filterButton = findViewById(R.id.buttonFilter);
 
 
         suburbTextView = findViewById(R.id.textViewSuburb);

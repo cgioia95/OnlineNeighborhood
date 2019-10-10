@@ -75,7 +75,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import id.zelory.compressor.Compressor;
 
 import static androidx.core.graphics.TypefaceCompatUtil.getTempFile;
 import static java.util.Calendar.*;
