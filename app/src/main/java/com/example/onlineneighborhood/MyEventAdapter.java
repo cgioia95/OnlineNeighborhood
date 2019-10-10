@@ -2,7 +2,6 @@ package com.example.onlineneighborhood;
 
 import android.content.Context;
 import android.net.Uri;
-import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,19 +24,16 @@ import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
-public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
+public class MyEventAdapter extends RecyclerView.Adapter<MyEventAdapter.EventViewHolder> {
 
     private static final String TAG = "Event Adapter";
 
     private static ArrayList<Event> eventList;
     private static Context mContext;
     private onEventClickListener mListener;
+
     private onEventLongClickListener mListener2;
-
-
-
 
 
 
@@ -191,9 +187,12 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         }
     }
 
-    public EventAdapter(ArrayList<Event> eventList, Context context) {
-        this.eventList = eventList;
+
+
+    public MyEventAdapter(Context context) {
+        //this.eventList = eventList;
         this.mContext = context;
+        this.eventList =  new ArrayList<Event>();
     }
 
 
@@ -211,7 +210,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     public void onBindViewHolder(@NonNull EventViewHolder holder, int position) {
         Event currentItem = eventList.get(position);
 
-        //FILTER LOGIC HERE
         Log.d(TAG, "user id " + currentItem.getHost().getUid());
         holder.mEvent.setText(currentItem.getName());
         //TODO: get the name of the hostID - DONE
@@ -225,12 +223,27 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
         Log.d(TAG, "onBindViewHolder: " + currentItem.getHost());
 
+
+    }
+
+    public void addDataAndUpdate(Event e){
+        eventList.add(e);
+        notifyItemChanged(eventList.size() -1);
+    }
+    public void clearData(){
+        eventList.clear();
+        notifyDataSetChanged();
     }
 
 
     @Override
     public int getItemCount() {
         return eventList.size();
+    }
+
+    public ArrayList<Event> getEventList() {
+        return eventList;
+
     }
 
 
