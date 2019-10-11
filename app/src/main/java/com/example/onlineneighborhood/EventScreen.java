@@ -5,16 +5,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Context;
 import android.content.Intent;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,6 +31,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class EventScreen extends AppCompatActivity {
     private static final String TAG = "EventScreenTAG";
 
@@ -44,7 +42,7 @@ public class EventScreen extends AppCompatActivity {
     public TextView mEventName, mDescription, mTime, mDate, attendingTextView;
     private FirebaseStorage storage;
     private StorageReference storageReference;
-    public ImageView hostPic;
+    public CircleImageView hostPic;
     public Button attendBtn;
     FirebaseAuth firebaseAuth;
 
@@ -86,11 +84,15 @@ public class EventScreen extends AppCompatActivity {
         mDescription = findViewById(R.id.eventDesc);
         mDate = findViewById(R.id.eventDate);
         mTime = findViewById(R.id.eventTime);
-        hostPic = findViewById(R.id.imageView);
+        hostPic = findViewById(R.id.hostImage);
+
+       
+
+
         storage = FirebaseStorage.getInstance();
         storageReference=storage.getReference();
 
-        attendingTextView = findViewById(R.id.attendingTextView);
+        //attendingTextView = findViewById(R.id.attendingTextView);
 
         thisUserString = firebaseAuth.getCurrentUser().getUid();
 
@@ -163,7 +165,7 @@ public class EventScreen extends AppCompatActivity {
 
                                 Log.d("TEST" , "Attempting Recycle View ");
                                 mRecyclerView = findViewById(R.id.recyclerViewUsers);
-                                mLayoutManager = new LinearLayoutManager( getApplicationContext()  );
+                                mLayoutManager = new LinearLayoutManager( getApplicationContext(),LinearLayoutManager.HORIZONTAL, false  );
                                 mAdapter = new UserAdapter(attendees,   getApplicationContext() );
 
 
@@ -181,7 +183,7 @@ public class EventScreen extends AppCompatActivity {
 
                                         Log.d("ONEVENTCLICK" , attendee.getUid());
 
-                                        Intent i = new Intent( getApplicationContext(), otherProfile.class);
+                                        Intent i = new Intent( getApplicationContext(), nonUserProfile.class);
                                         i.putExtra("UID", attendee.getUid());
                                         startActivity(i);
                                     }
@@ -222,11 +224,11 @@ public class EventScreen extends AppCompatActivity {
                         if (attending == true){
 
                             attendBtn.setText("UNATTEND");
-                            attendingTextView.setText("ATTENDING");
+                            //attendingTextView.setText("ATTENDING");
 
                         } else {
                             attendBtn.setText("ATTEND");
-                            attendingTextView.setText("UNATTENDING");
+                            //attendingTextView.setText("UNATTENDING");
                         }
 
                         Log.d(TAG, eventSnapshot.toString());
@@ -262,7 +264,7 @@ public class EventScreen extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                Intent i = new Intent(getApplicationContext(), otherProfile.class);
+                Intent i = new Intent(getApplicationContext(), nonUserProfile.class);
                 i.putExtra("UID", mEvent.getHost().getUid());
                 i.putExtra("MyObject", mEvent);
                 i.putExtra("SUBURB", intentSuburb);
@@ -283,7 +285,7 @@ public class EventScreen extends AppCompatActivity {
         // No Attend/Unattend button & Attendance status is just host
         if (host.equals(thisUserString)){
             attendBtn.setVisibility(View.INVISIBLE);
-            attendingTextView.setText("HOST");
+            //attendingTextView.setText("HOST");
         }
 
 
@@ -339,7 +341,7 @@ public class EventScreen extends AppCompatActivity {
 
 
                     Event updatedEvent = new Event(mEvent.getId(), mEvent.getHost(), mEvent.getAddress(), mEvent.getEventName(), mEvent.getDescription(),
-                            mEvent.getTime(), mEvent.getDate(), mEvent.getEndTime(), mEvent.getEndDate(), mEvent.getType(),addList);
+                            mEvent.getTime(), mEvent.getDate(), mEvent.getEndTime(), mEvent.getEndDate(), mEvent.getType(),addList, mEvent.getSuburbId());
 
                     Event userEvent = new Event(mEvent.getId(), intentSuburb);
 
@@ -367,7 +369,7 @@ public class EventScreen extends AppCompatActivity {
 
                     attending = true;
                     attendBtn.setText("UNATTEND");
-                    attendingTextView.setText("ATTENDING");
+                    //attendingTextView.setText("ATTENDING");
 
                     Toast.makeText(getApplicationContext(), "You're now attending the event!" , Toast.LENGTH_SHORT ).show();
 
@@ -441,7 +443,7 @@ public class EventScreen extends AppCompatActivity {
                     }
 
                     Event updatedEvent = new Event(mEvent.getId(), mEvent.getHost(), mEvent.getAddress(), mEvent.getEventName(), mEvent.getDescription(),
-                            mEvent.getTime(), mEvent.getDate(), mEvent.getEndTime(), mEvent.getEndDate(), mEvent.getType(),removeList);
+                            mEvent.getTime(), mEvent.getDate(), mEvent.getEndTime(), mEvent.getEndDate(), mEvent.getType(),removeList, mEvent.getSuburbId());
 
                     databaseEvent.setValue(updatedEvent);
 
@@ -457,7 +459,7 @@ public class EventScreen extends AppCompatActivity {
 
                     attending = false;
                     attendBtn.setText("ATTEND");
-                    attendingTextView.setText("NOT ATTENDING");
+                    //attendingTextView.setText("NOT ATTENDING");
 
                     Toast.makeText(getApplicationContext(), "You're no longer attending event!" , Toast.LENGTH_SHORT ).show();
 
