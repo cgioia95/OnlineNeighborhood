@@ -4,9 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="30dp"
-    android:layout_marginTop="50dp"
     tools:context=".EventScreen">
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar" />
 
     <TextView
         android:id="@+id/attendingTextView"
@@ -14,7 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/attendBtn"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="-95dp"
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="6dp"
         android:text="ATTENDING?" />
 
@@ -23,6 +25,7 @@
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_alignParentStart="true"
+        android:layout_marginTop="50dp"
         android:layout_marginRight="24dp" />
 
     <TextView
@@ -31,6 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_toEndOf="@id/imageView"
         android:text="EventName"
+        android:layout_marginTop="60dp"
         android:textSize="20sp" />
 
     <TextView
@@ -38,7 +42,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/eventName"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="38dp"
         android:layout_toEndOf="@id/imageView"
         android:text="EventTime"
         android:textSize="10sp" />

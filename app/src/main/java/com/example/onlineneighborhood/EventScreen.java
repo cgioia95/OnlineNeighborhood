@@ -90,6 +90,12 @@ public class EventScreen extends AppCompatActivity {
         storage = FirebaseStorage.getInstance();
         storageReference=storage.getReference();
 
+        androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Online Neighborhood");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
         attendingTextView = findViewById(R.id.attendingTextView);
 
         thisUserString = firebaseAuth.getCurrentUser().getUid();
