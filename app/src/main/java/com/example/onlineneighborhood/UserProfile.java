@@ -4,21 +4,32 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 
 import android.Manifest;
 
+import java.io.ByteArrayOutputStream;
+import java.util.*;
+
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.view.Menu;
@@ -29,11 +40,13 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -42,6 +55,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -50,11 +64,19 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
+
+import static androidx.core.graphics.TypefaceCompatUtil.getTempFile;
 import static java.util.Calendar.*;
 
 public class UserProfile extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
@@ -69,13 +91,17 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
     private DatabaseReference databaseReference;
     private FirebaseStorage storage;
     private StorageReference storageReference;
-    private static final int PICK_IMAGE = 1;
-    private static final int MY_CAMERA_PERMISSION_CODE = 100;
-    private static final int EXTERNAL_STORAGE_PERMISSION_CONSTANT = 120;
+    private ProgressDialog progressDialog;
+    private Bitmap photo;
 
-    private static final int REQUEST_PERMISSION_SETTING = 101;
-    private boolean sentToSettings = false;
-    private SharedPreferences permissionStatus;
+
+    private static final int PICK_IMAGE = 1, CAMERA_REQUEST=2;
+    private static final int MY_CAMERA_PERMISSION_CODE = 100;
+//    private static final int EXTERNAL_STORAGE_PERMISSION_CONSTANT = 120;
+//
+//    private static final int REQUEST_PERMISSION_SETTING = 101;
+//    private boolean sentToSettings = false;
+//    private SharedPreferences permissionStatus;
 
     private static final int  REQUEST_TAKE_PHOTO = 15;
     private static final String TAG = "My Profile";
@@ -89,15 +115,15 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_screen);
 
-        textViewName = findViewById(R.id.userName);
+        textViewName = findViewById(R.id.textViewName);
         tvBio = findViewById(R.id.tvBio);
         tvDOB = findViewById(R.id.tvDob);
         tvDOB.setVisibility(View.INVISIBLE);
         tvBio.setVisibility(View.INVISIBLE);
         editProfileBtn = findViewById(R.id.editProfileBtn);
         spinnerPreferences = (Spinner) findViewById(R.id.spinnerPreferences);
-        editTextdob = findViewById(R.id.dateOfBirth);
-        editTextBio = findViewById(R.id.bio);
+        editTextdob = findViewById(R.id.editTextdob);
+        editTextBio = findViewById(R.id.editTextbio);
         imageButtonPicture = findViewById(R.id.imageButtonPicture);
         fireBaseAuth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference("Users");
@@ -107,6 +133,7 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
         editTextBio.setEnabled(false);
         editTextdob.setEnabled(false);
         spinnerPreferences.setEnabled(false);
+        imageButtonPicture.setAdjustViewBounds(true);
 
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -114,7 +141,7 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
         getSupportActionBar().setTitle("Online Neighborhood");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        permissionStatus = getSharedPreferences("permissionStatus",MODE_PRIVATE);
+//        permissionStatus = getSharedPreferences("permissionStatus",MODE_PRIVATE);
 
 
 
@@ -146,67 +173,15 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                        if (i==0){
-
-                           if (ActivityCompat.checkSelfPermission(UserProfile.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                               if (ActivityCompat.shouldShowRequestPermissionRationale(UserProfile.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                                   //Show Information about why you need the permission
-                                   AlertDialog.Builder builder = new AlertDialog.Builder(UserProfile.this);
-                                   builder.setTitle("Need Storage Permission");
-                                   builder.setMessage("This app needs storage permission.");
-                                   builder.setPositiveButton("Grant", new DialogInterface.OnClickListener() {
-                                       @Override
-                                       public void onClick(DialogInterface dialog, int which) {
-                                           dialog.cancel();
-                                           ActivityCompat.requestPermissions(UserProfile.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_PERMISSION_CONSTANT);
-                                       }
-                                   });
-                                   builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                       @Override
-                                       public void onClick(DialogInterface dialog, int which) {
-                                           dialog.cancel();
-                                       }
-                                   });
-                                   builder.show();
-                               } else if (permissionStatus.getBoolean(Manifest.permission.WRITE_EXTERNAL_STORAGE,false)) {
-                                   //Previously Permission Request was cancelled with 'Dont Ask Again',
-                                   // Redirect to Settings after showing Information about why you need the permission
-                                   AlertDialog.Builder builder = new AlertDialog.Builder(UserProfile.this);
-                                   builder.setTitle("Need Storage Permission");
-                                   builder.setMessage("This app needs storage permission.");
-                                   builder.setPositiveButton("Grant", new DialogInterface.OnClickListener() {
-                                       @Override
-                                       public void onClick(DialogInterface dialog, int which) {
-                                           dialog.cancel();
-                                           sentToSettings = true;
-                                           Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                           Uri uri = Uri.fromParts("package", getPackageName(), null);
-                                           intent.setData(uri);
-                                           startActivityForResult(intent, REQUEST_PERMISSION_SETTING);
-                                           Toast.makeText(getBaseContext(), "Go to Permissions to Grant Storage", Toast.LENGTH_LONG).show();
-                                       }
-                                   });
-                                   builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                       @Override
-                                       public void onClick(DialogInterface dialog, int which) {
-                                           dialog.cancel();
-                                       }
-                                   });
-                                   builder.show();
-                               } else {
-                                   //just request the permission
-                                   ActivityCompat.requestPermissions(UserProfile.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_PERMISSION_CONSTANT);
-                               }
-
-                               SharedPreferences.Editor editor = permissionStatus.edit();
-                               editor.putBoolean(Manifest.permission.WRITE_EXTERNAL_STORAGE,true);
-                               editor.commit();
-
-
-                           } else {
-                               //You already have the permission, just go ahead.
-                               proceedAfterPermission();
+                           if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+                           {
+                               requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_PERMISSION_CODE);
                            }
-
+                           else
+                           {
+                               Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                               startActivityForResult(cameraIntent, CAMERA_REQUEST);
+                           }
 
                        }
                        if (i==1){
@@ -352,54 +327,67 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
         if (requestCode == PICK_IMAGE && resultCode == RESULT_OK) {
             imageuri = data.getData();
             try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageuri);
-                imageButtonPicture.setImageBitmap(bitmap);
-                uploadImage();
+                photo = MediaStore.Images.Media.getBitmap(getContentResolver(), imageuri);
+                submit();
+                imageButtonPicture.setImageBitmap(photo);
             } catch (IOException e) {
                 e.printStackTrace();
 
             }
         }
-
-        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
-
-            imageButtonPicture.setImageURI(Uri.parse(currentPhotoPath));
-            imageuri=Uri.parse(currentPhotoPath);
-            uploadImage();
-
+        if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK)
+        {
+            photo = (Bitmap) data.getExtras().get("data");
+            submit();
+            imageButtonPicture.setImageBitmap(photo);
+        }
 
         }
-        if (requestCode == REQUEST_PERMISSION_SETTING) {
-            if (ActivityCompat.checkSelfPermission(UserProfile.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                //Got Permission
-                proceedAfterPermission();
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == MY_CAMERA_PERMISSION_CODE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "camera permission granted", Toast.LENGTH_LONG).show();
+                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(cameraIntent, CAMERA_REQUEST);
+            } else {
+                Toast.makeText(this, "camera permission denied", Toast.LENGTH_LONG).show();
             }
         }
     }
 
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
-//    {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//        if (requestCode == MY_CAMERA_PERMISSION_CODE)
-//        {
-//            if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
-//            {
-//                Toast.makeText(this, "camera permission granted", Toast.LENGTH_LONG).show();
-//                Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-//                startActivityForResult(cameraIntent, CAMERA_REQUEST);
-//            }
-//            else
-//            {
-//                Toast.makeText(this, "camera permission denied", Toast.LENGTH_LONG).show();
-//            }
-//        }
-//
-//
-//    }
+
+    public void submit(){
+
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        photo.compress(Bitmap.CompressFormat.JPEG, 100, stream);
 
 
-    private void uploadImage() {
+        byte[] b = stream.toByteArray();
+        StorageReference ref = storageReference.child("profilePics/"+ uid.toString());
+        //StorageReference filePath = FirebaseStorage.getInstance().getReference().child("profile_images").child(userID);
+        ref.putBytes(b).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Uri downloadUrl = taskSnapshot.getUploadSessionUri();
+                Toast.makeText(UserProfile.this, "uploaded", Toast.LENGTH_SHORT).show();
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(UserProfile.this,"failed",Toast.LENGTH_LONG).show();
+
+
+            }
+        });
+
+    }
+
+
+    private void uploadImage() throws IOException {
         Log.d(TAG, "uploadImage: "+ imageuri);
         if(imageuri != null)
         {
@@ -474,80 +462,6 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
             });
     }
 
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-
-        // Save a file: path for use with ACTION_VIEW intents
-        currentPhotoPath = image.getAbsolutePath();
-        return image;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == EXTERNAL_STORAGE_PERMISSION_CONSTANT) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                //The External Storage Write Permission is granted to you... Continue your left job...
-                proceedAfterPermission();
-            } else {
-                if (ActivityCompat.shouldShowRequestPermissionRationale(UserProfile.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    //Show Information about why you need the permission
-                    AlertDialog.Builder builder = new AlertDialog.Builder(UserProfile.this);
-                    builder.setTitle("Need Storage Permission");
-                    builder.setMessage("This app needs storage permission");
-                    builder.setPositiveButton("Grant", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
 
 
-                            ActivityCompat.requestPermissions(UserProfile.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_PERMISSION_CONSTANT);
-
-
-                        }
-                    });
-                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
-                        }
-                    });
-                    builder.show();
-                } else {
-                    Toast.makeText(getBaseContext(),"Unable to get Permission",Toast.LENGTH_LONG).show();
-                }
-            }
-        }
-    }
-
-    private void proceedAfterPermission() {
-        //We've got the permission, now we can proceed further
-        Toast.makeText(getBaseContext(), "We got the Storage Permission", Toast.LENGTH_LONG).show();
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        try {
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(UserProfile.this, BuildConfig.APPLICATION_ID + ".provider", createImageFile()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        startActivityForResult(intent, REQUEST_TAKE_PHOTO);
-    }
-
-    @Override
-    protected void onPostResume() {
-        super.onPostResume();
-        if (sentToSettings) {
-            if (ActivityCompat.checkSelfPermission(UserProfile.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                //Got Permission
-                proceedAfterPermission();
-            }
-        }
-    }
-}
+ }

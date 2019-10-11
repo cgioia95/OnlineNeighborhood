@@ -71,6 +71,7 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
     private StorageReference storageReference;
     private String uid;
     public static Context contextOfApplication;
+    private Menu menu;
 
     public static Context getContextOfApplication()
     {
@@ -94,17 +95,6 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
 
         Log.d("BUNDLEVALUES:", ""+intentSuburb
                 +dateRange+ typeFilter +time);
-
-        //To load home screen automatically after logging it
-        Bundle bundle = new Bundle();
-        bundle.putString("SUBURB", intentSuburb);
-        bundle.putString("DATE",  dateRange);
-        bundle.putString("TYPE", typeFilter);
-        bundle.putString("TIME", time);
-        HomeFragment home = new HomeFragment();
-        home.setArguments(bundle);
-        loadFragment(home);
-
     }
 
     @Override
@@ -114,6 +104,10 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
         setContentView(R.layout.activity_bottom_navigation);
         BottomNavigationView navView = findViewById(R.id.nav_view);
         navView.setOnNavigationItemSelectedListener(this);
+        //navView.getMenu().findItem(R.id.navigation_home).setChecked(true);
+        if (savedInstanceState == null) {
+            navView.getMenu().performIdentifierAction(R.id.navigation_home, 0);
+        }
         contextOfApplication = getApplicationContext();
 
         databaseEvents = FirebaseDatabase.getInstance().getReference("events");
@@ -144,6 +138,17 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
 
         });
 
+        //To load home screen automatically after logging it
+//        Bundle bundle = new Bundle();
+//        bundle.putString("SUBURB", intentSuburb);
+//        bundle.putString("DATE",  dateRange);
+//        bundle.putString("TYPE", typeFilter);
+//        bundle.putString("TIME", time);
+//        HomeFragment home = new HomeFragment();
+//        home.setArguments(bundle);
+//        loadFragment(home);
+
+
     }
 
     private void setSupportActionBar(Toolbar toolbar) {
@@ -154,6 +159,7 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.toolbar_menu, menu);
+        this.menu = menu;
         return true;
     }
 
@@ -194,16 +200,22 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
 
             case R.id.navigation_events:
                 fragment = new MyEvents();
+//              Add "My events" fragment here
+                menuItem.setChecked(true);
+
                 break;
 
 
             case R.id.navigation_map:
                 // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+                menuItem.setChecked(true);
 
                 fragment = new MapFragment();
                 break;
 
             case R.id.navigation_home:
+                menuItem.setChecked(true);
+                Log.d("Bottom Navigation", "onNavigationItemSelected: Home");
                 fragment= home;
                 break;
 
