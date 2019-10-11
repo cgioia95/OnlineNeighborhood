@@ -6,13 +6,18 @@
     android:layout_height="match_parent"
     tools:context=".EventScreen"
     android:background="@color/white">
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/profile_toolbar" />
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:id="@+id/eventContainer"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="30dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="64dp"
+
+
 >
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/hostImage"
@@ -20,6 +25,8 @@
             android:layout_height="70dp"
             android:layout_alignParentStart="true"
             android:layout_marginRight="24dp" />
+
+
 
         <TextView
             android:id="@+id/eventName"

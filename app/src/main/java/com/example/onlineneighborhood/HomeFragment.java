@@ -204,6 +204,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
     public void onClick(View view) {
 
         if (view == addEvent){
+            applicationContext = BottomNavigationActivity.getContextOfApplication();
+
             Intent i = new Intent(applicationContext, createEvent.class);
             i.putExtra("SUBURB", suburb);
             startActivity(i);
