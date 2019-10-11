@@ -72,13 +72,21 @@ public class EventScreen extends AppCompatActivity {
         Log.d(TAG, "CREATE");
 
         Intent i = getIntent();
-        final String intentSuburb = ((OnlineNeighborhood) this.getApplication()).getsuburb();
+//        final String intentSuburb = ((OnlineNeighborhood) this.getApplication()).getsuburb();
+
 
         firebaseAuth = FirebaseAuth.getInstance();
         databaseUsers = FirebaseDatabase.getInstance().getReference("Users");
 
         Log.d(TAG, "HERE");
         final Event mEvent= (Event) i.getSerializableExtra("MyObject");
+
+        final String intentSuburb = mEvent.getSuburbId();
+
+
+
+        Log.d(TAG, intentSuburb);
+
         Log.d(TAG, "onCreate: " + mEvent);
         mEventName = findViewById(R.id.eventName);
         mDescription = findViewById(R.id.eventDesc);
