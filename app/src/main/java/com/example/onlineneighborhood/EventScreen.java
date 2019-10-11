@@ -341,7 +341,7 @@ public class EventScreen extends AppCompatActivity {
 
 
                     Event updatedEvent = new Event(mEvent.getId(), mEvent.getHost(), mEvent.getAddress(), mEvent.getEventName(), mEvent.getDescription(),
-                            mEvent.getTime(), mEvent.getDate(), mEvent.getEndTime(), mEvent.getEndDate(), mEvent.getType(),addList);
+                            mEvent.getTime(), mEvent.getDate(), mEvent.getEndTime(), mEvent.getEndDate(), mEvent.getType(),addList, mEvent.getSuburbId());
 
                     Event userEvent = new Event(mEvent.getId(), intentSuburb);
 
@@ -443,7 +443,7 @@ public class EventScreen extends AppCompatActivity {
                     }
 
                     Event updatedEvent = new Event(mEvent.getId(), mEvent.getHost(), mEvent.getAddress(), mEvent.getEventName(), mEvent.getDescription(),
-                            mEvent.getTime(), mEvent.getDate(), mEvent.getEndTime(), mEvent.getEndDate(), mEvent.getType(),removeList);
+                            mEvent.getTime(), mEvent.getDate(), mEvent.getEndTime(), mEvent.getEndDate(), mEvent.getType(),removeList, mEvent.getSuburbId());
 
                     databaseEvent.setValue(updatedEvent);
 
