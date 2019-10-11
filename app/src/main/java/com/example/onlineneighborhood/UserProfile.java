@@ -84,7 +84,8 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
     private TextView textViewName, tvBio, tvDOB;
     private Spinner spinnerPreferences;
     private Button editProfileBtn;
-    private EditText editTextdob, editTextBio;
+    private TextView editTextdob;
+    private EditText editTextBio;
     private ImageButton imageButtonPicture;
     private DatePickerDialog.OnDateSetListener DateSetListener;
     private FirebaseAuth fireBaseAuth;
