@@ -160,16 +160,13 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent i = getIntent();
-        String intentSuburb = i.getStringExtra("SUBURB");
+
+
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         setContentView(R.layout.activity_edit_delete);
 
-        databaseUsers = FirebaseDatabase.getInstance().getReference("Users");
-        databaseSuburb =  FirebaseDatabase.getInstance().getReference("suburbs").child(intentSuburb);
 
-        //getting authentication info to link the event to the user creating it
-        firebaseAuth = FirebaseAuth.getInstance();
 
 
         //Metrics of the popup window. Currently setting it to 90% of screen width and height
@@ -198,7 +195,17 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
         addCal = findViewById(R.id.addCal);
 
 
-         preEvent =  (Event)i.getSerializableExtra("MyObject");
+
+        preEvent =  (Event)i.getSerializableExtra("MyObject");
+
+        String intentSuburb = preEvent.getSuburbId();
+
+
+        databaseUsers = FirebaseDatabase.getInstance().getReference("Users");
+        databaseSuburb =  FirebaseDatabase.getInstance().getReference("suburbs").child(intentSuburb);
+
+        //getting authentication info to link the event to the user creating it
+        firebaseAuth = FirebaseAuth.getInstance();
 
         eventId = preEvent.getId();
 
