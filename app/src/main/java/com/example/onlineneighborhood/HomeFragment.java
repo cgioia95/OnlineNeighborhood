@@ -1,5 +1,6 @@
 package com.example.onlineneighborhood;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -9,12 +10,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -46,10 +50,12 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
     private ImageView addEvent, dateFilter, typeFilter;
     private String suburb;
     private String currSuburb;
+    private Callbacks mCallbacks;
     private static final String TAG = "HomeScreen";
     static Date calenderDate;
     private Suburb currentSuburb;
     private static String type;
+    private Button applyFilterButton;
 
     private FirebaseAuth fireBaseAuth;
     DatabaseReference databaseEvents;
@@ -59,7 +65,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
     private EventAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private ArrayList<Event> eventList = new ArrayList<>();
-    Context applicationContext = BottomNavigationActivity.getContextOfApplication();
 
 
 
@@ -77,11 +82,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
         dateFilter = mView.findViewById(R.id.dateFilterHome);
         typeFilter = mView.findViewById(R.id.typeFilter);
         suburbTextView = mView.findViewById(R.id.textViewSuburb);
+        applyFilterButton = mView.findViewById(R.id.applyFilterButton);
+
 
         currSuburb=suburb = ((OnlineNeighborhood) getActivity().getApplication()).getsuburb();
 
         suburbTextView.setText(suburb);
         addEvent.setOnClickListener(this);
+        applyFilterButton.setOnClickListener(this);
         dateFilter.setOnClickListener(this);
         typeFilter.setOnClickListener(this);
 
@@ -103,7 +111,16 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
                     ArrayList<Event> events = currentSuburb.getEvents();
                     for(Event event:events){
                         if(event != null) {
-                         eventList.add(event);
+                            try {
+                                if(filterApplied(calenderDate, type)){
+                                    Toast.makeText(getActivity(), "Filters Applied", Toast.LENGTH_SHORT).show();
+                                } else{
+                                    eventList.add(event);
+                                }
+                            } catch (ParseException e) {
+                                Toast.makeText(getActivity(), "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
+                                e.printStackTrace();
+                            }
                         }
                     }
                 }
@@ -140,7 +157,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
                             if (myId.equals(hostId)) {
                                 Log.d(TAG, "Permission Granted");
 
-                                Intent intent = new Intent(applicationContext, editDelete.class);
+                                Intent intent = new Intent(getActivity(), editDelete.class);
                                 intent.putExtra("MyObject", event);
                                 intent.putExtra("SUBURB", suburb);
 
@@ -184,13 +201,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
 
     }
 
-
-
     //@Override
     public void onClick(View view) {
 
         if (view == addEvent){
-            Intent i = new Intent(applicationContext, createEvent.class);
+            Intent i = new Intent(getActivity(), createEvent.class);
             i.putExtra("SUBURB", suburb);
             startActivity(i);
         }
@@ -202,35 +217,38 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
 
         if(view == typeFilter){
             openTypeDialog();
-            Log.d("CHOOSING", ""+type);
 
+        }
+
+        if(view == applyFilterButton){
+            mCallbacks.onButtonClicked();
         }
 
     }
 
     public boolean filterApplied(Date date, String type) throws ParseException {
         eventList.clear();
+        ArrayList<Event> events = currentSuburb.getEvents();
         if(date == null && type == null){
             return false;
         }else if(date != null && type == null){
-            try{
-                ArrayList<Event> events = currentSuburb.getEvents();
-                for(Event event : events){
-                    String eventStartDate = event.getDate() + " " + event.getTime();
-                    String eventEndDate = event.getEndDate() + " " + event.getEndTime();
-                    Date eventStart = new SimpleDateFormat("dd/MM/yyyy h:m").parse(eventStartDate);
-                    Date eventEnd = new SimpleDateFormat("dd/MM/yyyy h:m").parse(eventEndDate);
-                    if(eventStart.after(date) && eventEnd.before(date)) {
-                        eventList.add(event);
-                    }
+            for(Event event : events){
+                String eventStartDate = event.getDate() + " " + event.getTime();
+                String eventEndDate = event.getEndDate() + " " + event.getEndTime();
+                Date eventStart = new SimpleDateFormat("dd/MM/yyyy").parse(eventStartDate);
+                Date eventEnd = new SimpleDateFormat("dd/MM/yyyy").parse(eventEndDate);
+                if((eventStart.after(date) || eventStart.equals(date)) && (eventEnd.before(date)|| eventEnd.equals(date))) {
+                    eventList.add(event);
                 }
-            }catch (Exception e){
-                e.printStackTrace();
-                return false;
             }
             return true;
         } else{
-            return false;
+            for(Event event : events){
+                if(event.getType().equals(type)){
+                 eventList.add(event);
+                }
+            }
+            return true;
         }
     }
 
@@ -296,4 +314,20 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
 
     }
 
+    public interface Callbacks {
+        //Callback for when button clicked.
+        public void onButtonClicked();
     }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        // Activities containing this fragment must implement its callbacks
+        mCallbacks = (Callbacks) activity;
+
+    }
+
+
+
+
+}
