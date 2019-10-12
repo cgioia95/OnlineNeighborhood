@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/tvTypeFilt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Choose A Type of Event"
+        android:textAlignment="center"
+        android:textColor="#180303"
+        android:textSize="22sp" />
+
+    <Spinner
+        android:id="@+id/typeFilterSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/eventTypes"
+        android:spinnerMode="dropdown" />
+</LinearLayout>

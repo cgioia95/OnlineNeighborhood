@@ -80,7 +80,6 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
 
     @Override
     protected void onStart() {
-        super.onStart();
 
         Intent i = getIntent();
         intentSuburb = i.getStringExtra("SUBURB");
@@ -95,6 +94,8 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
 
         Log.d("BUNDLEVALUES:", ""+intentSuburb
                 +dateRange+ typeFilter +time);
+
+        super.onStart();
     }
 
     @Override

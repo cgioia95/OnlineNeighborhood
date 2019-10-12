@@ -1,31 +1,29 @@
 package com.example.onlineneighborhood;
 
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatDialogFragment;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.onlineneighborhood.BottomNavigationActivity;
-import com.example.onlineneighborhood.Event;
-import com.example.onlineneighborhood.EventAdapter;
-import com.example.onlineneighborhood.HomeScreen;
-import com.example.onlineneighborhood.Login;
-import com.example.onlineneighborhood.R;
-import com.example.onlineneighborhood.createEvent;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -45,11 +43,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
     TextView suburbTextView;
 
 
-    ImageView addEvent;
-    Button filterButton, clearFilter;
-    String suburb;
-    String currSuburb, date, type, time;
+    private ImageView addEvent, dateFilter, typeFilter;
+    private String suburb;
+    private String currSuburb;
     private static final String TAG = "HomeScreen";
+    static Date calenderDate;
+    private Suburb currentSuburb;
+    private static String type;
 
     private FirebaseAuth fireBaseAuth;
     DatabaseReference databaseEvents;
@@ -69,27 +69,22 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
         View mView = inflater.inflate(R.layout.activity_home_screen, null);
         if(getArguments() != null){
             currSuburb = getArguments().getString("SUBURB");
-            date = getArguments().getString("DATE");
-            type = getArguments().getString("TYPE");
-            time = getArguments().getString("TIME");
-
-            Log.d(TAG, "filter VALUES: "+ date + type+time);
 
         }
 
-
-
         fireBaseAuth = FirebaseAuth.getInstance();
         addEvent = mView.findViewById(R.id.addEvent);
+        dateFilter = mView.findViewById(R.id.dateFilterHome);
+        typeFilter = mView.findViewById(R.id.typeFilter);
         suburbTextView = mView.findViewById(R.id.textViewSuburb);
-        filterButton = mView.findViewById(R.id.filterButton);
-        clearFilter = mView.findViewById(R.id.clearFilter);
 
         currSuburb=suburb = ((OnlineNeighborhood) getActivity().getApplication()).getsuburb();
 
         suburbTextView.setText(suburb);
         addEvent.setOnClickListener(this);
-        filterButton.setOnClickListener(this);
+        dateFilter.setOnClickListener(this);
+        typeFilter.setOnClickListener(this);
+
         return mView;
     }
     @Override
@@ -103,21 +98,12 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 eventList.clear();
-                Suburb currSuburb = dataSnapshot.getValue(Suburb.class);
-                if(currSuburb.getEvents() != null){
-                    ArrayList<Event> events = currSuburb.getEvents();
+                currentSuburb = dataSnapshot.getValue(Suburb.class);
+                if(currentSuburb.getEvents() != null){
+                    ArrayList<Event> events = currentSuburb.getEvents();
                     for(Event event:events){
                         if(event != null) {
-                            try {
-                                if(filterApplied(date, time, type, event)){
-                                    Log.d(TAG, "FILTER APPLIED");
-                                }else{
-                                    eventList.add(event);
-                                    Log.d(TAG, "NOTHING TO FILTER");
-                                }
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                            }
+                         eventList.add(event);
                         }
                     }
                 }
@@ -209,51 +195,105 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
             startActivity(i);
         }
 
-        if(view == filterButton){
-            Intent i = new Intent(applicationContext, FilterEvents.class);
-            i.putExtra("SUBURB", suburb);
-            startActivity(i);
+        if (view == dateFilter){
+            DialogFragment newFragment = new SelectDateFragment();
+            newFragment.show(getFragmentManager(), "DatePicker");
         }
 
-        if(view == clearFilter){
-            time = null;
-            date = null;
-            type = null;
+        if(view == typeFilter){
+            openTypeDialog();
+            Log.d("CHOOSING", ""+type);
+
         }
 
     }
 
-    public boolean filterApplied(String date, String time, String type, Event event) throws ParseException {
-
-        if(date == null && time==null && type==null){
+    public boolean filterApplied(Date date, String type) throws ParseException {
+        eventList.clear();
+        if(date == null && type == null){
             return false;
-        }else{
-            String totalDate = date+" "+time;
-            String eventStartDate = event.getDate() + " " + event.getTime();
-            String eventDateConcat = event.getEndDate() + " " + event.getEndTime();
-            Date testedDate = new SimpleDateFormat("dd/MM/yyyy h:m").parse(totalDate);
-            Calendar c = Calendar.getInstance();
-            int hour = c.get(Calendar.HOUR);
-            int min = c.get(Calendar.MINUTE);
-            String currentDate = c.get(Calendar.DATE) +"/"+(c.get(Calendar.MONTH)+1)+"/"+c.get(Calendar.YEAR) + " " + hour +":"+ min;
+        }else if(date != null && type == null){
             try{
-                Date currDate = new SimpleDateFormat("dd/MM/yyyy h:m").parse(currentDate);
-                Date eventDate = new SimpleDateFormat("dd/MM/yyyy h:m").parse(eventDateConcat);
-                Date eventStart = new SimpleDateFormat("dd/MM/yyyy h:m").parse(eventStartDate);
-                Log.d(TAG, "DATES: "+ eventDate +"|"+ testedDate+"|"+currDate);
-                if((eventDate.after(currDate)||eventDate.equals(currDate)) && (eventStart.before(testedDate)|| eventStart.equals(testedDate))&& event.getType().equals(type)){
-                    eventList.add(event);
+                ArrayList<Event> events = currentSuburb.getEvents();
+                for(Event event : events){
+                    String eventStartDate = event.getDate() + " " + event.getTime();
+                    String eventEndDate = event.getEndDate() + " " + event.getEndTime();
+                    Date eventStart = new SimpleDateFormat("dd/MM/yyyy h:m").parse(eventStartDate);
+                    Date eventEnd = new SimpleDateFormat("dd/MM/yyyy h:m").parse(eventEndDate);
+                    if(eventStart.after(date) && eventEnd.before(date)) {
+                        eventList.add(event);
+                    }
                 }
             }catch (Exception e){
                 e.printStackTrace();
                 return false;
             }
             return true;
+        } else{
+            return false;
         }
     }
 
+    // NEED TO REFERENCE THIS
+    public static class SelectDateFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            final Calendar calendar = Calendar.getInstance();
+            int yy = calendar.get(Calendar.YEAR);
+            int mm = calendar.get(Calendar.MONTH);
+            int dd = calendar.get(Calendar.DAY_OF_MONTH);
+            return new DatePickerDialog(getActivity(), this, yy, mm, dd);
+        }
 
+        public void onDateSet(DatePicker view, int yy, int mm, int dd) {
+            populateSetDate(yy, mm+1, dd);
+        }
+        public Date populateSetDate(int year, int month, int day) {
 
+            calenderDate = new Date(year - 1900, month - 1, day);
+            Log.d("CALENDER DATE POPULATE" , calenderDate.toString());
 
-}
+            return calenderDate;
+        }
+
+    }
+
+    public void openTypeDialog(){
+        TypeDialog typeDialog = new TypeDialog();
+        typeDialog.show(getFragmentManager(), "Example Dialog");
+
+    }
+
+    public static class TypeDialog extends AppCompatDialogFragment {
+        private Spinner typeSpinner;
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+            View view = inflater.inflate(R.layout.layout_type_dialog, null);
+
+            typeSpinner = view.findViewById(R.id.typeFilterSpinner);
+            builder.setTitle("Choose A type")
+                    .setView(view)
+                    .setMessage("What kind of event are you looking for?")
+                    .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                        }
+                    })
+                    .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            type = typeSpinner.getSelectedItem().toString();
+                        }
+                    });
+
+            return builder.create();
+        }
+
+    }
+
+    }

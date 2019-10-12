@@ -9,12 +9,13 @@
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.MEDIA_CONTENT_CONTROL"
+    <uses-permission
+        android:name="android.permission.MEDIA_CONTENT_CONTROL"
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />
@@ -26,29 +27,22 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-      
-        <activity android:name=".editDelete"
-
-            android:theme="@style/AppTheme.PopUpTheme"
-            >
-      
-      </activity>
-      
-        <activity android:name=".FilterEvents"
-            android:theme="@style/AppTheme.PopUpTheme">
-        </activity>
+        <activity android:name=".ChooseSuburb"></activity>
+        <activity
+            android:name=".editDelete"
+            android:theme="@style/AppTheme.PopUpTheme"></activity>
+        <activity
+            android:name=".FilterEvents"
+            android:theme="@style/AppTheme.PopUpTheme"></activity>
         <activity
             android:name=".BottomNavigationActivity"
             android:label="Online Neighbourhood" />
-        <activity android:name=".EventScreen"
-            android:parentActivityName=".BottomNavigationActivity"/>
-
+        <activity
+            android:name=".EventScreen"
+            android:parentActivityName=".BottomNavigationActivity" />
         <activity
             android:name=".nonUserProfile"
-            android:label = "otherProfile"
-            />
-
-
+            android:label="otherProfile" />
         <activity
             android:name=".createEvent"
             android:theme="@style/AppTheme.PopUpTheme" />
@@ -89,12 +83,8 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths">
-            </meta-data>
+                android:resource="@xml/provider_paths"></meta-data>
         </provider>
-
     </application>
-
-
 
 </manifest>

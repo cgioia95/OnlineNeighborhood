@@ -197,7 +197,7 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
         }
 
         if (view == textViewSignIn){
-            startActivity(new Intent(this, Login.class));
+            startActivity(new Intent(this, ChooseSuburb.class));
         }
 
 //        if(view == editDob){
