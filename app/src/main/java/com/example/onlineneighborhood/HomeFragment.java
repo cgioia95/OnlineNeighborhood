@@ -49,13 +49,12 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
 
     private ImageView addEvent, dateFilter, typeFilter;
     private String suburb;
-    private String currSuburb;
     private Callbacks mCallbacks;
     private static final String TAG = "HomeScreen";
     static Date calenderDate;
     private Suburb currentSuburb;
     private static String type;
-    private Button applyFilterButton;
+    private Button applyFilterButton, clearFilter;
 
     private FirebaseAuth fireBaseAuth;
     DatabaseReference databaseEvents;
@@ -72,10 +71,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View mView = inflater.inflate(R.layout.activity_home_screen, null);
-        if(getArguments() != null){
-            currSuburb = getArguments().getString("SUBURB");
 
-        }
 
         fireBaseAuth = FirebaseAuth.getInstance();
         addEvent = mView.findViewById(R.id.addEvent);
@@ -83,15 +79,16 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
         typeFilter = mView.findViewById(R.id.typeFilter);
         suburbTextView = mView.findViewById(R.id.textViewSuburb);
         applyFilterButton = mView.findViewById(R.id.applyFilterButton);
+        clearFilter = mView.findViewById(R.id.clearFilter);
 
-
-        currSuburb=suburb = ((OnlineNeighborhood) getActivity().getApplication()).getsuburb();
+        suburb = ((OnlineNeighborhood) getActivity().getApplication()).getsuburb();
 
         suburbTextView.setText(suburb);
         addEvent.setOnClickListener(this);
         applyFilterButton.setOnClickListener(this);
         dateFilter.setOnClickListener(this);
         typeFilter.setOnClickListener(this);
+        clearFilter.setOnClickListener(this);
 
         return mView;
     }
@@ -109,18 +106,20 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
                 currentSuburb = dataSnapshot.getValue(Suburb.class);
                 if(currentSuburb.getEvents() != null){
                     ArrayList<Event> events = currentSuburb.getEvents();
-                    for(Event event:events){
+                    for(Event event: events){
                         if(event != null) {
                             try {
                                 if(filterApplied(calenderDate, type)){
                                     Toast.makeText(getActivity(), "Filters Applied", Toast.LENGTH_SHORT).show();
                                 } else{
                                     eventList.add(event);
+                                    Log.d(TAG, "EVENT ADDED " + event.getName());
                                 }
                             } catch (ParseException e) {
                                 Toast.makeText(getActivity(), "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
                                 e.printStackTrace();
                             }
+
                         }
                     }
                 }
@@ -221,6 +220,12 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
         }
 
         if(view == applyFilterButton){
+            mCallbacks.onButtonClicked();
+        }
+
+        if(view == clearFilter){
+            type = null;
+            calenderDate = null;
             mCallbacks.onButtonClicked();
         }
 
