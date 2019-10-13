@@ -1,6 +1,7 @@
 package com.example.onlineneighborhood;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -43,7 +44,7 @@ public class EventScreen extends AppCompatActivity {
     private FirebaseStorage storage;
     private StorageReference storageReference;
     public CircleImageView hostPic;
-    public Button attendBtn;
+    public Button attendBtn, editBtn, deleteBtn;
     FirebaseAuth firebaseAuth;
 
     DatabaseReference databaseUsers, databaseSuburb, databaseEvent, databaseUser;
@@ -260,12 +261,16 @@ public class EventScreen extends AppCompatActivity {
 
 
         attendBtn = findViewById(R.id.attendBtn);
+        editBtn = findViewById(R.id.editBtn);
+        deleteBtn = findViewById(R.id.deleteBtn);
         Log.d(TAG, "onCreate: "+ mEvent);
 
+        // Prepopulation
         mEventName.setText(mEvent.getName());
         mDescription.setText(mEvent.getDescription());
         mDate.setText(mEvent.getDate());
         mTime.setText(mEvent.getTime());
+
         downloadImage(mEvent.getHost().getUid());
         hostPic.setOnClickListener(new View.OnClickListener(){
 
@@ -293,8 +298,119 @@ public class EventScreen extends AppCompatActivity {
         // No Attend/Unattend button & Attendance status is just host
         if (host.equals(thisUserString)){
             attendBtn.setVisibility(View.INVISIBLE);
+            editBtn.setVisibility(View.VISIBLE);
+            deleteBtn.setVisibility(View.VISIBLE);
+
             //attendingTextView.setText("HOST");
         }
+
+        else {
+            attendBtn.setVisibility(View.VISIBLE);
+            editBtn.setVisibility(View.INVISIBLE);
+            deleteBtn.setVisibility(View.INVISIBLE);
+        }
+
+        editBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(getApplicationContext(), editDelete.class);
+                intent.putExtra("MyObject", mEvent);
+                intent.putExtra("SUBURB", intentSuburb);
+
+                startActivityForResult(intent, 0);
+
+            }
+        });
+
+        deleteBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                databaseEvent.removeValue();
+
+                DatabaseReference userEvents = databaseUsers.child(firebaseAuth.getCurrentUser().getUid()).child("myEvents");
+
+                userEvents.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                        for (DataSnapshot eventSnapshot : dataSnapshot.getChildren()) {
+
+                            String id = eventSnapshot.child("id").getValue().toString();
+
+                            if (mEvent.equals(id)) {
+                                Log.d(TAG, "Event Reference: " + eventSnapshot.getRef().toString());
+                                Log.d(TAG, "Event ID: " +  id);
+                                eventSnapshot.getRef().removeValue();
+                            }
+
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                } );
+
+
+                ArrayList<UserInformation> attendees = mEvent.getAttendees();
+
+                for (UserInformation attendee: attendees){
+
+                    String attendeeString = attendee.getUid();
+
+
+                    DatabaseReference userEventsAttending = databaseUsers.child(attendeeString).child("myEventsAttending");
+
+                    userEventsAttending.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                            if (dataSnapshot != null ) {
+
+                                if (dataSnapshot.child("id").getValue() != null){
+
+                                    String id = dataSnapshot.child("id").getValue().toString();
+
+                                    if (id == mEvent.getId()) {
+                                        dataSnapshot.getRef().removeValue();
+
+                                    }
+
+                                }
+
+
+
+                            }
+
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+
+
+
+
+                }
+
+                finish();
+            }
+
+
+
+
+
+
+
+        }
+
+        );
+
 
 
         attendBtn.setOnClickListener(new View.OnClickListener() {
@@ -482,6 +598,31 @@ public class EventScreen extends AppCompatActivity {
 
 
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 0){
+
+
+            if (resultCode == 1) {
+                Event resultEvent = (Event) data.getSerializableExtra("MyObject");
+
+                mEventName.setText(resultEvent.getName());
+                mDescription.setText(resultEvent.getDescription());
+                mDate.setText(resultEvent.getDate());
+                mTime.setText(resultEvent.getTime());
+
+            }
+
+
+
+            }
+        }
+
+
+
 
     @Override
     protected void onStart() {

@@ -232,6 +232,7 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
         evDate.setText(preStartDate);
         evEndTime.setText(preEndTime);
         evEndDate.setText(preEndDate);
+        evAddress.setText(preAddress);
 
         evTime.setOnClickListener(this);
         evDate.setOnClickListener(this);
@@ -326,6 +327,9 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
 
         if(view == editBtn){
             editEvent();
+
+
+
         }
 
         if(view == evTime){
@@ -489,10 +493,6 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
 
 
 
-
-
-
-
         }
 
         // Need to also cycle through the list of attendees, get their
@@ -540,6 +540,15 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
         databaseEvent.child("endTime").setValue(endTime);
         databaseEvent.child("eventName").setValue(eventName);
         databaseEvent.child("type").setValue(type);
+
+        Event resultEvent = new Event(preEvent.getId(), preEvent.getHost(), eventAddress, eventName, eventDesc, eventTime, eventDate, endTime, endDate, type, preEvent.getAttendees(), preEvent.getSuburbId());
+
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra("MyObject", resultEvent);
+
+        setResult(1);
+
+        finish();
 
 
 
