@@ -126,6 +126,31 @@
         android:paddingHorizontal="10dp"
         android:text="Attend" />
 
+    <Button
+        android:id="@+id/deleteBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_below="@id/recyclerViewUsers"
+        android:layout_alignStart="@+id/eventContainer"
+        android:layout_marginStart="205dp"
+        android:layout_marginTop="122dp"
+        android:background="@color/colorAccent"
+        android:paddingHorizontal="10dp"
+        android:text="DELETE"
+        android:textColor="@color/white" />
+
+    <Button
+        android:id="@+id/editBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_below="@id/recyclerViewUsers"
+        android:layout_alignStart="@+id/eventContainer"
+        android:layout_marginStart="63dp"
+        android:layout_marginTop="122dp"
+        android:background="@color/colorPrimary"
+        android:paddingHorizontal="10dp"
+        android:text="EDIT"
+        android:textColor="@color/white" />
 
 
 </RelativeLayout>

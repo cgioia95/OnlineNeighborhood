@@ -232,6 +232,7 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
         evDate.setText(preStartDate);
         evEndTime.setText(preEndTime);
         evEndDate.setText(preEndDate);
+        evAddress.setText(preAddress);
 
         evTime.setOnClickListener(this);
         evDate.setOnClickListener(this);
@@ -326,6 +327,9 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
 
         if(view == editBtn){
             editEvent();
+
+
+
         }
 
         if(view == evTime){
@@ -459,6 +463,10 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
 
                 for (DataSnapshot eventSnapshot : dataSnapshot.getChildren()) {
 
+                    Log.d(TAG, "DELETING AN EVENT");
+
+                    Log.d(TAG, eventSnapshot.toString());
+
                     String id = eventSnapshot.child("id").getValue().toString();
 
                     if (eventId.equals(id)) {
@@ -486,10 +494,6 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
 
 
             DatabaseReference userEventsAttending = databaseUsers.child(attendeeString).child("myEventsAttending");
-
-
-
-
 
 
 
@@ -540,6 +544,15 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
         databaseEvent.child("endTime").setValue(endTime);
         databaseEvent.child("eventName").setValue(eventName);
         databaseEvent.child("type").setValue(type);
+
+        Event resultEvent = new Event(preEvent.getId(), preEvent.getHost(), eventAddress, eventName, eventDesc, eventTime, eventDate, endTime, endDate, type, preEvent.getAttendees(), preEvent.getSuburbId());
+
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra("MyObject", resultEvent);
+
+        setResult(1);
+
+        finish();
 
 
 
