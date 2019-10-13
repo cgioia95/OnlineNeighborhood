@@ -137,28 +137,28 @@ public class MyEvents extends Fragment implements View.OnClickListener {
                                         });
 
                                         // Allows for clicking into an edit/delete screen after long click
-                                        mAdapter.setOnEventLongClickListener(new MyEventAdapter.onEventLongClickListener() {
-                                            @Override
-                                            public void onEventLongClick(int position) {
-
-                                                Event event = mAdapter.getEventList().get(position);
-                                                String hostId = event.getHost().getUid();
-                                                String myId = fireBaseAuth.getCurrentUser().getUid();
-                                                Log.d(TAG, "Long Click");
-
-                                                // Ensures that user is clicking as a host
-                                                if (myId.equals(hostId)) {
-                                                    Log.d(TAG, "Permission Granted");
-
-                                                    Intent intent = new Intent(getActivity(), editDelete.class);
-                                                    intent.putExtra("MyObject", event);
-                                                    intent.putExtra("SUBURB", event.getSuburbId());
-                                                    startActivity(intent);
-                                                } else {
-                                                    Log.d(TAG, "Permission Denied");
-                                                }
-                                            }
-                                        });
+//                                        mAdapter.setOnEventLongClickListener(new MyEventAdapter.onEventLongClickListener() {
+//                                            @Override
+//                                            public void onEventLongClick(int position) {
+//
+//                                                Event event = mAdapter.getEventList().get(position);
+//                                                String hostId = event.getHost().getUid();
+//                                                String myId = fireBaseAuth.getCurrentUser().getUid();
+//                                                Log.d(TAG, "Long Click");
+//
+//                                                // Ensures that user is clicking as a host
+//                                                if (myId.equals(hostId)) {
+//                                                    Log.d(TAG, "Permission Granted");
+//
+//                                                    Intent intent = new Intent(getActivity(), editDelete.class);
+//                                                    intent.putExtra("MyObject", event);
+//                                                    intent.putExtra("SUBURB", event.getSuburbId());
+//                                                    startActivity(intent);
+//                                                } else {
+//                                                    Log.d(TAG, "Permission Denied");
+//                                                }
+//                                            }
+//                                        });
                                     }
                                 }
 

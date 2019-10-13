@@ -463,6 +463,10 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
 
                 for (DataSnapshot eventSnapshot : dataSnapshot.getChildren()) {
 
+                    Log.d(TAG, "DELETING AN EVENT");
+
+                    Log.d(TAG, eventSnapshot.toString());
+
                     String id = eventSnapshot.child("id").getValue().toString();
 
                     if (eventId.equals(id)) {

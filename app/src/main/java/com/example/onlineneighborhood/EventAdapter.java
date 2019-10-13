@@ -34,7 +34,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     private static ArrayList<Event> eventList;
     private static Context mContext;
     private onEventClickListener mListener;
-    private onEventLongClickListener mListener2;
+
+
+//    private onEventLongClickListener mListener2;
 
 
 
@@ -46,9 +48,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     }
 
 
-    public interface onEventLongClickListener {
-        void onEventLongClick(int position);
-    }
+//    public interface onEventLongClickListener {
+//        void onEventLongClick(int position);
+//    }
 
 
 
@@ -57,9 +59,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     }
 
 
-    public void setOnEventLongClickListener(onEventLongClickListener listener) {
-        mListener2 = listener;
-    }
+//    public void setOnEventLongClickListener(onEventLongClickListener listener) {
+//        mListener2 = listener;
+//    }
 
 
     public static class EventViewHolder extends RecyclerView.ViewHolder {
@@ -74,7 +76,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         private DatabaseReference databaseReference;
 
 
-        public EventViewHolder(@NonNull View itemView, final onEventClickListener listener, final  onEventLongClickListener listener2) {
+        public EventViewHolder(@NonNull View itemView, final onEventClickListener listener) {
             super(itemView);
 
             mEvent = itemView.findViewById(R.id.eventName);
@@ -102,23 +104,23 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
             });
 
 
-            itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View view) {
-
-                    if(listener2!=null) {
-                        int position = getAdapterPosition();
-                        Log.d(TAG, "In onclick in eventadapter: position:" + position);
-                        if(position!= RecyclerView.NO_POSITION) {
-                            listener2.onEventLongClick(position);
-                        }
-
-                    }
-
-                    return true;
-
-                }
-            });
+//            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+//                @Override
+//                public boolean onLongClick(View view) {
+//
+//                    if(listener2!=null) {
+//                        int position = getAdapterPosition();
+//                        Log.d(TAG, "In onclick in eventadapter: position:" + position);
+//                        if(position!= RecyclerView.NO_POSITION) {
+//                            listener2.onEventLongClick(position);
+//                        }
+//
+//                    }
+//
+//                    return true;
+//
+//                }
+//            });
 
 
         }
@@ -201,7 +203,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     @Override
     public EventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.event_item, parent, false);
-        EventViewHolder viewholder = new EventViewHolder(v, mListener, mListener2);
+        EventViewHolder viewholder = new EventViewHolder(v, mListener);
         return viewholder;
 
 
