@@ -607,12 +607,16 @@ public class EventScreen extends AppCompatActivity {
 
 
             if (resultCode == 1) {
-                Event resultEvent = (Event) data.getSerializableExtra("MyObject");
 
-                mEventName.setText(resultEvent.getName());
-                mDescription.setText(resultEvent.getDescription());
-                mDate.setText(resultEvent.getDate());
-                mTime.setText(resultEvent.getTime());
+                if(data!=null) {
+                    Event resultEvent = (Event) data.getSerializableExtra("MyObject");
+
+                    mEventName.setText(resultEvent.getName());
+                    mDescription.setText(resultEvent.getDescription());
+                    mDate.setText(resultEvent.getDate());
+                    mTime.setText(resultEvent.getTime());
+                }
+
 
             }
 
