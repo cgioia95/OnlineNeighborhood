@@ -63,16 +63,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     Suburb suburb;
     ArrayList<Event> events;
 
-    String filterType = "NO_FILTER";
+    static String filterType = "NO_FILTER";
 
     DatabaseReference databaseEvents;
     DatabaseReference databaseUsers;
     DatabaseReference databaseSuburb;
 
-    ArrayList<Marker> defaultMarkers;
+    static ArrayList<Marker> defaultMarkers;
 
 
-    Button filterButton, todayFilterButton, dateButton, calenderFilterButton;
+    Button  todayFilterButton, dateButton;
     EditText editTextDays;
 
     Date todayDate;
@@ -81,8 +81,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
 
 
-    HashMap<String, Event> markerToEvent = new HashMap<String, Event>();
-    HashMap<String, Marker> markerIDtoMarker = new HashMap<String, Marker>();
+    static HashMap<String, Event> markerToEvent = new HashMap<String, Event>();
+    static HashMap<String, Marker> markerIDtoMarker = new HashMap<String, Marker>();
 
 
     public MapFragment() {
@@ -154,7 +154,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         dateButton = getView().findViewById(R.id.dateButton);
 
-        calenderFilterButton = getView().findViewById(R.id.calenderFilterButton);
 
 
 
@@ -205,45 +204,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
                 DialogFragment newFragment = new SelectDateFragment();
                 newFragment.show(getFragmentManager(), "DatePicker");
-
-            }
-        });
-
-        calenderFilterButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                if (calenderDate != null){
-
-                    filterType = "CALENDER_FILTER";
-
-                    Log.d("CALENDER FILTER BUTTON", calenderDate.toString());
-
-                    for (Marker marker: defaultMarkers){
-                        marker.setVisible(true);
-                    }
-
-                    for (HashMap.Entry<String,Event> entry : markerToEvent.entrySet()) {
-
-
-                        String stringDate = entry.getValue().getDate();
-
-                        try {
-                            Date testedDate =new SimpleDateFormat("dd/MM/yyyy").parse(stringDate);
-
-                            if (calenderDate.compareTo(testedDate) != 0 ){
-
-                                markerIDtoMarker.get(entry.getKey()).setVisible(false);
-                            }
-
-
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-
-                    }
-
-                }
 
             }
         });
@@ -455,6 +415,38 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
             calenderDate = new Date(year - 1900, month - 1, day);
             Log.d("CALENDER DATE POPULATE" , calenderDate.toString());
+
+            if (calenderDate != null){
+
+                filterType = "CALENDER_FILTER";
+
+                Log.d("CALENDER FILTER BUTTON", calenderDate.toString());
+
+                for (Marker marker: defaultMarkers){
+                    marker.setVisible(true);
+                }
+
+                for (HashMap.Entry<String,Event> entry : markerToEvent.entrySet()) {
+
+
+                    String stringDate = entry.getValue().getDate();
+
+                    try {
+                        Date testedDate =new SimpleDateFormat("dd/MM/yyyy").parse(stringDate);
+
+                        if (calenderDate.compareTo(testedDate) != 0 ){
+
+                            markerIDtoMarker.get(entry.getKey()).setVisible(false);
+                        }
+
+
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+            }
 
             return calenderDate;
         }
