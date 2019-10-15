@@ -2,7 +2,6 @@ package com.example.onlineneighborhood;
 
 import android.content.Context;
 import android.net.Uri;
-import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +24,6 @@ import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
 
@@ -66,10 +64,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
     public static class EventViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView mEvent;
-        public TextView mUserName;
-        public TextView mEventTime;
-        public TextView mEventAddress;
+        public TextView mEvent, mUserName, mEventTime, mEventAddress, mEventAttending;
         public ImageView hostPic;
         private FirebaseStorage storage;
         private StorageReference storageReference;
@@ -83,6 +78,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
             mUserName = itemView.findViewById(R.id.userName);
             mEventTime = itemView.findViewById(R.id.eventTime);
             mEventAddress = itemView.findViewById(R.id.eventAddress);
+            mEventAttending = itemView.findViewById(R.id.eventAttending);
             hostPic = itemView.findViewById(R.id.imageView);
             storage = FirebaseStorage.getInstance();
             databaseReference = FirebaseDatabase.getInstance().getReference("Users");
@@ -221,11 +217,11 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
         holder.mEventTime.setText(currentItem.getTime());
         holder.mEventAddress.setText(currentItem.getAddress());
+
+        //Get number of attendees
+        String size = "" +  currentItem.getAttendees().size();
+        holder.mEventAttending.setText(size);
         holder.downloadImage(currentItem.getHost().getUid());
-
-
-
-        Log.d(TAG, "onBindViewHolder: " + currentItem.getHost());
 
     }
 
