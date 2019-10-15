@@ -9,23 +9,24 @@
     android:orientation="vertical"
     android:layout_height="wrap_content"
     tools:context=".createEvent"
-    android:layout_margin="10dp">
+    android:layout_margin="12dp">
 
     <TextView
         android:id="@+id/eventHead"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:fontFamily="sans-serif-condensed-medium"
+        android:layout_marginBottom="12dp"
         android:text="@string/create_an_event"
         android:textAlignment="center"
-        android:textSize="22sp" />
+        android:textSize="22sp"
+        android:textColor="@color/colorPrimary"/>
 
     <EditText
         android:id="@+id/eventName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
+        android:background="@drawable/rounded_gray_border"
         android:ems="10"
         android:hint="@string/event_name"
         android:importantForAutofill="no"
@@ -36,6 +37,7 @@
         android:id="@+id/eventDesc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/rounded_gray_border"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         android:autofillHints="@string/description"

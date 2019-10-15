@@ -12,6 +12,7 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.PorterDuff;
 import android.icu.util.Calendar;
 import android.location.Address;
 import android.location.Geocoder;
@@ -98,6 +99,10 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     protected void onStart() {
 
         super.onStart();
+
+        //Set spinner to blue color
+        eventType.getBackground().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_ATOP);
+
         databaseUsers.child(firebaseAuth.getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
