@@ -33,37 +33,18 @@ public class MyEventAdapter extends RecyclerView.Adapter<MyEventAdapter.EventVie
     private static Context mContext;
     private onEventClickListener mListener;
 
-//    private onEventLongClickListener mListener2;
-
-
-
     public interface onEventClickListener {
         void onEventClick(int position);
     }
-
-
-//    public interface onEventLongClickListener {
-//        void onEventLongClick(int position);
-//    }
-
-
 
     public void setOnEventClickListener(onEventClickListener listener) {
         mListener = listener;
     }
 
 
-//    public void setOnEventLongClickListener(onEventLongClickListener listener) {
-//        mListener2 = listener;
-//    }
-
-
     public static class EventViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView mEvent;
-        public TextView mUserName;
-        public TextView mEventTime;
-        public TextView mEventAddress;
+        public TextView mEvent, mEventAttending, mUserName, mEventAddress, mEventTime;
         public ImageView hostPic;
         private FirebaseStorage storage;
         private StorageReference storageReference;
@@ -77,6 +58,7 @@ public class MyEventAdapter extends RecyclerView.Adapter<MyEventAdapter.EventVie
             mUserName = itemView.findViewById(R.id.userName);
             mEventTime = itemView.findViewById(R.id.eventTime);
             mEventAddress = itemView.findViewById(R.id.eventAddress);
+            mEventAttending = itemView.findViewById(R.id.eventAttending);
             hostPic = itemView.findViewById(R.id.imageView);
             storage = FirebaseStorage.getInstance();
             databaseReference = FirebaseDatabase.getInstance().getReference("Users");
@@ -97,43 +79,17 @@ public class MyEventAdapter extends RecyclerView.Adapter<MyEventAdapter.EventVie
                 }
             });
 
-
-//            itemView.setOnLongClickListener(new View.OnLongClickListener() {
-//                @Override
-//                public boolean onLongClick(View view) {
-//
-//                    if(listener2!=null) {
-//                        int position = getAdapterPosition();
-//                        Log.d(TAG, "In onclick in eventadapter: position:" + position);
-//                        if(position!= RecyclerView.NO_POSITION) {
-//                            listener2.onEventLongClick(position);
-//                        }
-//
-//                    }
-//
-//                    return true;
-//
-//                }
-//            });
-
-
         }
 
         private void getUsername(String uid){
             databaseReference.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    Log.d("On DATA CHANGE ", "IN");
-                    Log.d("On DATA CHANGE", "Snapshot" + dataSnapshot);
                     if (dataSnapshot.getValue() != null) {
                         String name = dataSnapshot.child("name").getValue().toString();
-
                         mUserName.setText(name);
-
                     }
-
                 }
-
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
                 }
@@ -147,12 +103,8 @@ public class MyEventAdapter extends RecyclerView.Adapter<MyEventAdapter.EventVie
             storageReference.child("profilePics/" + uid).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
                 public void onSuccess(Uri uri) {
-                    // Got the download URL for 'users/me/profile.png' in uri
-                    Log.d(TAG, "DOWNLOAD URL: " + uri.toString());
                     Picasso.get().load(uri).into(hostPic);
                     return;
-
-
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -166,31 +118,20 @@ public class MyEventAdapter extends RecyclerView.Adapter<MyEventAdapter.EventVie
                             Log.d(TAG, "DOWNLOAD URL: " + uri.toString());
                             Picasso.get().load(uri).into(hostPic);
                             return;
-
-
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception exception) {
                             // Handle any errors
                             Log.d(TAG, "DOWNLOAD URL: FAILURE");
-
                         }
                     });
-
                 }
             });
-
-
-
-
         }
     }
 
-
-
     public MyEventAdapter(Context context) {
-        //this.eventList = eventList;
         this.mContext = context;
         this.eventList =  new ArrayList<Event>();
     }
@@ -202,28 +143,20 @@ public class MyEventAdapter extends RecyclerView.Adapter<MyEventAdapter.EventVie
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.event_item, parent, false);
         EventViewHolder viewholder = new EventViewHolder(v, mListener);
         return viewholder;
-
-
     }
 
     @Override
     public void onBindViewHolder(@NonNull EventViewHolder holder, int position) {
         Event currentItem = eventList.get(position);
-
-        Log.d(TAG, "user id " + currentItem.getHost().getUid());
         holder.mEvent.setText(currentItem.getName());
-        //TODO: get the name of the hostID - DONE
         holder.getUsername(currentItem.getHost().getUid());
-
         holder.mEventTime.setText(currentItem.getTime());
         holder.mEventAddress.setText(currentItem.getAddress());
         holder.downloadImage(currentItem.getHost().getUid());
 
-
-
-        Log.d(TAG, "onBindViewHolder: " + currentItem.getHost());
-
-
+        //Get number of attendees
+        String size = "" +  currentItem.getAttendees().size();
+        holder.mEventAttending.setText(size);
     }
 
     public void addDataAndUpdate(Event e){
