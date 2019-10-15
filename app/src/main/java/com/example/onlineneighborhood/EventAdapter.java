@@ -30,6 +30,8 @@ import java.util.Locale;
 import java.util.Calendar;
 import android.icu.text.SimpleDateFormat;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
 
     private static final String TAG = "Event Adapter";
@@ -70,7 +72,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     public static class EventViewHolder extends RecyclerView.ViewHolder {
 
         public TextView mEvent, mUserName, mEventTime, mEventAddress, mEventAttending, mEventDate;
-        public ImageView hostPic;
+        public CircleImageView hostPic;
         private FirebaseStorage storage;
         private StorageReference storageReference;
         private DatabaseReference databaseReference;

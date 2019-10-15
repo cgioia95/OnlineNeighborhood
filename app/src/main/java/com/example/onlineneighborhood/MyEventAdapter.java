@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class MyEventAdapter extends RecyclerView.Adapter<MyEventAdapter.EventViewHolder> {
 
     private static final String TAG = "Event Adapter";
@@ -49,7 +51,7 @@ public class MyEventAdapter extends RecyclerView.Adapter<MyEventAdapter.EventVie
     public static class EventViewHolder extends RecyclerView.ViewHolder {
 
         public TextView mEvent, mEventAttending, mUserName, mEventAddress, mEventTime, mEventDate;
-        public ImageView hostPic;
+        public CircleImageView hostPic;
         private FirebaseStorage storage;
         private StorageReference storageReference;
         private DatabaseReference databaseReference;

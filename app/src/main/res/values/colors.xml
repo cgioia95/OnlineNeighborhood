@@ -4,6 +4,7 @@
     <color name="textPrimary">#424242</color>
     <color name="textSecondary">#A1A1AC</color>
     <color name="white">#ffff</color>
+    <color name="textAccent">#FC7688</color>
     <color name="colorAccent">#7E8CFF</color> <!-- old: #a393eb-->
     <color name="attendBtn">#55ebbe</color>
     <color name="deleteBtn">#FF6557</color>
