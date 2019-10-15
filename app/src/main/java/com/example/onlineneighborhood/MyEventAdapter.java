@@ -1,6 +1,7 @@
 package com.example.onlineneighborhood;
 
 import android.content.Context;
+import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,7 +24,10 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public class MyEventAdapter extends RecyclerView.Adapter<MyEventAdapter.EventViewHolder> {
 
@@ -44,7 +48,7 @@ public class MyEventAdapter extends RecyclerView.Adapter<MyEventAdapter.EventVie
 
     public static class EventViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView mEvent, mEventAttending, mUserName, mEventAddress, mEventTime;
+        public TextView mEvent, mEventAttending, mUserName, mEventAddress, mEventTime, mEventDate;
         public ImageView hostPic;
         private FirebaseStorage storage;
         private StorageReference storageReference;
@@ -57,6 +61,7 @@ public class MyEventAdapter extends RecyclerView.Adapter<MyEventAdapter.EventVie
             mEvent = itemView.findViewById(R.id.eventName);
             mUserName = itemView.findViewById(R.id.userName);
             mEventTime = itemView.findViewById(R.id.eventTime);
+            mEventDate= itemView.findViewById(R.id.eventTime);
             mEventAddress = itemView.findViewById(R.id.eventAddress);
             mEventAttending = itemView.findViewById(R.id.eventAttending);
             hostPic = itemView.findViewById(R.id.imageView);
@@ -153,6 +158,20 @@ public class MyEventAdapter extends RecyclerView.Adapter<MyEventAdapter.EventVie
         holder.mEventTime.setText(currentItem.getTime());
         holder.mEventAddress.setText(currentItem.getAddress());
         holder.downloadImage(currentItem.getHost().getUid());
+
+        //Change the date format to display the date and day of the week
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = null;
+        try {
+            date = sdf.parse(currentItem.getDate());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        sdf.applyPattern("EEE d MMM"); //new cal pattern
+        String newDate = sdf.format(date);
+        holder.mEventDate.setText(newDate);
 
         //Get number of attendees
         String size = "" +  currentItem.getAttendees().size();

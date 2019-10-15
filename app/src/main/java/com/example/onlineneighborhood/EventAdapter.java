@@ -69,7 +69,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
     public static class EventViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView mEvent, mUserName, mEventTime, mEventAddress, mEventAttending;
+        public TextView mEvent, mUserName, mEventTime, mEventAddress, mEventAttending, mEventDate;
         public ImageView hostPic;
         private FirebaseStorage storage;
         private StorageReference storageReference;
@@ -82,6 +82,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
             mEvent = itemView.findViewById(R.id.eventName);
             mUserName = itemView.findViewById(R.id.userName);
             mEventTime = itemView.findViewById(R.id.eventTime);
+            mEventDate = itemView.findViewById(R.id.eventDate);
             mEventAddress = itemView.findViewById(R.id.eventAddress);
             mEventAttending = itemView.findViewById(R.id.eventAttending);
             hostPic = itemView.findViewById(R.id.imageView);
@@ -219,12 +220,11 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         holder.mEvent.setText(currentItem.getName());
         //TODO: get the name of the hostID - DONE
         holder.getUsername(currentItem.getHost().getUid());
-
         holder.mEventTime.setText(currentItem.getTime());
-
-        Log.d(TAG, "onBindViewHolder: time" + currentItem.getDate());
         holder.mEventAddress.setText(currentItem.getAddress());
 
+
+        //Change the date format to display the date and day of the week
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         Date date = null;
         try {
@@ -234,22 +234,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         }
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
-        Log.d(TAG, "onBindViewHolder: newDate" + date);
-
-        sdf.applyPattern("EEE d MMM");
-        String sMyDate = sdf.format(date);
-
-        int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-
-        Log.d(TAG, "onBindViewHolder: dayOfWeek" + dayOfWeek);
-        Log.d(TAG, "onBindViewHolder: sMyDate" + sMyDate);
-/*
-        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);
-        try {
-            cal.setTime(sdf.parse("Mon Mar 14 16:02:37 GMT 2011"));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }*/
+        sdf.applyPattern("EEE d MMM"); //new cal pattern
+        String newDate = sdf.format(date);
+        holder.mEventDate.setText(newDate);
 
         //Get number of attendees
         String size = "" +  currentItem.getAttendees().size();
