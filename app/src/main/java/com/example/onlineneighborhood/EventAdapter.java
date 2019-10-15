@@ -23,7 +23,12 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Calendar;
+import android.icu.text.SimpleDateFormat;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
 
@@ -216,7 +221,35 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         holder.getUsername(currentItem.getHost().getUid());
 
         holder.mEventTime.setText(currentItem.getTime());
+
+        Log.d(TAG, "onBindViewHolder: time" + currentItem.getDate());
         holder.mEventAddress.setText(currentItem.getAddress());
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = null;
+        try {
+            date = sdf.parse(currentItem.getDate());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        Log.d(TAG, "onBindViewHolder: newDate" + date);
+
+        sdf.applyPattern("EEE d MMM");
+        String sMyDate = sdf.format(date);
+
+        int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+
+        Log.d(TAG, "onBindViewHolder: dayOfWeek" + dayOfWeek);
+        Log.d(TAG, "onBindViewHolder: sMyDate" + sMyDate);
+/*
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);
+        try {
+            cal.setTime(sdf.parse("Mon Mar 14 16:02:37 GMT 2011"));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }*/
 
         //Get number of attendees
         String size = "" +  currentItem.getAttendees().size();
