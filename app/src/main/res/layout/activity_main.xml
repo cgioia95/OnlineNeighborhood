@@ -101,9 +101,8 @@
         android:layout_marginLeft="20dp"
         android:layout_marginTop="200dp"
         android:layout_marginRight="20dp"
-        android:text="TextView"
-        android:textColor="#130E0E"
-        tools:text="New To-Gathering? Sign Up below!" />
+        android:text="New To-Gathering? Sign Up below!"
+        android:textColor="#130E0E" />
 
     <Button
         android:id="@+id/registerBtn"

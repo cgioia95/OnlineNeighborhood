@@ -248,7 +248,10 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
         if(item.getItemId() == R.id.logout){
 
             fireBaseAuth.signOut();
-            startActivity(new Intent(getApplicationContext(), Login.class));
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
         }
 
         if(item.getItemId() == R.id.edit){
