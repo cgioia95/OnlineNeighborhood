@@ -28,6 +28,12 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.onlineneighborhood.BottomNavigationActivity;
+import com.example.onlineneighborhood.Event;
+import com.example.onlineneighborhood.EventAdapter;
+import com.example.onlineneighborhood.Login;
+import com.example.onlineneighborhood.R;
+import com.example.onlineneighborhood.createEvent;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -47,14 +53,15 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
     TextView suburbTextView;
 
 
-    private ImageView addEvent, dateFilter, typeFilter;
-    private String suburb;
+    ImageView  addEvent, dateFilter, typeFilter;
+    Button filterButton, clearFilter;
+    String suburb;
+    static String date, type;
     private Callbacks mCallbacks;
     private static final String TAG = "HomeScreen";
     static Date calenderDate;
     private Suburb currentSuburb;
-    private static String type;
-    private Button applyFilterButton, clearFilter;
+    private Button applyFilterButton;
 
     private FirebaseAuth fireBaseAuth;
     DatabaseReference databaseEvents;
@@ -134,7 +141,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
                 }
 
                 if(mAdapter!=null) {
-                    mAdapter.setOnEventLongClickListener(new EventAdapter.onEventLongClickListener() {
+/*                    mAdapter.setOnEventLongClickListener(new EventAdapter.onEventLongClickListener() {
                         @Override
                         public void onEventLongClick(int position) {
 
@@ -163,7 +170,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
 
                         }
                     });
-
+*/
                     mAdapter.setOnEventClickListener(new EventAdapter.onEventClickListener() {
                         @Override
                         public void onEventClick(int position) {

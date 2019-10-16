@@ -2,7 +2,6 @@ package com.example.onlineneighborhood;
 
 import android.content.Context;
 import android.net.Uri;
-import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,8 +23,14 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Calendar;
+import android.icu.text.SimpleDateFormat;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
 
@@ -34,7 +39,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     private static ArrayList<Event> eventList;
     private static Context mContext;
     private onEventClickListener mListener;
-    private onEventLongClickListener mListener2;
+
+
+//    private onEventLongClickListener mListener2;
 
 
 
@@ -46,9 +53,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     }
 
 
-    public interface onEventLongClickListener {
-        void onEventLongClick(int position);
-    }
+//    public interface onEventLongClickListener {
+//        void onEventLongClick(int position);
+//    }
 
 
 
@@ -57,30 +64,29 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     }
 
 
-    public void setOnEventLongClickListener(onEventLongClickListener listener) {
-        mListener2 = listener;
-    }
+//    public void setOnEventLongClickListener(onEventLongClickListener listener) {
+//        mListener2 = listener;
+//    }
 
 
     public static class EventViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView mEvent;
-        public TextView mUserName;
-        public TextView mEventTime;
-        public TextView mEventAddress;
-        public ImageView hostPic;
+        public TextView mEvent, mUserName, mEventTime, mEventAddress, mEventAttending, mEventDate;
+        public CircleImageView hostPic;
         private FirebaseStorage storage;
         private StorageReference storageReference;
         private DatabaseReference databaseReference;
 
 
-        public EventViewHolder(@NonNull View itemView, final onEventClickListener listener, final  onEventLongClickListener listener2) {
+        public EventViewHolder(@NonNull View itemView, final onEventClickListener listener) {
             super(itemView);
 
             mEvent = itemView.findViewById(R.id.eventName);
             mUserName = itemView.findViewById(R.id.userName);
             mEventTime = itemView.findViewById(R.id.eventTime);
+            mEventDate = itemView.findViewById(R.id.eventDate);
             mEventAddress = itemView.findViewById(R.id.eventAddress);
+            mEventAttending = itemView.findViewById(R.id.eventAttending);
             hostPic = itemView.findViewById(R.id.imageView);
             storage = FirebaseStorage.getInstance();
             databaseReference = FirebaseDatabase.getInstance().getReference("Users");
@@ -102,23 +108,23 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
             });
 
 
-            itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View view) {
-
-                    if(listener2!=null) {
-                        int position = getAdapterPosition();
-                        Log.d(TAG, "In onclick in eventadapter: position:" + position);
-                        if(position!= RecyclerView.NO_POSITION) {
-                            listener2.onEventLongClick(position);
-                        }
-
-                    }
-
-                    return true;
-
-                }
-            });
+//            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+//                @Override
+//                public boolean onLongClick(View view) {
+//
+//                    if(listener2!=null) {
+//                        int position = getAdapterPosition();
+//                        Log.d(TAG, "In onclick in eventadapter: position:" + position);
+//                        if(position!= RecyclerView.NO_POSITION) {
+//                            listener2.onEventLongClick(position);
+//                        }
+//
+//                    }
+//
+//                    return true;
+//
+//                }
+//            });
 
 
         }
@@ -201,7 +207,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     @Override
     public EventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.event_item, parent, false);
-        EventViewHolder viewholder = new EventViewHolder(v, mListener, mListener2);
+        EventViewHolder viewholder = new EventViewHolder(v, mListener);
         return viewholder;
 
 
@@ -216,14 +222,28 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         holder.mEvent.setText(currentItem.getName());
         //TODO: get the name of the hostID - DONE
         holder.getUsername(currentItem.getHost().getUid());
-
         holder.mEventTime.setText(currentItem.getTime());
         holder.mEventAddress.setText(currentItem.getAddress());
+
+
+        //Change the date format to display the date and day of the week
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = null;
+        try {
+            date = sdf.parse(currentItem.getDate());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        sdf.applyPattern("EEE d MMM"); //new cal pattern
+        String newDate = sdf.format(date);
+        holder.mEventDate.setText(newDate);
+
+        //Get number of attendees
+        String size = "" +  currentItem.getAttendees().size();
+        holder.mEventAttending.setText(size);
         holder.downloadImage(currentItem.getHost().getUid());
-
-
-
-        Log.d(TAG, "onBindViewHolder: " + currentItem.getHost());
 
     }
 

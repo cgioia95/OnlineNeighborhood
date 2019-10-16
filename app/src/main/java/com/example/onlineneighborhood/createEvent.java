@@ -26,6 +26,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
@@ -44,7 +45,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -72,7 +72,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     DatabaseReference databaseSuburb;
 
     //location variables
-    private final String DEFAULT_LOCAL = "please wait a few seconds while we get your location";
+    private final String DEFAULT_LOCAL = "Please wait a few seconds while we get your location";
     private String locat = DEFAULT_LOCAL;
     Button getLocation, createEvent;
 
@@ -86,7 +86,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     static int year, day, month;
     static int hour, minute;
     private static boolean startAndEnd;
-    private Spinner eventType;
+    private Spinner eventTypeSpinner;
     CheckBox addCal;
     ArrayList<UserInformation> users;
 
@@ -98,6 +98,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     protected void onStart() {
 
         super.onStart();
+
         databaseUsers.child(firebaseAuth.getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -160,7 +161,9 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         int width = dm.widthPixels;
         int height = dm.heightPixels;
 
-        getWindow().setLayout((int)(width*.85), (int)(height*.85));
+
+        //change this to 0.85 for example to lessen the size of the screen
+        getWindow().setLayout((int)(width*1), (int)(height*1));
 
         // Bind Simple Variables
         users = new ArrayList<UserInformation>();
@@ -175,7 +178,18 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         evEndTime = findViewById(R.id.endTime);
         evAddress = findViewById(R.id.eventAddress);
         addCal = findViewById(R.id.addCal);
-        eventType = (Spinner) findViewById(R.id.spinnerType);
+
+        //Setting up the spinner with different types of event
+        eventTypeSpinner = (Spinner) findViewById(R.id.spinnerEventType);
+        String[] spinner_array = getApplicationContext().getResources().getStringArray(R.array.eventTypes);
+
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(
+                this,R.layout.spinner_item,spinner_array
+        );
+        spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item);
+        eventTypeSpinner.setAdapter(spinnerArrayAdapter);
+
+
 
         // Bind On clicks
         getLocation.setOnClickListener(this);
@@ -251,6 +265,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         eventTv.setText(locat);
 
 
+
     }
 
 
@@ -258,7 +273,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     @Override
     public void onClick(View view) {
         if(view == getLocation){
-            eventTv.setText(locat);
+            evAddress.setText(locat);
             //if this is true then location services has been requested and we are allowed to use it
             clicked = true;
         }
@@ -332,7 +347,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         String eventDate = evDate.getText().toString().trim();
         String endTime = evEndTime.getText().toString().trim();
         String endDate = evEndDate.getText().toString().trim();
-        final String type = eventType.getSelectedItem().toString();
+        final String type = eventTypeSpinner.getSelectedItem().toString();
 
         Log.d("EVENTCREATE", "CREATING EVENT");
 
@@ -348,11 +363,10 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
             if (firebaseAuth.getCurrentUser() == null){
                 Toast.makeText(this, "you are not logged in", Toast.LENGTH_LONG).show();
                 finish();
-                startActivity(new Intent(getApplicationContext(), Login.class));
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
             }
 
             //this is just doing a couple of checks to ensure that a address is *actually* sent to firebase
-            //TODO: this needs to be cleaned up/properly checked
             if(!TextUtils.isEmpty(eventAddress)){
                 String addressStatus = validate(eventAddress);
 

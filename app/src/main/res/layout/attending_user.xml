@@ -20,6 +20,7 @@
             android:layout_below="@id/imageViewU"
             android:text="UserName"
             android:layout_centerHorizontal="true"
+            android:textColor="@color/textSecondary"
             android:textSize="14sp"
             android:maxLines="1"
             android:ellipsize="end"

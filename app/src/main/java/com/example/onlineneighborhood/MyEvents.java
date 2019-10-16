@@ -2,6 +2,7 @@ package com.example.onlineneighborhood;
 
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -39,16 +41,24 @@ public class MyEvents extends Fragment implements View.OnClickListener {
     private ArrayList<Event> userMyEvents = new ArrayList<>();
     private ArrayList<Event> userMyEventsAttending = new ArrayList<>();
 
-    // Setting up recycler-view and adapter for displaying events
+    // Variables recycler-view and adapter for displaying events
     private RecyclerView mRecyclerView;
     private MyEventAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
-    Button attending;
-    Button hosting;
+    TextView attending, hosting;
 
     public MyEvents() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // Retrieve 'hosting' list and display it on default
+        getDataHost();
+
     }
 
     @Override
@@ -80,8 +90,6 @@ public class MyEvents extends Fragment implements View.OnClickListener {
         userID = fireBaseAuth.getCurrentUser().getUid();
         databaseUserReference = FirebaseDatabase.getInstance().getReference("Users").child(userID);
 
-        // Retrieve 'hosting' list and display it on default
-        getDataHost();
     }
 
     public void getDataHost() {
@@ -135,30 +143,6 @@ public class MyEvents extends Fragment implements View.OnClickListener {
 
 
                                         });
-
-                                        // Allows for clicking into an edit/delete screen after long click
-                                        mAdapter.setOnEventLongClickListener(new MyEventAdapter.onEventLongClickListener() {
-                                            @Override
-                                            public void onEventLongClick(int position) {
-
-                                                Event event = mAdapter.getEventList().get(position);
-                                                String hostId = event.getHost().getUid();
-                                                String myId = fireBaseAuth.getCurrentUser().getUid();
-                                                Log.d(TAG, "Long Click");
-
-                                                // Ensures that user is clicking as a host
-                                                if (myId.equals(hostId)) {
-                                                    Log.d(TAG, "Permission Granted");
-
-                                                    Intent intent = new Intent(getActivity(), editDelete.class);
-                                                    intent.putExtra("MyObject", event);
-                                                    intent.putExtra("SUBURB", event.getSuburbId());
-                                                    startActivity(intent);
-                                                } else {
-                                                    Log.d(TAG, "Permission Denied");
-                                                }
-                                            }
-                                        });
                                     }
                                 }
 
@@ -182,16 +166,13 @@ public class MyEvents extends Fragment implements View.OnClickListener {
 
     public void getAttendingData() {
 
-        mAdapter.clearData();
-
         databaseUserReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                mAdapter.clearData();
 
-                //TODO: see if these are needed /Emma
+                mAdapter.clearData();
                 userMyEvents.clear();
-                userMyEventsAttending.clear();
+                userMyEventsAttending.clear();;
 
                 UserInformation user = dataSnapshot.getValue(UserInformation.class);
 
@@ -260,17 +241,21 @@ public class MyEvents extends Fragment implements View.OnClickListener {
         });
     }
 
+    //Buttons to switch between viewing hostdata and attending data
     @Override
     public void onClick(View v) {
 
         switch (v.getId()) {
-
             case R.id.my_events_attending_button:
                 getAttendingData();
+                attending.setTextColor(getResources().getColor(R.color.white));
+                hosting.setTextColor(getResources().getColor(R.color.offWhite));
                 break;
 
             case R.id.my_events_hosting_button:
                 getDataHost();
+                attending.setTextColor(getResources().getColor(R.color.offWhite));
+                hosting.setTextColor(getResources().getColor(R.color.white));
                 break;
 
             default:

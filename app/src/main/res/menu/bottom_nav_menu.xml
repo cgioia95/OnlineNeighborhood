@@ -5,7 +5,7 @@
         android:id="@+id/navigation_home"
         android:icon="@drawable/ic_home_black_24dp"
         android:title="Home"
-        android:iconTint="@color/colorPrimaryLight"
+
         />
 
 
@@ -13,12 +13,12 @@
         android:id="@+id/navigation_map"
         android:icon="@drawable/ic_dashboard_black_24dp"
         android:title="Maps"
-        android:iconTint="@color/colorPrimaryLight"/>
+   />
 
     <item
         android:id="@+id/navigation_events"
         android:icon="@drawable/places_ic_search"
         android:title="My Events"
-        android:iconTint="@color/colorPrimaryLight"/>
+        />
 
 </menu>

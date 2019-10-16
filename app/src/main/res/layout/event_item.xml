@@ -14,49 +14,78 @@
         android:layout_margin="10dp"
         >
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/imageView"
-            android:layout_width="54dp"
-            android:layout_height="54dp"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
             android:layout_centerVertical="true"
-            android:layout_marginRight="24dp"/>
+            android:layout_marginRight="18dp"/>
 
         <TextView
             android:id="@+id/eventName"
+            android:textColor="#504E62"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_toEndOf="@id/imageView"
+            android:layout_below="@id/eventTime"
+            android:text="EventName"
+            android:textSize="18sp"
+            android:maxLines="1"
+            android:ellipsize="end"
+             />
+
+        <TextView
+            android:id="@+id/eventDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toEndOf="@id/imageView"
-            android:text="EventName"
-            android:textSize="18sp"
-             />
+            android:text="Fri 18 Oct"
+            android:textColor="@color/textAccent"
+            android:textStyle="bold"
+            android:textSize="10sp"
+            />
+
+        <TextView
+            android:id="@+id/dot"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="5dp"
+            android:layout_toRightOf="@id/eventDate"
+            android:text="•"
+            android:textColor="@color/textAccent"
+            android:textSize="10sp"
+            />
 
         <TextView
             android:id="@+id/eventTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
+           android:layout_toRightOf="@id/dot"
             android:text="EventTime"
+            android:textColor="@color/textAccent"
+            android:textStyle="bold"
             android:textSize="10sp"
             />
 
         <TextView
             android:id="@+id/userName"
-            android:layout_marginTop="2dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/eventName"
             android:textSize="12sp"
             android:layout_toEndOf="@id/imageView"
+            android:textColor="@color/textSecondary"
             android:text="UserName" />
 
         <TextView
             android:id="@+id/eventAddress"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="10dp"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_below="@id/userName"
             android:layout_gravity="center"
             android:layout_alignStart="@id/userName"
+             android:textColor="@color/textSecondary"
             android:drawableLeft="@drawable/location_icon_18dp"
             android:drawablePadding="4dip"
             android:text="216 Kerr Street"
@@ -70,8 +99,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/eventAddress"
+             android:textColor="@color/textSecondary"
             android:layout_gravity="center"
-            android:layout_toLeftOf="@id/eventTime"
+            android:layout_toRightOf="@id/eventAddress"
             android:drawableLeft="@drawable/attending_icon_18dp"
             android:drawablePadding="4dip"
             android:text="2"
