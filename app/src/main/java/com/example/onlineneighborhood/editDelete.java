@@ -26,6 +26,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
@@ -59,7 +60,7 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
     EditText evName, evDesc, evAddress;
     private TextView eventTv;
     static TextView evTime, evDate, evEndTime, evEndDate;
-    private Spinner eventType;
+    private Spinner eventTypeSpinner;
     Button btnGetLocation, editBtn, deleteBtn;
 
     public String eventId;
@@ -167,16 +168,6 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
 
 
 
-        //Metrics of the popup window. Currently setting it to 90% of screen width and height
-        DisplayMetrics dm = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(dm);
-
-        int width = dm.widthPixels;
-        int height = dm.heightPixels;
-
-        getWindow().setLayout((int)(width*.9), (int)(height*.9));
-
-
         btnGetLocation =findViewById(R.id.btnGetLocation);
         editBtn = findViewById(R.id.editBtn);
         deleteBtn = findViewById(R.id.deleteBtn);
@@ -189,8 +180,18 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
         evDate = findViewById(R.id.eventDate);
         evEndTime = findViewById(R.id.endTime);
         evEndDate = findViewById(R.id.endDate);
-        eventType = findViewById(R.id.spinnerEventType);
+        eventTypeSpinner = findViewById(R.id.spinnerEventType);
         addCal = findViewById(R.id.addCal);
+
+        //Setting up the spinner with different types of event
+        eventTypeSpinner = (Spinner) findViewById(R.id.spinnerEventType);
+        String[] spinner_array = getApplicationContext().getResources().getStringArray(R.array.eventTypes);
+
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(
+                this,R.layout.spinner_item,spinner_array
+        );
+        spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item);
+        eventTypeSpinner.setAdapter(spinnerArrayAdapter);
 
 
 
@@ -225,7 +226,7 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
         evName.setText(preName);
         evDesc.setText(preDescription);
         eventTv.setText(preAddress);
-        eventType.setSelection(Arrays.asList(getResources().getStringArray(R.array.eventTypes)).indexOf(preType));
+        eventTypeSpinner.setSelection(Arrays.asList(getResources().getStringArray(R.array.eventTypes)).indexOf(preType));
         evTime.setText(preStartTime);
         evDate.setText(preStartDate);
         evEndTime.setText(preEndTime);
@@ -238,7 +239,6 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
         evEndDate.setOnClickListener(this);
         btnGetLocation.setOnClickListener(this);
         editBtn.setOnClickListener(this);
-        deleteBtn.setOnClickListener(this);
 
         // Setup the Location Manager and Listener
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -388,7 +388,7 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
         String eventDate = evDate.getText().toString().trim();
         String endTime = evEndTime.getText().toString().trim();
         String endDate = evEndDate.getText().toString().trim();
-        final String type = eventType.getSelectedItem().toString();
+        final String type = eventTypeSpinner.getSelectedItem().toString();
 
         String eventAddress = evAddress.getText().toString().trim();
 

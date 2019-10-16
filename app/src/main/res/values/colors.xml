@@ -7,6 +7,6 @@
     <color name="white">#ffff</color>
     <color name="textAccent">#FC7688</color>
     <color name="colorAccent">#FC7688</color> <!-- old: #a393eb-->
-    <color name="attendBtn">#55ebbe</color>
+    <color name="attendBtn">#4BDDB1</color>
     <color name="deleteBtn">#FF6557</color>
 </resources>
