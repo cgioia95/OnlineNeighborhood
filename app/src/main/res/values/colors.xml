@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#7886F5</color>  <!-- TODO: try this: #52556B -->
+    <color name="colorPrimary">#606685</color>  <!-- TODO: try this: #52556B -->
     <color name="textPrimary">#424242</color>
     <color name="textSecondary">#A1A1AC</color>
+    <color name="lightGray">#BFC1C9</color>
     <color name="white">#ffff</color>
     <color name="textAccent">#FC7688</color>
-    <color name="colorAccent">#FF7184</color> <!-- old: #a393eb-->
+    <color name="colorAccent">#FC7688</color> <!-- old: #a393eb-->
     <color name="attendBtn">#55ebbe</color>
     <color name="deleteBtn">#FF6557</color>
 </resources>
