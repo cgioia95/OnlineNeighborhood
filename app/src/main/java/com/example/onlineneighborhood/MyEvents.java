@@ -2,6 +2,7 @@ package com.example.onlineneighborhood;
 
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -44,8 +46,7 @@ public class MyEvents extends Fragment implements View.OnClickListener {
     private MyEventAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
-    Button attending;
-    Button hosting;
+    TextView attending, hosting;
 
     public MyEvents() {
         // Required empty public constructor
@@ -247,10 +248,14 @@ public class MyEvents extends Fragment implements View.OnClickListener {
         switch (v.getId()) {
             case R.id.my_events_attending_button:
                 getAttendingData();
+                attending.setTextColor(getResources().getColor(R.color.white));
+                hosting.setTextColor(getResources().getColor(R.color.offWhite));
                 break;
 
             case R.id.my_events_hosting_button:
                 getDataHost();
+                attending.setTextColor(getResources().getColor(R.color.offWhite));
+                hosting.setTextColor(getResources().getColor(R.color.white));
                 break;
 
             default:

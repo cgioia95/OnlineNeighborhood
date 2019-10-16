@@ -5,6 +5,7 @@
     <color name="textSecondary">#A1A1AC</color>
     <color name="lightGray">#BFC1C9</color>
     <color name="white">#ffff</color>
+    <color name="offWhite">#B0B3C5</color>
     <color name="textAccent">#FC7688</color>
     <color name="colorAccent">#FC7688</color> <!-- old: #a393eb-->
     <color name="attendBtn">#4BDDB1</color>

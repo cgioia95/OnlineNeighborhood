@@ -15,18 +15,24 @@
         android:orientation="horizontal"
         android:weightSum="2">
 
-        <Button
+        <TextView
             android:id="@+id/my_events_hosting_button"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:layout_height="40dp"
             android:layout_weight="1"
+            android:gravity="center"
+            android:background="@color/colorPrimary"
             android:text="@string/my_events_hosting" />
 
-        <Button
+        <TextView
             android:id="@+id/my_events_attending_button"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:textColor="@color/offWhite"
+            android:layout_height="40dp"
             android:layout_weight="1"
+            android:background="@color/colorPrimary"
+            android:gravity="center"
             android:text="@string/my_events_attending" />
 
     </LinearLayout>
