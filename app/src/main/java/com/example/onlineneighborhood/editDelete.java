@@ -42,8 +42,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import org.w3c.dom.Text;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -191,7 +189,7 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
         evDate = findViewById(R.id.eventDate);
         evEndTime = findViewById(R.id.endTime);
         evEndDate = findViewById(R.id.endDate);
-        eventType = findViewById(R.id.spinnerType);
+        eventType = findViewById(R.id.spinnerEventType);
         addCal = findViewById(R.id.addCal);
 
 

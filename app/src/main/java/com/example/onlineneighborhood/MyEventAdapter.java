@@ -63,7 +63,7 @@ public class MyEventAdapter extends RecyclerView.Adapter<MyEventAdapter.EventVie
             mEvent = itemView.findViewById(R.id.eventName);
             mUserName = itemView.findViewById(R.id.userName);
             mEventTime = itemView.findViewById(R.id.eventTime);
-            mEventDate= itemView.findViewById(R.id.eventTime);
+            mEventDate= itemView.findViewById(R.id.eventDate);
             mEventAddress = itemView.findViewById(R.id.eventAddress);
             mEventAttending = itemView.findViewById(R.id.eventAttending);
             hostPic = itemView.findViewById(R.id.imageView);

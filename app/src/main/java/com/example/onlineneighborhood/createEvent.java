@@ -12,7 +12,6 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.PorterDuff;
 import android.icu.util.Calendar;
 import android.location.Address;
 import android.location.Geocoder;
@@ -27,6 +26,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
@@ -45,7 +45,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -87,7 +86,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     static int year, day, month;
     static int hour, minute;
     private static boolean startAndEnd;
-    private Spinner eventType;
+    private Spinner eventTypeSpinner;
     CheckBox addCal;
     ArrayList<UserInformation> users;
 
@@ -99,9 +98,6 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     protected void onStart() {
 
         super.onStart();
-
-        //Set spinner to blue color
-        eventType.getBackground().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_ATOP);
 
         databaseUsers.child(firebaseAuth.getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
             @Override
@@ -177,7 +173,18 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         evEndTime = findViewById(R.id.endTime);
         evAddress = findViewById(R.id.eventAddress);
         addCal = findViewById(R.id.addCal);
-        eventType = (Spinner) findViewById(R.id.spinnerType);
+
+        //Setting up the spinner with different types of event
+        eventTypeSpinner = (Spinner) findViewById(R.id.spinnerEventType);
+        String[] spinner_array = getApplicationContext().getResources().getStringArray(R.array.eventTypes);
+
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(
+                this,R.layout.spinner_item,spinner_array
+        );
+        spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item);
+        eventTypeSpinner.setAdapter(spinnerArrayAdapter);
+
+
 
         // Bind On clicks
         getLocation.setOnClickListener(this);
@@ -334,7 +341,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         String eventDate = evDate.getText().toString().trim();
         String endTime = evEndTime.getText().toString().trim();
         String endDate = evEndDate.getText().toString().trim();
-        final String type = eventType.getSelectedItem().toString();
+        final String type = eventTypeSpinner.getSelectedItem().toString();
 
         Log.d("EVENTCREATE", "CREATING EVENT");
 

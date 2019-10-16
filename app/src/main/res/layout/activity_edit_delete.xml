@@ -54,7 +54,7 @@
         android:textSize="16sp" />
 
     <Spinner
-        android:id="@+id/spinnerType"
+        android:id="@+id/spinnerEventType"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="15dp"
