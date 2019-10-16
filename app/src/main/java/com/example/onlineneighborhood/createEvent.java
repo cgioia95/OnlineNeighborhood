@@ -72,7 +72,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     DatabaseReference databaseSuburb;
 
     //location variables
-    private final String DEFAULT_LOCAL = "please wait a few seconds while we get your location";
+    private final String DEFAULT_LOCAL = "Please wait a few seconds while we get your location";
     private String locat = DEFAULT_LOCAL;
     Button getLocation, createEvent;
 
