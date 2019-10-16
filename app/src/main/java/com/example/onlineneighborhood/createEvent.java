@@ -158,7 +158,9 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         int width = dm.widthPixels;
         int height = dm.heightPixels;
 
-        getWindow().setLayout((int)(width*.85), (int)(height*.85));
+
+        //change this to 0.85 for example to lessen the size of the screen
+        getWindow().setLayout((int)(width*1), (int)(height*1));
 
         // Bind Simple Variables
         users = new ArrayList<UserInformation>();
