@@ -72,7 +72,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View mView = inflater.inflate(R.layout.activity_home_screen, null);
 
-
         fireBaseAuth = FirebaseAuth.getInstance();
         addEvent = mView.findViewById(R.id.addEvent);
         dateFilter = mView.findViewById(R.id.dateFilterHome);
@@ -83,7 +82,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
 
         suburb = ((OnlineNeighborhood) getActivity().getApplication()).getsuburb();
 
-        suburbTextView.setText(suburb);
         addEvent.setOnClickListener(this);
         applyFilterButton.setOnClickListener(this);
         dateFilter.setOnClickListener(this);
@@ -104,22 +102,17 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
 
                 eventList.clear();
                 currentSuburb = dataSnapshot.getValue(Suburb.class);
+                suburbTextView.setText(currentSuburb.getSubName());
                 if(currentSuburb.getEvents() != null){
                     ArrayList<Event> events = currentSuburb.getEvents();
                     for(Event event: events){
                         if(event != null) {
                             try {
-                                if(filterApplied(calenderDate, type)){
-                                    Toast.makeText(getActivity(), "Filters Applied", Toast.LENGTH_SHORT).show();
-                                } else{
-                                    eventList.add(event);
-                                    Log.d(TAG, "EVENT ADDED " + event.getName());
-                                }
+                                filterApplied(calenderDate, type, event);
                             } catch (ParseException e) {
-                                Toast.makeText(getActivity(), "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
+                                eventList.add(event);
                                 e.printStackTrace();
                             }
-
                         }
                     }
                 }
@@ -231,29 +224,26 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
 
     }
 
-    public boolean filterApplied(Date date, String type) throws ParseException {
-        eventList.clear();
-        ArrayList<Event> events = currentSuburb.getEvents();
+    public void filterApplied(Date date, String type, Event event) throws ParseException {
+        String eventStartDate = event.getDate() + " " + event.getTime();
+        String eventEndDate = event.getEndDate() + " " + event.getEndTime();
+        Date eventStart = new SimpleDateFormat("dd/MM/yyyy").parse(eventStartDate);
+        Date eventEnd = new SimpleDateFormat("dd/MM/yyyy").parse(eventEndDate);
         if(date == null && type == null){
-            return false;
+            eventList.add(event);
         }else if(date != null && type == null){
-            for(Event event : events){
-                String eventStartDate = event.getDate() + " " + event.getTime();
-                String eventEndDate = event.getEndDate() + " " + event.getEndTime();
-                Date eventStart = new SimpleDateFormat("dd/MM/yyyy").parse(eventStartDate);
-                Date eventEnd = new SimpleDateFormat("dd/MM/yyyy").parse(eventEndDate);
                 if((eventStart.after(date) || eventStart.equals(date)) && (eventEnd.before(date)|| eventEnd.equals(date))) {
                     eventList.add(event);
                 }
-            }
-            return true;
-        } else{
-            for(Event event : events){
+
+        } else if( date == null && type != null){
                 if(event.getType().equals(type)){
                  eventList.add(event);
                 }
+        } else{
+            if((eventStart.after(date) || eventStart.equals(date)) && (eventEnd.before(date)|| eventEnd.equals(date)) && event.getType().equals(type)) {
+                eventList.add(event);
             }
-            return true;
         }
     }
 
