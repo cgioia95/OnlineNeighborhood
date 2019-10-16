@@ -4,31 +4,60 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:orientation="vertical"
-    android:layout_height="match_parent"
-    tools:context=".HomeScreen">
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/dateFilterHome"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="5dp"
+        app:srcCompat="@drawable/ic_date_range" />
+
+    <ImageView
+        android:id="@+id/typeFilter"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="5dp"
+        app:srcCompat="@drawable/ic_filter_list" />
+
+    <Button
+        android:id="@+id/applyFilterButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="5dp"
+        android:layout_toEndOf="@+id/typeFilter"
+        android:text="Apply" />
+
+    <Button
+        android:id="@+id/clearFilter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="200dp"
+        android:layout_marginTop="5dp"
+        android:text="clear" />
 
     <TextView
         android:id="@+id/textViewSuburb"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="60dp"
-        android:text="NO SUBURB"
-        android:textAlignment="center"
-        android:textSize="40sp"
-        tools:layout_editor_absoluteX="148dp"
-        tools:layout_editor_absoluteY="315dp" />
-
-    <Button
-        android:id="@+id/filterButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Filter" />
+        android:layout_marginStart="185dp"
+        android:layout_marginTop="20dp"
+        android:layout_toEndOf="@+id/typeFilter"
+        android:text="NO SUBURB"
+        android:textAlignment="center"
+        android:textColor="#090101"
+        android:textSize="12sp"
+        tools:layout_editor_absoluteX="148dp"
+        tools:layout_editor_absoluteY="315dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="680dp"
+        android:layout_height="fill_parent"
         android:layout_alignParentBottom="true"
+        android:layout_marginTop="50dp"
         android:padding="4dp">
 
     </androidx.recyclerview.widget.RecyclerView>
@@ -45,14 +74,5 @@
         android:layout_marginRight="66dp"
         android:layout_marginBottom="10dp"
         app:srcCompat="@drawable/ic_add_white_24dp" />
-
-    <Button
-        android:id="@+id/clearFilter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/textViewSuburb"
-        android:layout_marginStart="30dp"
-        android:layout_marginLeft="90dp"
-        android:text="clear filter" />
 
 </RelativeLayout>

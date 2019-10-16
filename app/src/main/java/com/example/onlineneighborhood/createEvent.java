@@ -127,13 +127,15 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
 
         //autofilling dates
+        Calendar c = Calendar.getInstance();
+        int hour = c.get(Calendar.HOUR_OF_DAY);
+        int minute = c.get(Calendar.MINUTE);
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH);
+        int day = c.get(Calendar.DAY_OF_MONTH);
 
         evTime.setText(hour +":"+minute);
-        if(hour > 23){
-            evEndTime.setText((0)+":"+minute);
-        }else{
-            evEndTime.setText((hour+1)+":"+minute);
-        }
+        evEndTime.setText((hour+1)+":"+minute);
         evDate.setText(day+"/"+(month+1)+"/"+year);
         evEndDate.setText(day+"/"+(month+1)+"/"+year);
     }
@@ -144,6 +146,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
         Intent i = getIntent();
         intentSuburb = i.getStringExtra("SUBURB");
+
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_create_event);
 
@@ -262,6 +265,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         eventTv.setText(locat);
 
 
+
     }
 
 
@@ -269,7 +273,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     @Override
     public void onClick(View view) {
         if(view == getLocation){
-            eventTv.setText(locat);
+            evAddress.setText(locat);
             //if this is true then location services has been requested and we are allowed to use it
             clicked = true;
         }
@@ -359,11 +363,10 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
             if (firebaseAuth.getCurrentUser() == null){
                 Toast.makeText(this, "you are not logged in", Toast.LENGTH_LONG).show();
                 finish();
-                startActivity(new Intent(getApplicationContext(), Login.class));
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
             }
 
             //this is just doing a couple of checks to ensure that a address is *actually* sent to firebase
-            //TODO: this needs to be cleaned up/properly checked
             if(!TextUtils.isEmpty(eventAddress)){
                 String addressStatus = validate(eventAddress);
 

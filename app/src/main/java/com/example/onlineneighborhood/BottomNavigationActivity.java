@@ -54,7 +54,7 @@ import java.util.List;
 import static java.util.Locale.getDefault;
 
 
-public class BottomNavigationActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
+public class BottomNavigationActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, HomeFragment.Callbacks {
 
 
     private GoogleMap mMap;
@@ -80,7 +80,6 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
 
     @Override
     protected void onStart() {
-        super.onStart();
 
         Intent i = getIntent();
         intentSuburb = i.getStringExtra("SUBURB");
@@ -95,6 +94,8 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
 
         Log.d("BUNDLEVALUES:", ""+intentSuburb
                 +dateRange+ typeFilter +time);
+
+        super.onStart();
     }
 
     @Override
@@ -189,9 +190,6 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
 
         Bundle bundle = new Bundle();
         bundle.putString("SUBURB", intentSuburb);
-        bundle.putString("DATE",  dateRange);
-        bundle.putString("TYPE", typeFilter);
-        bundle.putString("TIME", time);
         HomeFragment home = new HomeFragment();
         home.setArguments(bundle);
 
@@ -386,5 +384,16 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
     }
 
 
+    @Override
+    public void onButtonClicked() {
 
+        Bundle bundle = new Bundle();
+        bundle.putString("SUBURB", intentSuburb);
+        HomeFragment home = new HomeFragment();
+        home.setArguments(bundle);
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, home)
+                .commit();
+    }
 }

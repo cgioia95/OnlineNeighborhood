@@ -95,9 +95,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                              Bundle savedInstanceState) {
 
 
-
-        Intent i = getActivity().getIntent();
-        suburbName = i.getStringExtra("SUBURB");
+        suburbName = ((OnlineNeighborhood) getActivity().getApplication()).getsuburb();
 
         // Inflate the layout for this fragment
         View v =  inflater.inflate(R.layout.fragment_map, container, false);

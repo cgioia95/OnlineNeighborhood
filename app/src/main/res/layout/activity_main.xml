@@ -8,27 +8,6 @@
     tools:context=".MainActivity">
 
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/searchBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme" />
-
-    <com.miguelcatalan.materialsearchview.MaterialSearchView
-        android:id="@+id/searchView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:searchBackground="?colorPrimary"
-        app:searchBackIcon="@drawable/ic_action_navigation_arrow_back_inverted"
-        app:searchCloseIcon="@drawable/ic_action_navigation_close_inverted"
-        app:searchSuggestionIcon="@drawable/ic_suggestion"
-        android:textColor="#FFFFFF"
-        android:textColorHint="#FFFFFF">
-
-    </com.miguelcatalan.materialsearchview.MaterialSearchView>
-
     <TextView
         android:id="@+id/headingTv"
         android:layout_width="match_parent"
@@ -42,8 +21,9 @@
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="25dp"
         android:gravity="center_horizontal"
-        android:text="ONLINE NEIGHBORHOOD"
+        android:text="Togather"
         android:textAlignment="center"
+        android:textColor="#673AB7"
         android:textSize="30sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -54,40 +34,46 @@
         app:layout_constraintVertical_bias="0.284" />
 
     <TextView
-        android:id="@+id/textView7"
+        android:id="@+id/textView10"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="40dp"
+        android:text="Welcome to Togather, A place to see whats happening in your area and meet new people! "
+        android:textAlignment="center"
+        android:textColor="#0C061A"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/tvDetails"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:text="Enter your details below"
+        android:textColor="#000101" />
+
+    <EditText
+        android:id="@+id/username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:text="Use the search bar to find a Suburb"
-        android:textAlignment="center"
-        android:textSize="18sp" />
+        android:ems="10"
+        android:hint="Username"
+        android:inputType="textPersonName" />
 
-    <TextView
-        android:id="@+id/ORtv"
+    <EditText
+        android:id="@+id/password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/or"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        android:textStyle="bold" />
-
-    <Button
-        android:id="@+id/getLocationBtn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginBottom="75dp"
-        android:text="Get Currrent Location" />
-
-    <TextView
-        android:id="@+id/tvSuburb"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="textView"
-        android:textAlignment="center" />
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:ems="10"
+        android:hint="Password"
+        android:inputType="textPassword" />
 
     <Button
         android:id="@+id/loginBtn"
@@ -108,6 +94,17 @@
         app:layout_constraintTop_toBottomOf="@+id/headingTv"
         app:layout_constraintVertical_bias="0.192" />
 
+    <TextView
+        android:id="@+id/textView7"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="200dp"
+        android:layout_marginRight="20dp"
+        android:text="TextView"
+        android:textColor="#130E0E"
+        tools:text="New To-Gathering? Sign Up below!" />
+
     <Button
         android:id="@+id/registerBtn"
         android:layout_width="match_parent"
@@ -117,7 +114,6 @@
         android:layout_alignParentTop="true"
         android:layout_centerVertical="true"
         android:layout_marginLeft="20dp"
-        android:layout_marginTop="72dp"
         android:layout_marginRight="20dp"
         android:text="REGISTER"
         app:layout_constraintEnd_toEndOf="parent"
