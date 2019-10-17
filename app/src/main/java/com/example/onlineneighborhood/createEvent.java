@@ -53,27 +53,22 @@ import static java.util.Locale.getDefault;
 
 public class createEvent extends AppCompatActivity implements View.OnClickListener {
 
-
-    //creating initialization variables
-    //long and latitude
-    private double lon;
-    private double lat;
-    private Suburb suburb;
-    //bool check to ensure get location has been requested
+    //Creating initialization variables
+    //Bool check to ensure get location has been requested
     private boolean clicked = false;
-    UserInformation hostID;
-    UserInformation host;
+    UserInformation hostID, host;
     String intentSuburb;
 
-    //firebase variables
+    //Firebase variables
     private FirebaseAuth firebaseAuth;
-    DatabaseReference databaseEvents;
-    DatabaseReference databaseUsers;
-    DatabaseReference databaseSuburb;
+    DatabaseReference databaseEvents, databaseUsers, databaseSuburb;
 
     //location variables
     private final String DEFAULT_LOCAL = "Please wait a few seconds while we get your location";
     private String locat = DEFAULT_LOCAL;
+    //Long and latitude
+    private double lon, lat;
+    private Suburb suburb;
     Button getLocation, createEvent;
 
     //TODO: add this loading dialog
@@ -90,7 +85,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     CheckBox addCal;
     ArrayList<UserInformation> users;
 
-    // Two components used to get user Location
+    //Two components used to get user Location
     private LocationManager locationManager;
     private LocationListener locationListener;
 
@@ -108,7 +103,6 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
             }
         });
 
@@ -125,8 +119,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
             }
         });
 
-
-        //autofilling dates
+        //Auto-filling dates
         Calendar c = Calendar.getInstance();
         int hour = c.get(Calendar.HOUR_OF_DAY);
         int minute = c.get(Calendar.MINUTE);
@@ -161,11 +154,10 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         int width = dm.widthPixels;
         int height = dm.heightPixels;
 
-
-        //change this to 0.85 for example to lessen the size of the screen
+        //Change this to 0.85 for example to lessen the size of the screen
         getWindow().setLayout((int)(width*1), (int)(height*1));
 
-        // Bind Simple Variables
+        //Bind Simple Variables
         users = new ArrayList<UserInformation>();
         eventTv = findViewById(R.id.eventTv);
         createEvent = findViewById(R.id.editBtn);
@@ -189,9 +181,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item);
         eventTypeSpinner.setAdapter(spinnerArrayAdapter);
 
-
-
-        // Bind On clicks
+        //Bind On-clicks
         getLocation.setOnClickListener(this);
         createEvent.setOnClickListener(this);
         evDate.setOnClickListener(this);
@@ -199,32 +189,27 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         evEndTime.setOnClickListener(this);
         evEndDate.setOnClickListener(this);
 
-        //getting authentication info to link the event to the user creating it
+        //Getting authentication info to link the event to the user creating it
         firebaseAuth = FirebaseAuth.getInstance();
 
-        // Setup the Location Manager and Listener
+        //Setup the Location Manager and Listener
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        // just taking Gioias code and converting it to get a specific location
+        //Get a specific location
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
 
                 lon = location.getLongitude();
                 lat = location.getLatitude();
-
                 String coordinates = "Long: " + lon + "Lat: " + lat;
 
                 Log.d("LOCATION", "Long: " + lon + "Lat: " + lat );
 
-
-                //gets the specific location to the address
+                //Gets the specific location to the address
                 locat = getLocation(lon, lat);
 
-
-               Log.d("LOCATION", locat );
-
-
+                Log.d("LOCATION", locat );
             }
 
             @Override
@@ -242,13 +227,12 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 startActivity(intent);
-
             }
         };
 
-        // Checks if user has granted necessary location tracking permissions
-        // If they haven't, requests them from the user
-        // If they have, enables the location button to request location updates
+        //Checks if user has granted necessary location tracking permissions
+        //If they haven't, requests them from the user
+        //If they have, enables the location button to request location updates
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
             requestPermissions(new String[]{
@@ -257,24 +241,21 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
             return;
         } else {
-            //configure Button is the method which updates the location every 5 seconds
+            //Configure Button is the method which updates the location every 5 seconds
              locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 5, locationListener);
         }
 
-        //sets the
+        //Sets the location
         eventTv.setText(locat);
-
-
-
     }
 
 
-    //adding functionality to the buttons
+    //Functionalities for the buttons
     @Override
     public void onClick(View view) {
         if(view == getLocation){
             evAddress.setText(locat);
-            //if this is true then location services has been requested and we are allowed to use it
+            //If this is true then location services has been requested and we are allowed to use it
             clicked = true;
         }
 
@@ -303,7 +284,6 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
     }
 
-
     /**
      * This method takes the long and lat provided and converts it through googles API to
      * an actual address
@@ -314,24 +294,20 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
      */
     private String getLocation(double lon, double lat) {
 
-
         String location = "NO LOCATION FOUND";
         Geocoder geocoder = new Geocoder(createEvent.this, Locale.getDefault());
-
 
         try {
             List<Address> addresses = geocoder.getFromLocation(lat, lon, 1);
             location = addresses.get(0).getAddressLine(0);
 
             Log.d("LOCATION", location);
-
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         return location;
     }
-
 
     /**
      * This method takes all the data provided by the activity and sends it to firebase.
@@ -340,7 +316,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
      */
     public void addEvent(){
 
-        //pass name, description, time, date, address, and user.
+        //Pass name, description, time, date, address, and user.
         String eventName = evName.getText().toString().trim();
         String eventDesc = evDesc.getText().toString().trim();
         String eventTime = evTime.getText().toString().trim();
@@ -353,20 +329,19 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
         String eventAddress = evAddress.getText().toString().trim();
 
-
-        //checks all the fields are filled
+        //Checks all the fields are filled
         if(!TextUtils.isEmpty(eventName) && !eventTime.contains("Time") && !endDate.contains("Date")
                 && !endTime.contains("Time") && !TextUtils.isEmpty(eventDesc) && !eventDate.contains("Date")){
 
-            // Checks if the User's Logged in already, if so bypasses the Login Screen and takes them to Choose Screen
-            //put this here to ensure that the user is not null and if it is will exit to the log in screen
+            //Checks if the User's Logged in already, if so bypasses the Login Screen and takes them to Choose Screen
+            //Put this here to ensure that the user is not null and if it is will exit to the log in screen
             if (firebaseAuth.getCurrentUser() == null){
                 Toast.makeText(this, "you are not logged in", Toast.LENGTH_LONG).show();
                 finish();
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
             }
 
-            //this is just doing a couple of checks to ensure that a address is *actually* sent to firebase
+            //This is just doing a couple of checks to ensure that a address is *actually* sent to firebase
             if(!TextUtils.isEmpty(eventAddress)){
                 String addressStatus = validate(eventAddress);
 
@@ -378,7 +353,6 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
                     if(addCal.isChecked()){
                         createCalenderEvent(eventName, eventDesc, eventAddress);
                     }
-
                     this.finish();
 
                 }else{
@@ -403,7 +377,6 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
                 }else{
                     Toast.makeText(this, "sorry, something went wrong, please try again", Toast.LENGTH_LONG).show();
                 }
-
             }
         }
         else{
@@ -411,25 +384,24 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         }
     }
 
-
     public boolean addEventToSuburb(String eventAddress,String eventName,String eventDesc, String eventTime, String eventDate, String endTime, String endDate, String type){
         try{
-            //creating the event and all the variables needed for the event.
+            //Creating the event and all the variables needed for the event.
             String id = databaseEvents.push().getKey();
-            //the method above generates a random key every second. need to consolidate the value so it
-            //doesnt change everytime id is called.
+            //The method above generates a random key every second. need to consolidate the value so it
+            //doesn't change everytime id is called.
             String confirmid = id;
 
-            //gets currents users ID and assigns it as the host, creates and adds it to the attendee list
+            //Gets currents users ID and assigns it as the host, creates and adds it to the attendee list
             hostID = new UserInformation(firebaseAuth.getCurrentUser().getUid());
             ArrayList<UserInformation> attendees = new ArrayList<UserInformation>();
             attendees.add(hostID);
 
-            //creating 2 events. one to add to the suburb, and one to link to the user.
+            //Creating 2 events. one to add to the suburb, and one to link to the user.
             Event event = new Event(confirmid, hostID, eventAddress, eventName, eventDesc, eventTime, eventDate, endTime, endDate, type, attendees, suburb.getId());
             Event userEvent = new Event(confirmid, suburb.getId());
 
-            //creating database references and list arrays to properly ensure that a dynamic array will be properly updated to suburb/user values
+            //Creating database references and list arrays to properly ensure that a dynamic array will be properly updated to suburb/user values
             DatabaseReference databaseSuburbChange = FirebaseDatabase.getInstance().getReference("suburbs").child(suburb.getId());
             DatabaseReference databaseUpdateUser = FirebaseDatabase.getInstance().getReference("Users").child(hostID.getUid());
             ArrayList<Event> events = new ArrayList<Event>();
@@ -437,18 +409,14 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
             ArrayList<Event> userEvents = new ArrayList<Event>();
             userEvents.add(userEvent);
             ArrayList<Event> eventCheck = host.getMyEvents();
-
             ArrayList<Event> eventCheck2 = host.getMyEventsAttending();
 
-
-            //checks if a array exists, if it doesnt it creates one
+            //Checks if an events array exists in the suburb, if it doesn't, this creates one
             if(suburb.getEvents() == null){
                 suburb.setEvents(events);
             }else{
                 suburb.getEvents().add(event);
             }
-
-
 
             if(eventCheck == null){
                 host.setMyEvents(userEvents);
@@ -462,8 +430,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
                 host.getMyEventsAttending().add(userEvent);
             }
 
-
-            //sends update to firebase
+            //Sends update to Firebase
             databaseUpdateUser.setValue(host);
             databaseSuburbChange.setValue(suburb);
             return true;
@@ -473,10 +440,9 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         }
     }
 
-
     /***************************************************************************************
      *
-     *    took this code for the clock and date functionality. Referenced the place i got it from below.
+     *    Took this code for the clock and date functionality. Referenced the place i got it from below.
      *
      *    Title: Android pick date time from EditText OnClick event
      *    Author: Mohit Gupt
@@ -485,24 +451,23 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
      *    Availability: https://www.truiton.com/2013/03/android-pick-date-time-from-edittext-onclick-event/
      *
      ***************************************************************************************/
-
-
     public static class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener{
+
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the current time as the default values for the picker
+            //Use the current time as the default values for the picker
             final Calendar c = Calendar.getInstance();
             hour = c.get(Calendar.HOUR_OF_DAY);
             minute = c.get(Calendar.MINUTE);
 
-            // Create a new instance of TimePickerDialog and return it
+            //Create a new instance of TimePickerDialog and return it
             return new TimePickerDialog(getActivity(), this, hour, minute,
                     DateFormat.is24HourFormat(getActivity()));
         }
 
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-            // Do something with the time chosen by the user
-            // due to int data type, a bodge job adding zeros manually.
+            //Do something with the time chosen by the user
+            //due to int data type, a bodge job adding zeros manually.
             if(startAndEnd){
                 if(minute < 10){
                     evTime.setText(hourOfDay + ":0"	+ minute);
@@ -530,18 +495,18 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the current date as the default date in the picker
+            //Use the current date as the default date in the picker
             final Calendar c = Calendar.getInstance();
             year = c.get(Calendar.YEAR);
             month = c.get(Calendar.MONTH);
             day = c.get(Calendar.DAY_OF_MONTH);
 
-            // Create a new instance of DatePickerDialog and return it
+            //Create a new instance of DatePickerDialog and return it
             return new DatePickerDialog(getActivity(), this, year, month, day);
         }
 
         public void onDateSet(DatePicker view, int year, int month, int day) {
-            // Do something with the date chosen by the user
+            //Do something with the date chosen by the user
             if(startAndEnd){
                 evDate.setText(day + "/" + (month + 1) + "/" + year);
             }
@@ -584,7 +549,6 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         List<Address> addresses = null;
         Geocoder geocoder = new Geocoder(getApplicationContext(), getDefault());
 
-
         try {
             addresses = geocoder.getFromLocationName(eventAddress, 1);
             if (addresses.size() > 0) {
@@ -592,14 +556,12 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
                 Address address = addresses.get(0);
                 String testedSuburb = address.getLocality();
 
-
                 if (!suburb.getSubName().equals(testedSuburb)) {
                     Log.d("VALIDATOR", "NOT IN SUBURB");
                     Log.d("VALIDATOR", "We are in " + intentSuburb + " You have entered: " + testedSuburb);
                     Toast.makeText(this, "Address not in suburb", Toast.LENGTH_LONG).show();
                     return "NOT_IN_SUBURB";
                 }
-
 
             } else {
                 Log.d("VALIDATOR", "2 - INVALID");
@@ -615,6 +577,4 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         }
         return "VALID";
     }
-
-
 }
