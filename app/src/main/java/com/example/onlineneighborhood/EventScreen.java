@@ -91,6 +91,13 @@ public class EventScreen extends AppCompatActivity {
         thisUserString = firebaseAuth.getCurrentUser().getUid();
         Log.d(TAG, "This User String found: " + this.thisUserString);
 
+        //Setting toolbar for adding profile icon
+        androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Online Neighborhood");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
         databaseUsers.child(thisUserString).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

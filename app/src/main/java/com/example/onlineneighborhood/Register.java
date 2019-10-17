@@ -34,7 +34,7 @@ import static java.util.Calendar.YEAR;
 import static java.util.Calendar.getInstance;
 
 // REGISTER activity takes some user details, creates a user, authenticating in Firebase and uploading their details to a database
-public class Register extends AppCompatActivity implements View.OnClickListener {
+public class Register extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener {
 
     // Declare all simple Variables
     private Button buttonRegister;
@@ -78,7 +78,7 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
         // Assign Click Listeners to Register Button and Link to Sign In Button
         buttonRegister.setOnClickListener(this);
         textViewSignIn.setOnClickListener(this);
-//        editDob.setOnClickListener(this);
+        editDob.setOnClickListener(this);
     }
 
     // Parses editText inputs, registers the user with FireBase Authentication
@@ -170,23 +170,23 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
     }
 
 
-//    private void showDatePickerDialog(){
-//        DatePickerDialog datePickerDialog = new DatePickerDialog(this, this,
-//                getInstance().get(YEAR),
-//                getInstance().get(MONTH),
-//                getInstance().get(DAY_OF_MONTH)
-//        );
-//
-//        datePickerDialog.show();
-//
-//    }
-//
-//    @Override
-//    public void onDateSet(DatePicker datePicker, int year, int month, int dayOfMonth) {
-//        month++;
-//        String date = dayOfMonth +"/" + month + "/" + year;
-//        editDob.setText(date);
-//    }
+    private void showDatePickerDialog(){
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, this,
+                getInstance().get(YEAR),
+                getInstance().get(MONTH),
+                getInstance().get(DAY_OF_MONTH)
+        );
+
+        datePickerDialog.show();
+
+    }
+
+    @Override
+    public void onDateSet(DatePicker datePicker, int year, int month, int dayOfMonth) {
+        month++;
+        String date = dayOfMonth +"/" + month + "/" + year;
+        editDob.setText(date);
+    }
 
     // Assigning functions to the two buttons
     @Override
@@ -200,11 +200,11 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
             startActivity(new Intent(this, ChooseSuburb.class));
         }
 
-//        if(view == editDob){
-//
-//            showDatePickerDialog();
-//        }
-//
+        if(view == editDob){
+
+            showDatePickerDialog();
+        }
+
 
     }
 
