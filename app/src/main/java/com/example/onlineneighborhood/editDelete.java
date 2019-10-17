@@ -65,25 +65,20 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
 
     public String eventId;
 
-    //firebase variables
+    //Firebase variables
     private FirebaseAuth firebaseAuth;
-    DatabaseReference databaseEvents;
-    DatabaseReference databaseUsers;
-    DatabaseReference databaseSuburb;
-    DatabaseReference databaseEvent;
+    DatabaseReference databaseEvents, databaseUsers, databaseSuburb, databaseEvent;
     CheckBox addCal;
 
     Event preEvent;
 
-
-    //creating initialization variables
-    //long and latitude
+    //Location-based initialization variables
+    //Longitude and latitude
     private double lon;
     private double lat;
     private Suburb suburb;
-    //bool check to ensure get location has been requested
+    //Bool check to ensure get location has been requested
     private boolean clicked = false;
-    //location variables
     private final String DEFAULT_LOCAL = "please wait a few seconds while we get your location";
     private String locat = DEFAULT_LOCAL;
 
@@ -91,87 +86,65 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
     static int hour, minute;
     private static boolean startAndEnd;
 
-
-    // Two components used to get user Location
+    //Two components used to get user Location
     private LocationManager locationManager;
     private LocationListener locationListener;
-
 
     @Override
     protected void onStart() {
 
-
         super.onStart();
-
         databaseSuburb.addListenerForSingleValueEvent(new ValueEventListener() {
-
 
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Suburb currSuburb = dataSnapshot.getValue(Suburb.class);
                             suburb = currSuburb;
-
                 databaseSuburb.child("events").addListenerForSingleValueEvent(new ValueEventListener() {
+
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         for (DataSnapshot eventSnapshot: dataSnapshot.getChildren()){
 
                             Log.d(TAG, "REFERENCE: " + eventSnapshot.getRef().toString());
-
                             Log.d(TAG, eventSnapshot.toString());
-
                             Log.d(TAG, eventSnapshot.child("id").toString());
-
                             Log.d(TAG, eventSnapshot.child("id").getValue().toString());
 
                             if (eventId.equals(eventSnapshot.child("id").getValue().toString())){
-
                                 databaseEvent = eventSnapshot.getRef();
                                 Log.d(TAG, "MATCH");
-
                             }
-
                         }
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
-
                     }
                 });
-
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-
         });
-
-
-
-
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent i = getIntent();
 
-
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         setContentView(R.layout.activity_edit_delete);
-
-
-
 
         btnGetLocation =findViewById(R.id.btnGetLocation);
         editBtn = findViewById(R.id.editBtn);
         deleteBtn = findViewById(R.id.deleteBtn);
 
+        //Get views of event details
         evName = findViewById(R.id.eventName);
         evDesc = findViewById(R.id.eventDesc);
         evAddress = findViewById(R.id.eventAddress);
@@ -193,21 +166,15 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
         spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item);
         eventTypeSpinner.setAdapter(spinnerArrayAdapter);
 
-
-
         preEvent =  (Event)i.getSerializableExtra("MyObject");
-
         String intentSuburb = preEvent.getSuburbId();
-
 
         databaseUsers = FirebaseDatabase.getInstance().getReference("Users");
         databaseSuburb =  FirebaseDatabase.getInstance().getReference("suburbs").child(intentSuburb);
 
-        //getting authentication info to link the event to the user creating it
+        //Getting authentication info to link the event to the user creating it
         firebaseAuth = FirebaseAuth.getInstance();
-
         eventId = preEvent.getId();
-
 
         Log.d(TAG, eventId);
 
@@ -220,9 +187,7 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
         String preEndTime = preEvent.getEndTime();
         String preAddress = preEvent.getAddress();
 
-
-
-
+        //Set views of event details
         evName.setText(preName);
         evDesc.setText(preDescription);
         eventTv.setText(preAddress);
@@ -240,29 +205,23 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
         btnGetLocation.setOnClickListener(this);
         editBtn.setOnClickListener(this);
 
-        // Setup the Location Manager and Listener
+        //Setup the Location Manager and Listener
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        // just taking Gioias code and converting it to get a specific location
+        //Get a specific location of an address
         locationListener = new LocationListener() {
+
             @Override
             public void onLocationChanged(Location location) {
 
                 lon = location.getLongitude();
                 lat = location.getLatitude();
-
                 String coordinates = "Long: " + lon + "Lat: " + lat;
-
                 Log.d("LOCATION", "Long: " + lon + "Lat: " + lat );
 
-
-                //gets the specific location to the address
+                //Gets the specific location to the address
                 locat = getLocation(lon, lat);
-
-
                 Log.d("LOCATION", locat );
-
-
             }
 
             @Override
@@ -277,16 +236,14 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
 
             @Override
             public void onProviderDisabled(String s) {
-
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 startActivity(intent);
-
             }
         };
 
-        // Checks if user has granted necessary location tracking permissions
-        // If they haven't, requests them from the user
-        // If they have, enables the location button to request location updates
+        //Checks if user has granted necessary location tracking permissions
+        //If they haven't, requests them from the user
+        //If they have, enables the location button to request location updates
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
             requestPermissions(new String[]{
@@ -295,39 +252,30 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
 
             return;
         } else {
-            //configure Button is the method which updates the location every 5 seconds
+            //Configure Button is the method which updates the location every 5 seconds
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 5, locationListener);
         }
 
-        //sets the
         eventTv.setText(locat);
-
-
-
-
     }
 
-    //adding functionality to the buttons
+    //Adding functionality to the buttons
     @Override
     public void onClick(View view) {
 
         if (view == deleteBtn ){
             deleteEvent();
-
             this.finish();
         }
 
         if(view == btnGetLocation){
             eventTv.setText(locat);
-            //if this is true then location services has been requested and we are allowed to use it
+            //If this is true then location services has been requested and we are allowed to use it
             clicked = true;
         }
 
         if(view == editBtn){
             editEvent();
-
-
-
         }
 
         if(view == evTime){
@@ -348,9 +296,7 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
             startAndEnd = false;
             showTruitonDatePickerDialog(view);
         }
-
     }
-
 
     /**
      * This method takes the long and lat provided and converts it through googles API to
@@ -362,10 +308,8 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
      */
     private String getLocation(double lon, double lat) {
 
-
         String location = "NO LOCATION FOUND";
         Geocoder geocoder = new Geocoder(editDelete.this, Locale.getDefault());
-
 
         try {
             List<Address> addresses = geocoder.getFromLocation(lat, lon, 1);
@@ -389,14 +333,13 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
         String endTime = evEndTime.getText().toString().trim();
         String endDate = evEndDate.getText().toString().trim();
         final String type = eventTypeSpinner.getSelectedItem().toString();
-
         String eventAddress = evAddress.getText().toString().trim();
 
-        //checks all the fields are filled
+        //Checks all the fields are filled
         if(!TextUtils.isEmpty(eventName) && !eventTime.contains("Time") && !endDate.contains("Date")
                 && !endTime.contains("Time") && !TextUtils.isEmpty(eventDesc) && !eventDate.contains("Date")){
 
-            // Checks if the User's Logged in already, if so bypasses the Login Screen and takes them to Choose Screen
+            //Checks if the User's Logged in already, if so bypasses the Login Screen and takes them to Choose Screen
             //put this here to ensure that the user is not null and if it is will exit to the log in screen
             if (firebaseAuth.getCurrentUser() == null){
                 Toast.makeText(this, "you are not logged in", Toast.LENGTH_LONG).show();
@@ -404,11 +347,10 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
                 startActivity(new Intent(getApplicationContext(), Login.class));
             }
 
-            //this is just doing a couple of checks to ensure that a address is *actually* sent to firebase
+            //This is just doing a couple of checks to ensure that a address is *actually* sent to firebase
             //TODO: this needs to be cleaned up/properly checked
             if(!TextUtils.isEmpty(eventAddress)){
                 String addressStatus = validate(eventAddress);
-
                 if (addressStatus!="VALID"){
                     return;
                 }
@@ -433,38 +375,30 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
                     if(addCal.isChecked()){
                         createCalenderEvent(eventName, eventDesc, eventAddress);
                     }
-
                 }else{
                     Toast.makeText(this, "sorry, something went wrong, please try again", Toast.LENGTH_LONG).show();
                 }
-
             }
         }
         else{
             Toast.makeText(this, "please enter all fields", Toast.LENGTH_LONG).show();
         }
-
     }
 
     public void deleteEvent(){
-
         databaseEvent.removeValue();
 
-        // Removes the myEvents hosting section of the user deleting this event
-
+        //Removes the myEvents hosting section of the user deleting this event
         DatabaseReference userEvents = databaseUsers.child(firebaseAuth.getCurrentUser().getUid()).child("myEvents");
 
-
         userEvents.addValueEventListener(new ValueEventListener() {
+
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 for (DataSnapshot eventSnapshot : dataSnapshot.getChildren()) {
-
                     Log.d(TAG, "DELETING AN EVENT");
-
                     Log.d(TAG, eventSnapshot.toString());
-
                     String id = eventSnapshot.child("id").getValue().toString();
 
                     if (eventId.equals(id)) {
@@ -472,7 +406,6 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
                         Log.d(TAG, "Event ID: " +  id);
                         eventSnapshot.getRef().removeValue();
                     }
-
                 }
             }
 
@@ -482,25 +415,14 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
             }
         } );
 
-        // delete the reference for all attendees
-
+        //Delete the reference for all attendees
         ArrayList<UserInformation> attendees = preEvent.getAttendees();
-
         for (UserInformation attendee: attendees){
-
             String attendeeString = attendee.getUid();
-
-
             DatabaseReference userEventsAttending = databaseUsers.child(attendeeString).child("myEventsAttending");
-
-
-
         }
 
         // Need to also cycle through the list of attendees, get their
-
-
-
 
 //        databaseUsers.addValueEventListener(new ValueEventListener() {
 //            @Override
@@ -526,9 +448,6 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
 //
 //            }
 //        });
-
-
-
     }
 
     public boolean editEventInSuburb(String eventAddress,String eventName,String eventDesc, String eventTime, String eventDate, String endTime, String endDate, String type){
@@ -543,18 +462,13 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
         databaseEvent.child("eventName").setValue(eventName);
         databaseEvent.child("type").setValue(type);
 
-        Event resultEvent = new Event(preEvent.getId(), preEvent.getHost(), eventAddress, eventName, eventDesc, eventTime, eventDate, endTime, endDate, type, preEvent.getAttendees(), preEvent.getSuburbId());
-
+        Event resultEvent = new Event(preEvent.getId(), preEvent.getHost(), eventAddress, eventName,
+                                      eventDesc, eventTime, eventDate, endTime, endDate, type,
+                                      preEvent.getAttendees(), preEvent.getSuburbId());
         Intent resultIntent = new Intent();
         resultIntent.putExtra("MyObject", resultEvent);
-
         setResult(1);
-
         finish();
-
-
-
-
         return true;
     }
 
@@ -569,24 +483,23 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
      *    Availability: https://www.truiton.com/2013/03/android-pick-date-time-from-edittext-onclick-event/
      *
      ***************************************************************************************/
-
-
     public static class TimePickerFragmentEdit extends DialogFragment implements TimePickerDialog.OnTimeSetListener{
+
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the current time as the default values for the picker
+            //Use the current time as the default values for the picker
             final Calendar c = Calendar.getInstance();
             hour = c.get(Calendar.HOUR_OF_DAY);
             minute = c.get(Calendar.MINUTE);
 
-            // Create a new instance of TimePickerDialog and return it
+            //Create a new instance of TimePickerDialog and return it
             return new TimePickerDialog(getActivity(), this, hour, minute,
                     DateFormat.is24HourFormat(getActivity()));
         }
 
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-            // Do something with the time chosen by the user
-            // due to int data type, a bodge job adding zeros manually.
+            //Do something with the time chosen by the user
+            //due to int data type, a bodge job adding zeros manually.
             if(startAndEnd){
                 if(minute < 10){
                     evTime.setText(hourOfDay + ":0"	+ minute);
@@ -614,18 +527,18 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
 
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the current date as the default date in the picker
+            //Use the current date as the default date in the picker
             final Calendar c = Calendar.getInstance();
             year = c.get(Calendar.YEAR);
             month = c.get(Calendar.MONTH);
             day = c.get(Calendar.DAY_OF_MONTH);
 
-            // Create a new instance of DatePickerDialog and return it
+            //Create a new instance of DatePickerDialog and return it
             return new DatePickerDialog(getActivity(), this, year, month, day);
         }
 
         public void onDateSet(DatePicker view, int year, int month, int day) {
-            // Do something with the date chosen by the user
+            //Do something with the date chosen by the user
             if(startAndEnd){
                 evDate.setText(day + "/" + (month + 1) + "/" + year);
             }
@@ -668,7 +581,6 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
         List<Address> addresses = null;
         Geocoder geocoder = new Geocoder(getApplicationContext(), getDefault());
 
-
         try {
             addresses = geocoder.getFromLocationName(eventAddress, 1);
             if (addresses.size() > 0) {
@@ -676,14 +588,12 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
                 Address address = addresses.get(0);
                 String testedSuburb = address.getLocality();
 
-
                 if (!suburb.getSubName().equals(testedSuburb)) {
                     Log.d("VALIDATOR", "NOT IN SUBURB");
                     Log.d("VALIDATOR", "We are in " + suburb.getSubName() + " You have entered: " + testedSuburb);
                     Toast.makeText(this, "Address not in suburb", Toast.LENGTH_LONG).show();
                     return "NOT_IN_SUBURB";
                 }
-
 
             } else {
                 Log.d("VALIDATOR", "2 - INVALID");
@@ -699,6 +609,4 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
         }
         return "VALID";
     }
-
-
 }

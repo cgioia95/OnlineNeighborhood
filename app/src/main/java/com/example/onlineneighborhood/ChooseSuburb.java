@@ -36,7 +36,6 @@ public class ChooseSuburb extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_suburb);
 
-
         suburbSearch = findViewById(R.id.searchSuburb);
         suburbList = findViewById(R.id.suburbList);
         suburbs = parseCSV();
@@ -99,21 +98,21 @@ public class ChooseSuburb extends AppCompatActivity {
         return suburbList;
     }
 
-
     public ArrayList<String> convertArray(ArrayList<String[]> arr, int index){
 
-        // declaration and initialise String Array
+        //Declaration and initialise String Array
         ArrayList<String> str = new ArrayList<String>();
 
-        // ArrayList to Array Conversion
+        //ArrayList to Array Conversion
         for (int j = 0; j < arr.size(); j++) {
-            // Assign each value to String array
+            //Assign each value to String array
             String[] strings = arr.get(j);
             str.add(strings[index]);
         }
         return str;
     }
 
+    //Checks if suburb is found within a list of and sets it to suburbid
     private boolean findSuburbId(ArrayList<String[]> idList, String suburb){
         boolean successfulFind = false;
         for(int i = 0; i < idList.size(); i++){
@@ -127,5 +126,4 @@ public class ChooseSuburb extends AppCompatActivity {
 
         return successfulFind;
     }
-
 }
