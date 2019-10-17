@@ -40,9 +40,9 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
     private Button buttonRegister;
     private EditText editTextEmail;
     private EditText editTextPassword;
-    private EditText editTextName, editBio, editDob;
+    private EditText editTextName, editBio;
     private Spinner spinnerPreferences;
-    private TextView textViewSignIn;
+    private TextView textViewSignIn, editDob;
 
     // Simple loading screen while authentication is being processed
     private ProgressDialog progressDialog;
@@ -71,7 +71,7 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
         editTextPassword = (EditText) findViewById(R.id.editTextPassword);
         editTextName = (EditText) findViewById(R.id.editTextName);
         editBio = (EditText) findViewById(R.id.etBio);
-        editDob = (EditText) findViewById(R.id.etDOB);
+        editDob = (TextView) findViewById(R.id.etDOB);
         spinnerPreferences = (Spinner) findViewById(R.id.spinnerPreferences);
         textViewSignIn = (TextView) findViewById(R.id.textViewSignIn);
 
