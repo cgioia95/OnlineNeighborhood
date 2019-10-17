@@ -39,35 +39,23 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     private static ArrayList<Event> eventList;
     private static Context mContext;
     private onEventClickListener mListener;
-
-
 //    private onEventLongClickListener mListener2;
-
-
-
-
-
 
     public interface onEventClickListener {
         void onEventClick(int position);
     }
 
-
 //    public interface onEventLongClickListener {
 //        void onEventLongClick(int position);
 //    }
-
-
 
     public void setOnEventClickListener(onEventClickListener listener) {
         mListener = listener;
     }
 
-
 //    public void setOnEventLongClickListener(onEventLongClickListener listener) {
 //        mListener2 = listener;
 //    }
-
 
     public static class EventViewHolder extends RecyclerView.ViewHolder {
 
@@ -77,10 +65,10 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         private StorageReference storageReference;
         private DatabaseReference databaseReference;
 
-
         public EventViewHolder(@NonNull View itemView, final onEventClickListener listener) {
             super(itemView);
 
+            //Retrieve relevant views to be populated for an event; set up Firebase references
             mEvent = itemView.findViewById(R.id.eventName);
             mUserName = itemView.findViewById(R.id.userName);
             mEventTime = itemView.findViewById(R.id.eventTime);
@@ -101,13 +89,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
                         if(position!= RecyclerView.NO_POSITION) {
                             listener.onEventClick(position);
                         }
-
                     }
-
                 }
             });
-
-
 //            itemView.setOnLongClickListener(new View.OnLongClickListener() {
 //                @Override
 //                public boolean onLongClick(View view) {
@@ -125,75 +109,60 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 //
 //                }
 //            });
-
-
         }
 
         private void getUsername(String uid){
             databaseReference.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Log.d("On DATA CHANGE ", "IN");
                     Log.d("On DATA CHANGE", "Snapshot" + dataSnapshot);
                     if (dataSnapshot.getValue() != null) {
                         String name = dataSnapshot.child("name").getValue().toString();
-
                         mUserName.setText(name);
-
                     }
-
                 }
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
                 }
             });
-
         }
-
-
 
         protected void downloadImage(String uid) {
             storageReference.child("profilePics/" + uid).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
                 public void onSuccess(Uri uri) {
-                    // Got the download URL for 'users/me/profile.png' in uri
+                    //Got the download URL for 'users/me/profile.png' in uri
                     Log.d(TAG, "DOWNLOAD URL: " + uri.toString());
                     Picasso.get().load(uri).into(hostPic);
                     return;
-
 
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception exception) {
-                    // Handle any errors
+                    //Handle any errors
                     Log.d(TAG, "DOWNLOAD URL: FAILURE");
                     storageReference.child("profilePics/" + "default.png").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
-                            // Got the download URL for 'users/me/profile.png' in uri
+                            //Got the download URL for 'users/me/profile.png' in uri
                             Log.d(TAG, "DOWNLOAD URL: " + uri.toString());
                             Picasso.get().load(uri).into(hostPic);
                             return;
-
 
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception exception) {
-                            // Handle any errors
+                            //Handle any errors
                             Log.d(TAG, "DOWNLOAD URL: FAILURE");
-
                         }
                     });
-
                 }
             });
-
-
-
-
         }
     }
 
@@ -202,15 +171,12 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         this.mContext = context;
     }
 
-
     @NonNull
     @Override
     public EventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.event_item, parent, false);
         EventViewHolder viewholder = new EventViewHolder(v, mListener);
         return viewholder;
-
-
     }
 
     @Override
@@ -224,7 +190,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         holder.getUsername(currentItem.getHost().getUid());
         holder.mEventTime.setText(currentItem.getTime());
         holder.mEventAddress.setText(currentItem.getAddress());
-
 
         //Change the date format to display the date and day of the week
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
@@ -244,14 +209,10 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         String size = "" +  currentItem.getAttendees().size();
         holder.mEventAttending.setText(size);
         holder.downloadImage(currentItem.getHost().getUid());
-
     }
-
 
     @Override
     public int getItemCount() {
         return eventList.size();
     }
-
-
 }
