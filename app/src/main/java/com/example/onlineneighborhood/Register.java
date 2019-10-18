@@ -138,6 +138,7 @@ public class Register extends AppCompatActivity implements View.OnClickListener,
         progressDialog.setMessage("Registering User");
         progressDialog.show();
 
+
         fireBaseAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -148,6 +149,8 @@ public class Register extends AppCompatActivity implements View.OnClickListener,
 
                             Toast.makeText(Register.this, "Registered Succesfully", Toast.LENGTH_SHORT).show();
 
+                            //getting the specific firebase authentication ID of the user and associating it with the database
+                            //creating an instance with the user information and then setting in the firebase database
                             String Uid = task.getResult().getUser().getUid();
 
                             UserInformation userInformation = new UserInformation(name, preference, dob, bio);
@@ -159,13 +162,14 @@ public class Register extends AppCompatActivity implements View.OnClickListener,
 
 
                         } else {
-                            progressDialog.dismiss();
 
+                            progressDialog.dismiss();
                             Toast.makeText(Register.this, "Could not register ... please try again", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
     }
+
 
 
     private void showDatePickerDialog(){

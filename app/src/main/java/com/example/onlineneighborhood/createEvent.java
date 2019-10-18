@@ -71,9 +71,6 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     private Suburb suburb;
     Button getLocation, createEvent;
 
-    //TODO: add this loading dialog
-    private ProgressDialog progressDialog;
-
     //XML variables
     EditText evName, evDesc, evAddress;
     private TextView eventTv;
@@ -152,16 +149,6 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         databaseEvents = FirebaseDatabase.getInstance().getReference("events");
         databaseUsers = FirebaseDatabase.getInstance().getReference("Users");
         databaseSuburb =  FirebaseDatabase.getInstance().getReference("suburbs").child(intentSuburb);
-
-        //Metrics of the popup window. Currently setting it to 90% of screen width and height
-        DisplayMetrics dm = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(dm);
-
-        int width = dm.widthPixels;
-        int height = dm.heightPixels;
-
-        //Change this to 0.85 for example to lessen the size of the screen
-        getWindow().setLayout((int)(width*1), (int)(height*1));
 
         //Bind Simple Variables
         users = new ArrayList<UserInformation>();
@@ -269,21 +256,21 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
         if(view == evTime){
             startAndEnd = true;
-            showTruitonTimePickerDialog(view);
+            showTimePickerDialog(view);
         }
         if(view == evEndTime){
             startAndEnd = false;
-            showTruitonTimePickerDialog(view);
+            showTimePickerDialog(view);
         }
 
         if(view == evDate){
             startAndEnd = true;
-            showTruitonDatePickerDialog(view);
+            showDatePickerDialog(view);
         }
 
         if(view == evEndDate){
             startAndEnd = false;
-            showTruitonDatePickerDialog(view);
+            showDatePickerDialog(view);
         }
 
     }
@@ -413,7 +400,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
             ArrayList<Event> userEvents = new ArrayList<Event>();
             userEvents.add(userEvent);
             ArrayList<Event> eventCheck = host.getMyEvents();
-            ArrayList<Event> eventCheck2 = host.getMyEventsAttending();
+            ArrayList<Event> myEventsCheck = host.getMyEventsAttending();
 
             //Checks if an events array exists in the suburb, if it doesn't, this creates one
             if(suburb.getEvents() == null){
@@ -428,7 +415,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
                 host.getMyEvents().add(userEvent);
             }
 
-            if(eventCheck2 == null){
+            if(myEventsCheck == null){
                 host.setMyEventsAttending(userEvents);
             }else{
                 host.getMyEventsAttending().add(userEvent);
@@ -446,7 +433,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
     /***************************************************************************************
      *
-     *    Took this code for the clock and date functionality. Referenced the place i got it from below.
+     *    Took this code for the clock and date functionality. Referenced the place I got it from below.
      *
      *    Title: Android pick date time from EditText OnClick event
      *    Author: Mohit Gupt
@@ -509,12 +496,12 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         }
     }
 
-    public void showTruitonTimePickerDialog(View v) {
+    public void showTimePickerDialog(View v) {
         DialogFragment newFragment = new TimePickerFragment();
         newFragment.show(getSupportFragmentManager(), "timePicker");
     }
 
-    public void showTruitonDatePickerDialog(View v) {
+    public void showDatePickerDialog(View v) {
         DialogFragment newFragment = new DatePickerFragment();
         newFragment.show(getSupportFragmentManager(), "datePicker");
     }
@@ -571,6 +558,8 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         return "VALID";
     }
 
+
+    //manipulating the time int variables receives from calender and converting them for readability purposes
     public static String timeToString(int time){
         String setTime;
         if(time == 0){
