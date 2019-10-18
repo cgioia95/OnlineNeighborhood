@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
@@ -29,13 +30,10 @@ public class ChooseSuburb extends AppCompatActivity {
     private String suburbid, suburbName;
     private ArrayAdapter<String> arrayAdapter;
 
-    final static String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/onlineNeighbourhood/melbourneSuburbs.csv";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_suburb);
-
         suburbSearch = findViewById(R.id.searchSuburb);
         suburbList = findViewById(R.id.suburbList);
         suburbs = parseCSV();
@@ -60,6 +58,9 @@ public class ChooseSuburb extends AppCompatActivity {
         suburbList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                //when item is clicked in the list view,
+                // we take its name, check if it is in our list of suburbs,
+                // and if it is we start the intent
                 String name = adapterView.getItemAtPosition(i).toString().trim();
                 suburbName = name;
 
@@ -74,7 +75,10 @@ public class ChooseSuburb extends AppCompatActivity {
         });
     }
 
+
     public void startIntent(){
+        //setting the global variable of suburb so that the rest of the app
+        // can access this information without excessive passing of intents
         ((OnlineNeighborhood) this.getApplication()).setsuburb(suburbid);
         ((OnlineNeighborhood) this.getApplication()).setSuburbName(suburbName);
 
@@ -83,6 +87,12 @@ public class ChooseSuburb extends AppCompatActivity {
         startActivity(intent);
     }
 
+
+    /***
+     * method which extracts each row of data from a CSV file which has suburb information saved in it
+     * each row is extracted into a String[] array containing 3 feilds, name, postcode, and firebase ID
+     * @return  an arraylist of the CSV file saved locally
+     */
     public ArrayList<String[]> parseCSV(){
         ArrayList<String[]> suburbList = new ArrayList<String[]>();
         try{
@@ -104,6 +114,13 @@ public class ChooseSuburb extends AppCompatActivity {
         return suburbList;
     }
 
+    /**
+     * simple method which seperates the csv columns and extracts the data, returning a array list
+     * of the speicific column requested
+     * @param arr --  requires ArrayList which should be created from CSV
+     * @param index -- choose which column index of CSV you want to extract
+     * @return -- returns ArrayList of specified column
+     */
     public ArrayList<String> convertArray(ArrayList<String[]> arr, int index){
 
         //Declaration and initialise String Array
@@ -118,7 +135,7 @@ public class ChooseSuburb extends AppCompatActivity {
         return str;
     }
 
-    //Checks if suburb is found within a list of and sets it to suburbid
+    //Checks if suburb is found within a list and sets it to SuburbID
     private boolean findSuburbId(ArrayList<String[]> idList, String suburb){
         boolean successfulFind = false;
         for(int i = 0; i < idList.size(); i++){

@@ -17,7 +17,7 @@ public class Event implements Serializable {
     public Event(){
 
     }
-
+    //2 different constructors for the different firebase instances of events
     public Event(String id, String suburbId){
         this.id = id;
         this.suburbId = suburbId;

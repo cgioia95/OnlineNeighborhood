@@ -4,13 +4,11 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -18,7 +16,6 @@ import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,12 +25,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.onlineneighborhood.BottomNavigationActivity;
-import com.example.onlineneighborhood.Event;
-import com.example.onlineneighborhood.EventAdapter;
-import com.example.onlineneighborhood.Login;
-import com.example.onlineneighborhood.R;
-import com.example.onlineneighborhood.createEvent;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -50,20 +41,19 @@ import java.util.Date;
 
 public class HomeFragment extends Fragment implements View.OnClickListener, Serializable {
 
-    TextView suburbTextView;
 
 
+    TextView dateFilterActive, typeFilterActive;
     ImageView  addEvent, dateFilter, typeFilter;
-    Button filterButton, clearFilter;
+    Button clearFilter;
     String suburb;
-    static String date, type;
-    private Callbacks mCallbacks;
+    static String type;
+    private static Callbacks mCallbacks;
     private static final String TAG = "HomeScreen";
     static Date calenderDate;
     private Suburb currentSuburb;
-    private Button applyFilterButton;
 
-    private FirebaseAuth fireBaseAuth;
+
     DatabaseReference databaseEvents;
 
     //Setting up recyclerview and adapter for displaying events
@@ -79,18 +69,18 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View mView = inflater.inflate(R.layout.activity_home_screen, null);
 
-        fireBaseAuth = FirebaseAuth.getInstance();
         addEvent = mView.findViewById(R.id.addEvent);
         dateFilter = mView.findViewById(R.id.dateFilterHome);
         typeFilter = mView.findViewById(R.id.typeFilter);
-        suburbTextView = mView.findViewById(R.id.textViewSuburb);
-        applyFilterButton = mView.findViewById(R.id.applyFilterButton);
         clearFilter = mView.findViewById(R.id.clearFilter);
+        dateFilterActive = mView.findViewById(R.id.dateFilterActive);
+        typeFilterActive = mView.findViewById(R.id.typeFilterActive);
+
+        dateFilterActive.setVisibility(View.INVISIBLE);
+        typeFilterActive.setVisibility(View.INVISIBLE);
 
         suburb = ((OnlineNeighborhood) getActivity().getApplication()).getsuburb();
-
         addEvent.setOnClickListener(this);
-        applyFilterButton.setOnClickListener(this);
         dateFilter.setOnClickListener(this);
         typeFilter.setOnClickListener(this);
         clearFilter.setOnClickListener(this);
@@ -103,17 +93,20 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
 
         databaseEvents = FirebaseDatabase.getInstance().getReference("suburbs").child(suburb);
 
+        //this method on start retrieves the list of events in the requested suburb and adds them
+        //to the recycler view for viewing/interaction. the filter method is used when type/date are not null
         databaseEvents.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 eventList.clear();
                 currentSuburb = dataSnapshot.getValue(Suburb.class);
-                suburbTextView.setText(currentSuburb.getSubName());
                 if(currentSuburb.getEvents() != null){
                     ArrayList<Event> events = currentSuburb.getEvents();
                     for(Event event: events){
                         if(event != null) {
+                            //calling the method to check if filters are applied
+                            //and applying them/adding to the list for the recycler view
                             try {
                                 filterApplied(calenderDate, type, event);
                             } catch (ParseException e) {
@@ -125,8 +118,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
                 }
 
                 //SET UP EVENTLIST
-                //i think when theres no list of events this throws. not sure why but just put an error check on it
-                //TODO: NEED TO FIX THIS ASAP. (turns out it still crashes even with this)
+                //try catch to stop crashing when there are null pointers when creating a recycler view
                 try{
                     mRecyclerView = getActivity().findViewById(R.id.recyclerView);
                     mLayoutManager = new LinearLayoutManager(getActivity());
@@ -141,36 +133,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
                 }
 
                 if(mAdapter!=null) {
-/*                    mAdapter.setOnEventLongClickListener(new EventAdapter.onEventLongClickListener() {
-                        @Override
-                        public void onEventLongClick(int position) {
 
-                            Event event = eventList.get(position);
-
-                            String hostId = event.getHost().getUid();
-
-                            String myId = fireBaseAuth.getCurrentUser().getUid();
-                            Log.d(TAG, "Long Click");
-
-
-                            if (myId.equals(hostId)) {
-                                Log.d(TAG, "Permission Granted");
-
-                                Intent intent = new Intent(getActivity(), editDelete.class);
-                                intent.putExtra("MyObject", event);
-                                intent.putExtra("SUBURB", suburb);
-
-
-                                startActivity(intent);
-
-                            } else {
-                                Log.d(TAG, "Permission Denied");
-                            }
-
-
-                        }
-                    });
-*/
                     mAdapter.setOnEventClickListener(new EventAdapter.onEventClickListener() {
                         @Override
                         public void onEventClick(int position) {
@@ -198,6 +161,19 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
             }
         });
 
+
+        if(type != null){
+            typeFilterActive.setText("Type Filter: " + type);
+            typeFilterActive.setVisibility(View.VISIBLE);
+        }
+
+        if(calenderDate != null){
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+            String dateTime = dateFormat.format(calenderDate);
+            dateFilterActive.setText("Date Filter: " + dateTime);
+            dateFilterActive.setVisibility(View.VISIBLE);
+        }
     }
 
     //@Override
@@ -219,18 +195,17 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
 
         }
 
-        if(view == applyFilterButton){
-            mCallbacks.onButtonClicked();
-        }
-
         if(view == clearFilter){
             type = null;
             calenderDate = null;
+
+            //this callsback the homescreen and re-loads it. basically refreshing the fragment
             mCallbacks.onButtonClicked();
         }
 
     }
 
+    //basic method which does simple checks against the selected filters and sees if the event elements match the filters
     public void filterApplied(Date date, String type, Event event) throws ParseException {
         String eventStartDate = event.getDate() + " " + event.getTime();
         String eventEndDate = event.getEndDate() + " " + event.getEndTime();
@@ -239,7 +214,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
         if(date == null && type == null){
             eventList.add(event);
         }else if(date != null && type == null){
-                if((eventStart.after(date) || eventStart.equals(date)) && (eventEnd.before(date)|| eventEnd.equals(date))) {
+                if(eventStart.equals(date)) {
                     eventList.add(event);
                 }
 
@@ -248,13 +223,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
                  eventList.add(event);
                 }
         } else{
-            if((eventStart.after(date) || eventStart.equals(date)) && (eventEnd.before(date)|| eventEnd.equals(date)) && event.getType().equals(type)) {
+            if(eventStart.equals(date) && event.getType().equals(type)) {
                 eventList.add(event);
             }
         }
     }
 
-    // NEED TO REFERENCE THIS
+
+    //dialog date fragment
     public static class SelectDateFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 
         @Override
@@ -268,12 +244,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
 
         public void onDateSet(DatePicker view, int yy, int mm, int dd) {
             populateSetDate(yy, mm+1, dd);
+
         }
         public Date populateSetDate(int year, int month, int day) {
 
             calenderDate = new Date(year - 1900, month - 1, day);
             Log.d("CALENDER DATE POPULATE" , calenderDate.toString());
-
+            mCallbacks.onButtonClicked();
             return calenderDate;
         }
 
@@ -308,6 +285,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             type = typeSpinner.getSelectedItem().toString();
+                            mCallbacks.onButtonClicked();
                         }
                     });
 
@@ -324,7 +302,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        // Activities containing this fragment must implement its callbacks
+        //Activities containing this fragment must implement its callbacks
         mCallbacks = (Callbacks) activity;
 
     }
