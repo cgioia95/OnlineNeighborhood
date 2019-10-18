@@ -133,7 +133,7 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Log.d("user profile", "onCreate: " + toolbar);
-        getSupportActionBar().setTitle("Online Neighborhood");
+        getSupportActionBar().setTitle("My Profile");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
