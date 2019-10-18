@@ -64,7 +64,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
     DatabaseReference databaseEvents, databaseUsers, databaseSuburb;
 
     //location variables
-    private final String DEFAULT_LOCAL = "Please wait a few seconds while we get your location";
+    private final String DEFAULT_LOCAL = "NO LOCATION FOUND";
     private String locat = DEFAULT_LOCAL;
     //Long and latitude
     private double lon, lat;
@@ -94,6 +94,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
         super.onStart();
 
+        //finding host data based off the firebase UID and assigning it to a local UserInformation variable
         databaseUsers.child(firebaseAuth.getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -105,6 +106,7 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         });
+
 
         databaseSuburb.addValueEventListener(new ValueEventListener() {
             @Override
@@ -126,12 +128,16 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         int year = c.get(Calendar.YEAR);
         int month = c.get(Calendar.MONTH);
         int day = c.get(Calendar.DAY_OF_MONTH);
+        String setHour = timeToString(hour);
+        String setMin = timeToString(minute);
+        String setEndHour = timeToString(hour+1);
 
-        evTime.setText(hour +":"+minute);
-        evEndTime.setText((hour+1)+":"+minute);
+        evTime.setText(setHour +":"+setMin);
+        evEndTime.setText(setEndHour+":"+setMin);
         evDate.setText(day+"/"+(month+1)+"/"+year);
         evEndDate.setText(day+"/"+(month+1)+"/"+year);
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -245,12 +251,10 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
              locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 5, locationListener);
         }
 
-        //Sets the location
-        eventTv.setText(locat);
     }
 
 
-    //Functionalities for the buttons
+
     @Override
     public void onClick(View view) {
         if(view == getLocation){
@@ -468,24 +472,13 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
             //Do something with the time chosen by the user
             //due to int data type, a bodge job adding zeros manually.
+            String setHour = com.example.onlineneighborhood.createEvent.timeToString(hourOfDay);
+            String setMin = com.example.onlineneighborhood.createEvent.timeToString(minute);
             if(startAndEnd){
-                if(minute < 10){
-                    evTime.setText(hourOfDay + ":0"	+ minute);
-                }
-                else if(minute == 0){
-                    evTime.setText(hourOfDay + ":00" + minute);
-                }else {
-                    evTime.setText(hourOfDay + ":"	+ minute);
-                }
+                evTime.setText(setHour + ':' + setMin);
+
             }else{
-                if(minute < 10){
-                    evEndTime.setText(hourOfDay + ":0"	+ minute);
-                }
-                else if(minute == 0){
-                    evEndTime.setText(hourOfDay + ":00" + minute);
-                }else {
-                    evEndTime.setText(hourOfDay + ":"	+ minute);
-                }
+                evEndTime.setText(setHour+":"+setMin);
             }
         }
     }
@@ -576,5 +569,19 @@ public class createEvent extends AppCompatActivity implements View.OnClickListen
 
         }
         return "VALID";
+    }
+
+    public static String timeToString(int time){
+        String setTime;
+        if(time == 0){
+            setTime = "00";
+            return setTime;
+        } else if(time < 10){
+            setTime = "0" + time;
+            return setTime;
+        } else {
+            setTime = "" + time;
+            return setTime;
+        }
     }
 }

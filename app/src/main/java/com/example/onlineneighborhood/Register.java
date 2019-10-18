@@ -64,7 +64,6 @@ public class Register extends AppCompatActivity implements View.OnClickListener,
         databaseReference = FirebaseDatabase.getInstance().getReference("Users");
 
         // Bind all simple variables
-
         progressDialog = new ProgressDialog(this);
         buttonRegister = (Button) findViewById(R.id.buttonRegister);
         editTextEmail = (EditText) findViewById(R.id.editTextEmail);
