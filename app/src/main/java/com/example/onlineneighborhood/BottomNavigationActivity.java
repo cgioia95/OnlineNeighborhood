@@ -48,6 +48,7 @@ import android.widget.Toolbar;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,6 +67,7 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
     Suburb suburb, toolbarSub;
     ArrayList<Event> events;
     String suburbName = "LOADING";
+
 
     // Firebase reference variables
     DatabaseReference databaseEvents, databaseUsers, databaseSuburb;
@@ -224,6 +226,8 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
                 mMap.clear();
                 for (DataSnapshot suburbSnapshot : dataSnapshot.getChildren()) {
                     Suburb currentSuburb = suburbSnapshot.getValue(Suburb.class);
+                    Log.d("Suburb Name", "onDataChange: " + currentSuburb.getSubName());
+
                     Intent i = getIntent();
                     String intentSuburb = i.getStringExtra("SUBURB");
                     Log.d("SUBURB", "" + suburbSnapshot);

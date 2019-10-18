@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,7 +37,8 @@ public class EventScreen extends AppCompatActivity {
     private static final String TAG = "EventScreenTAG";
     private static final String TAG2 = "EventScreenList";
 
-    public TextView mEventName, mDescription, mTime, mDate, attendingTextView;
+
+    public TextView mEventName, mDescription, mTime, mDate, mEventAdress, attendingTextView;
     private StorageReference storageReference;
     public CircleImageView hostPic;
     public Button attendBtn, editBtn, deleteBtn;
@@ -83,6 +83,8 @@ public class EventScreen extends AppCompatActivity {
         mDate = findViewById(R.id.eventDate);
         mTime = findViewById(R.id.eventTime);
         hostPic = findViewById(R.id.hostImage);
+
+        mEventAdress = findViewById(R.id.eventAddress);
 
         storage = FirebaseStorage.getInstance();
         storageReference=storage.getReference();
@@ -208,6 +210,7 @@ public class EventScreen extends AppCompatActivity {
 
         //Pre-population
         mEventName.setText(mEvent.getName());
+        mEventAdress.setText(mEvent.getAddress());
         mDescription.setText(mEvent.getDescription());
         mDate.setText(mEvent.getDate());
         mTime.setText(mEvent.getTime());

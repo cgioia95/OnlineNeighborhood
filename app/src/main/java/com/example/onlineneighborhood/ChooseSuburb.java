@@ -27,7 +27,7 @@ public class ChooseSuburb extends AppCompatActivity {
     private ListView suburbList;
     private ArrayList<String[]> suburbs;
     private ArrayList<String> suburbNames;
-    private String suburbid;
+    private String suburbid, suburbName;
     private ArrayAdapter<String> arrayAdapter;
 
     @Override
@@ -62,8 +62,11 @@ public class ChooseSuburb extends AppCompatActivity {
                 // we take its name, check if it is in our list of suburbs,
                 // and if it is we start the intent
                 String name = adapterView.getItemAtPosition(i).toString().trim();
+                suburbName = name;
+
                 if(findSuburbId(suburbs, name)){
                    startIntent();
+
                 } else{
                     Toast.makeText(getApplicationContext(), "please try again", Toast.LENGTH_LONG).show();
                 }
@@ -77,7 +80,10 @@ public class ChooseSuburb extends AppCompatActivity {
         //setting the global variable of suburb so that the rest of the app
         // can access this information without excessive passing of intents
         ((OnlineNeighborhood) this.getApplication()).setsuburb(suburbid);
+        ((OnlineNeighborhood) this.getApplication()).setSuburbName(suburbName);
+
         Intent intent = new Intent(this, BottomNavigationActivity.class);
+        intent.putExtra("SuburbName", suburbName);
         startActivity(intent);
     }
 
