@@ -26,7 +26,7 @@ public class ChooseSuburb extends AppCompatActivity {
     private ListView suburbList;
     private ArrayList<String[]> suburbs;
     private ArrayList<String> suburbNames;
-    private String suburbid;
+    private String suburbid, suburbName;
     private ArrayAdapter<String> arrayAdapter;
 
     final static String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/onlineNeighbourhood/melbourneSuburbs.csv";
@@ -61,8 +61,11 @@ public class ChooseSuburb extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String name = adapterView.getItemAtPosition(i).toString().trim();
+                suburbName = name;
+
                 if(findSuburbId(suburbs, name)){
                    startIntent();
+
                 } else{
                     Toast.makeText(getApplicationContext(), "please try again", Toast.LENGTH_LONG).show();
                 }
@@ -73,7 +76,10 @@ public class ChooseSuburb extends AppCompatActivity {
 
     public void startIntent(){
         ((OnlineNeighborhood) this.getApplication()).setsuburb(suburbid);
+        ((OnlineNeighborhood) this.getApplication()).setSuburbName(suburbName);
+
         Intent intent = new Intent(this, BottomNavigationActivity.class);
+        intent.putExtra("SuburbName", suburbName);
         startActivity(intent);
     }
 

@@ -100,15 +100,8 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
 
     private static final int PICK_IMAGE = 1, CAMERA_REQUEST=2;
     private static final int MY_CAMERA_PERMISSION_CODE = 100;
-//    private static final int EXTERNAL_STORAGE_PERMISSION_CONSTANT = 120;
-//
-//    private static final int REQUEST_PERMISSION_SETTING = 101;
-//    private boolean sentToSettings = false;
-//    private SharedPreferences permissionStatus;
-
-    private static final int  REQUEST_TAKE_PHOTO = 15;
     private static final String TAG = "My Profile";
-    private String uid, currentPhotoPath;
+    private String uid;
     Uri imageuri;
     private List<String> preferenceOptions = Arrays.asList("Sports", "Gigs", "Dating", "Misc.");
 
@@ -135,7 +128,7 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
 
 
         spinnerPreferences.setEnabled(false);
-//        imageButtonPicture.setAdjustViewBounds(true);
+
 
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -143,7 +136,6 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
         getSupportActionBar().setTitle("Online Neighborhood");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-//        permissionStatus = getSharedPreferences("permissionStatus",MODE_PRIVATE);
 
 
 
