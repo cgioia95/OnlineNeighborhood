@@ -4,13 +4,11 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -18,7 +16,6 @@ import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,12 +25,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.onlineneighborhood.BottomNavigationActivity;
-import com.example.onlineneighborhood.Event;
-import com.example.onlineneighborhood.EventAdapter;
-import com.example.onlineneighborhood.Login;
-import com.example.onlineneighborhood.R;
-import com.example.onlineneighborhood.createEvent;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -50,18 +41,18 @@ import java.util.Date;
 
 public class HomeFragment extends Fragment implements View.OnClickListener, Serializable {
 
-    TextView suburbTextView;
 
 
+    TextView dateFilterActive, typeFilterActive;
     ImageView  addEvent, dateFilter, typeFilter;
     Button filterButton, clearFilter;
     String suburb;
-    static String date, type;
-    private Callbacks mCallbacks;
+    static String type;
+    private static Callbacks mCallbacks;
     private static final String TAG = "HomeScreen";
     static Date calenderDate;
     private Suburb currentSuburb;
-    private Button applyFilterButton;
+
 
     private FirebaseAuth fireBaseAuth;
     DatabaseReference databaseEvents;
@@ -83,14 +74,15 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
         addEvent = mView.findViewById(R.id.addEvent);
         dateFilter = mView.findViewById(R.id.dateFilterHome);
         typeFilter = mView.findViewById(R.id.typeFilter);
-        suburbTextView = mView.findViewById(R.id.textViewSuburb);
-        applyFilterButton = mView.findViewById(R.id.applyFilterButton);
         clearFilter = mView.findViewById(R.id.clearFilter);
+        dateFilterActive = mView.findViewById(R.id.dateFilterActive);
+        typeFilterActive = mView.findViewById(R.id.typeFilterActive);
+
+        dateFilterActive.setVisibility(View.INVISIBLE);
+        typeFilterActive.setVisibility(View.INVISIBLE);
 
         suburb = ((OnlineNeighborhood) getActivity().getApplication()).getsuburb();
-
         addEvent.setOnClickListener(this);
-        applyFilterButton.setOnClickListener(this);
         dateFilter.setOnClickListener(this);
         typeFilter.setOnClickListener(this);
         clearFilter.setOnClickListener(this);
@@ -109,7 +101,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
 
                 eventList.clear();
                 currentSuburb = dataSnapshot.getValue(Suburb.class);
-                suburbTextView.setText(currentSuburb.getSubName());
                 if(currentSuburb.getEvents() != null){
                     ArrayList<Event> events = currentSuburb.getEvents();
                     for(Event event: events){
@@ -198,6 +189,18 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
             }
         });
 
+        if(type != null){
+            typeFilterActive.setText("Type Filter: " + type);
+            typeFilterActive.setVisibility(View.VISIBLE);
+        }
+
+        if(calenderDate != null){
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+            String dateTime = dateFormat.format(calenderDate);
+            dateFilterActive.setText("Date Filter: " + dateTime);
+            dateFilterActive.setVisibility(View.VISIBLE);
+        }
     }
 
     //@Override
@@ -217,10 +220,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
         if(view == typeFilter){
             openTypeDialog();
 
-        }
-
-        if(view == applyFilterButton){
-            mCallbacks.onButtonClicked();
         }
 
         if(view == clearFilter){
@@ -268,12 +267,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
 
         public void onDateSet(DatePicker view, int yy, int mm, int dd) {
             populateSetDate(yy, mm+1, dd);
+
         }
         public Date populateSetDate(int year, int month, int day) {
 
             calenderDate = new Date(year - 1900, month - 1, day);
             Log.d("CALENDER DATE POPULATE" , calenderDate.toString());
-
+            mCallbacks.onButtonClicked();
             return calenderDate;
         }
 
@@ -308,6 +308,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             type = typeSpinner.getSelectedItem().toString();
+                            mCallbacks.onButtonClicked();
                         }
                     });
 

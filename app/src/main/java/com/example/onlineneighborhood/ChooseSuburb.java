@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
@@ -33,7 +34,6 @@ public class ChooseSuburb extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_suburb);
-
         suburbSearch = findViewById(R.id.searchSuburb);
         suburbList = findViewById(R.id.suburbList);
         suburbs = parseCSV();
