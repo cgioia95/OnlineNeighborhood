@@ -128,15 +128,16 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
             uid = fireBaseAuth.getCurrentUser().getUid();
 
 
-
+        //adding current suburb name to toolbar
         Intent i = getIntent();
-
         suburbName = i.getStringExtra("SuburbName");
         if(suburbName == null){
             suburbName = ((OnlineNeighborhood) this.getApplication()).getSuburbName();
         }
         ((OnlineNeighborhood) this.getApplication()).setSuburbName(suburbName);
-        //Setting toolbar for adding profile icon
+
+
+        //Setting up toolbar with a profile image
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         profile = toolbar.findViewById(R.id.profile);
         downloadImage();

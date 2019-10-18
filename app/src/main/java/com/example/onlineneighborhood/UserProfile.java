@@ -96,8 +96,6 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
     private StorageReference storageReference;
     private ProgressDialog progressDialog;
     private Bitmap photo;
-
-
     private static final int PICK_IMAGE = 1, CAMERA_REQUEST=2;
     private static final int MY_CAMERA_PERMISSION_CODE = 100;
     private static final String TAG = "My Profile";
@@ -112,8 +110,6 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
         setContentView(R.layout.activity_profile_screen);
 
         textViewName = findViewById(R.id.textViewName);
-
-
         editProfileBtn = findViewById(R.id.editProfileBtn);
         spinnerPreferences = (Spinner) findViewById(R.id.spinnerPreferences);
         editTextdob = findViewById(R.id.editTextdob);
@@ -126,10 +122,10 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
         storageReference=storage.getReference();
 
 
-
         spinnerPreferences.setEnabled(false);
 
 
+        //Setting up toolbar
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Log.d("user profile", "onCreate: " + toolbar);
@@ -137,30 +133,16 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
-
-
-
         if (fireBaseAuth.getCurrentUser() != null)
             uid = fireBaseAuth.getCurrentUser().getUid();
 
-
-
-
-
+        //Display dialog box to choose between camera and gallery
         imageButtonPicture.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-//                if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
-//                {
-//                    requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_PERMISSION_CODE);
-//                }
-//                else
-//                {
-//                    Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-//                    startActivityForResult(cameraIntent, CAMERA_REQUEST);
-//                }
+
                 CharSequence[] items={"Camera", "Gallery"};
                 AlertDialog.Builder builder = new AlertDialog.Builder(UserProfile.this);
                 builder.setTitle("Pick an image from").setItems(items, new DialogInterface.OnClickListener() {
@@ -194,7 +176,7 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
             }
         });
 
-
+        //Fetch User's data from firebase
         databaseReference.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -247,15 +229,13 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
             finish();
         }
 
+        //edit alternates Bio between textView and EditText for better UX
         if(item.getItemId() == R.id.edit){
             editProfileBtn.setVisibility(View.VISIBLE);
             spinnerPreferences.setEnabled(true);
             textViewBio.setVisibility(View.GONE);
             editTextBio.setText(textViewBio.getText().toString());
             editTextBio.setVisibility(View.VISIBLE);
-
-
-
             editTextdob.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -266,6 +246,7 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
 
             });
 
+            //Upload changes to firebase
             editProfileBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
