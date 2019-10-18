@@ -9,13 +9,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Event implements Serializable {
-    private String id;
+
     private UserInformation host;
-    private String address, eventName, description, time, date, endTime, endDate, type, suburbId;
-  
-
+    private String address, eventName, description, time, date, endTime, endDate, type, suburbId, id;
     private ArrayList<UserInformation> attendees;
-
 
     public Event(){
 
@@ -41,6 +38,7 @@ public class Event implements Serializable {
         this.attendees = attendees;
     }
 
+    //Getters and setters for event items, for current and future potential usage
 
     public String getEventName() {
         return eventName;
@@ -89,7 +87,6 @@ public class Event implements Serializable {
     public void setDate(String date) {
         this.date = date;
     }
-
 
     public String getAddress() {
         return address;

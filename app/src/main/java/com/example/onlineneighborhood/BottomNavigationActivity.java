@@ -54,24 +54,24 @@ import java.util.List;
 import static java.util.Locale.getDefault;
 
 
-public class BottomNavigationActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
+public class BottomNavigationActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, HomeFragment.Callbacks {
 
 
     private GoogleMap mMap;
-    String intentSuburb, dateRange, typeFilter, time;
+    public static Context contextOfApplication;
+    private Menu menu;
     private ImageView profile;
     Bundle bundle = new Bundle();
+    String intentSuburb, dateRange, typeFilter, time, uid;
     Suburb suburb;
     ArrayList<Event> events;
-    DatabaseReference databaseEvents;
-    DatabaseReference databaseUsers;
-    DatabaseReference databaseSuburb;
+
+    // Firebase reference variables
+    DatabaseReference databaseEvents, databaseUsers, databaseSuburb;
     private FirebaseAuth fireBaseAuth;
     private FirebaseStorage storage;
     private StorageReference storageReference;
-    private String uid;
-    public static Context contextOfApplication;
-    private Menu menu;
+
 
     public static Context getContextOfApplication()
     {
@@ -80,7 +80,6 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
 
     @Override
     protected void onStart() {
-        super.onStart();
 
         Intent i = getIntent();
         intentSuburb = i.getStringExtra("SUBURB");
@@ -88,6 +87,7 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
         typeFilter  = i.getStringExtra("TYPE");
         time = i.getStringExtra("TIME");
 
+        // Set up bundle for future relevant activities
         bundle.putString("SUBURB", intentSuburb);
         bundle.putString("DATE",  dateRange);
         bundle.putString("TYPE", typeFilter);
@@ -95,6 +95,8 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
 
         Log.d("BUNDLEVALUES:", ""+intentSuburb
                 +dateRange+ typeFilter +time);
+
+        super.onStart();
     }
 
     @Override
@@ -104,21 +106,21 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
         setContentView(R.layout.activity_bottom_navigation);
         BottomNavigationView navView = findViewById(R.id.nav_view);
         navView.setOnNavigationItemSelectedListener(this);
-        //navView.getMenu().findItem(R.id.navigation_home).setChecked(true);
+
         if (savedInstanceState == null) {
             navView.getMenu().performIdentifierAction(R.id.navigation_home, 0);
         }
-        contextOfApplication = getApplicationContext();
 
+        contextOfApplication = getApplicationContext();
         databaseEvents = FirebaseDatabase.getInstance().getReference("events");
         databaseUsers = FirebaseDatabase.getInstance().getReference("Users");
         databaseSuburb =  FirebaseDatabase.getInstance().getReference("suburbs");
         fireBaseAuth = FirebaseAuth.getInstance();
         storage = FirebaseStorage.getInstance();
         storageReference=storage.getReference();
+
         if (fireBaseAuth.getCurrentUser() != null)
             uid = fireBaseAuth.getCurrentUser().getUid();
-
 
         //Setting toolbar for adding profile icon
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
@@ -130,10 +132,8 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
         profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 Intent i = new Intent(getApplicationContext(), UserProfile.class);
                 startActivity(i);
-
             }
 
         });
@@ -154,7 +154,7 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
     private void setSupportActionBar(Toolbar toolbar) {
     }
 
-    //inflate toolbar menu
+    //Inflate toolbar menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -163,74 +163,64 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
         return true;
     }
 
-
-    //managing toolbar items
+    //Managing toolbar items
     public boolean onOptionsItemSelected(MenuItem item){
 
         return super.onOptionsItemSelected(item);
     }
 
-    //loading fragment above the navigation bar
+    //Loading fragment above the navigation bar
     private boolean loadFragment(Fragment fragment){
 
-
        if(fragment != null){
-
            getSupportFragmentManager()
                    .beginTransaction()
                    .replace(R.id.fragment_container,fragment).commit();
        }
+
        return false;
     }
-
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
 
         Bundle bundle = new Bundle();
         bundle.putString("SUBURB", intentSuburb);
-        bundle.putString("DATE",  dateRange);
-        bundle.putString("TYPE", typeFilter);
-        bundle.putString("TIME", time);
         HomeFragment home = new HomeFragment();
         home.setArguments(bundle);
 
         Fragment fragment = null;
         switch (menuItem.getItemId()){
 
+            //On clicking button to lead to 'MyEvents'
             case R.id.navigation_events:
                 fragment = new MyEvents();
-//              Add "My events" fragment here
                 menuItem.setChecked(true);
-
                 break;
 
-
+            //On clicking events map button
             case R.id.navigation_map:
                 // Obtain the SupportMapFragment and get notified when the map is ready to be used.
                 menuItem.setChecked(true);
-
                 fragment = new MapFragment();
                 break;
 
+            //On click home button, to show active list of checked in suburb's events
             case R.id.navigation_home:
                 menuItem.setChecked(true);
                 Log.d("Bottom Navigation", "onNavigationItemSelected: Home");
                 fragment= home;
                 break;
-
         }
+
         return loadFragment(fragment);
     }
-
-
 
     //Handling Maps
     //@Override
     public void onMapReady(GoogleMap googleMap) {
 
         mMap = googleMap;
-
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
@@ -238,89 +228,66 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
             }
         });
 
+        //Zoom into Melbourne as standard for now
         LatLng MELBOURNE = new LatLng(-37.814, 144.96);
-
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(MELBOURNE, 10));
 
-
-
         databaseSuburb.addValueEventListener(new ValueEventListener() {
-
-
-
 
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 mMap.clear();
-
-
-                for(DataSnapshot suburbSnapshot : dataSnapshot.getChildren()) {
+                for (DataSnapshot suburbSnapshot : dataSnapshot.getChildren()) {
                     Suburb currentSuburb = suburbSnapshot.getValue(Suburb.class);
                     Intent i = getIntent();
                     String intentSuburb = i.getStringExtra("SUBURB");
                     Log.d("SUBURB", "" + suburbSnapshot);
 
                     try{
-
                         if (intentSuburb.equals(currentSuburb.getSubName())) {
-
                             suburb = currentSuburb;
-
                             DatabaseReference databaseSuburbChange = FirebaseDatabase.getInstance().getReference("suburbs").child(suburb.getId());
-
 
                             Log.d("CHOSEN: ", "" + suburb + suburb.getSubName());
 
                             if ((events = suburb.getEvents()) != null){
-
-
                                 for (Event event: events){
-
                                     String title = event.getName();
                                     String address = event.getAddress();
                                     String date = event.getDate();
 
-
                                     Log.d("MAPTEST", title);
                                     Log.d("MAPTEST", address);
 
-
                                     Geocoder geocoder = new Geocoder(getApplicationContext(), getDefault());
                                     List<Address> addresses = null;
+
                                     try {
                                         addresses = geocoder.getFromLocationName(address, 1);
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }
+
                                     Address add = addresses.get(0);
                                     double longitude = add.getLongitude();
                                     double latitude = add.getLatitude();
-
                                     LatLng locat = new LatLng(latitude, longitude);
-
-
                                     Marker marker = mMap.addMarker(new MarkerOptions()
                                             .position(locat)
                                             .title(event.getName())
                                             .snippet(event.getDescription()));
 
-
                                     Log.d("MAPTEST", "LONG: " +  Double.toString(longitude) + " LAT: " + Double.toString(latitude));
-
-
                                 }
-
-
                             }
-
                             break;
                         }
 
                     } catch (NullPointerException e){
-                        //this catches null pointer exceptions, it happens alot
+                        //This catches null pointer exceptions - it happens a lot
                         //TODO: I need to find a better way to loop through all the suburbs
-                        //if you look at the log you can see the 'null pointer' still gets the suburb name. weird.
+                        //If you look at the log you can see the 'null pointer' still gets the suburb name. weird.
                         Log.d("ERROR VALUES", "" + currentSuburb.getSubName());
                     }
 
@@ -337,7 +304,6 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
 
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
-
     }
 
     protected void downloadImage(){
@@ -345,17 +311,16 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
         storageReference.child("profilePics/" + uid).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
-                // Got the download URL for 'users/me/profile.png' in uri
+                //Got the download URL for 'users/me/profile.png' in uri
                 Log.d("Bottom Navigation", "DOWNLOAD URL: " + uri.toString());
                 Picasso.get().load(uri).into(profile);
                 return;
-
 
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                // Handle any errors
+                //Handle any errors
                 Log.d("Bottom Navigation", "DOWNLOAD URL: FAILURE");
                 storageReference.child("profilePics/" + "default.png").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
@@ -364,27 +329,29 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
                         Log.d("Bottom Navigation", "DOWNLOAD URL: " + uri.toString());
                         Picasso.get().load(uri).into(profile);
                         return;
-
-
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
                         // Handle any errors
                         Log.d("Bottom Navigation", "DOWNLOAD URL: FAILURE");
-
                     }
                 });
             }
         });
-
-
-
-
-
-
     }
 
 
+    @Override
+    public void onButtonClicked() {
 
+        Bundle bundle = new Bundle();
+        bundle.putString("SUBURB", intentSuburb);
+        HomeFragment home = new HomeFragment();
+        home.setArguments(bundle);
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, home)
+                .commit();
+    }
 }
