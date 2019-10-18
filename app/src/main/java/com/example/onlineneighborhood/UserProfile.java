@@ -76,17 +76,19 @@ import java.util.List;
 import java.util.Locale;
 
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 import static androidx.core.graphics.TypefaceCompatUtil.getTempFile;
 import static java.util.Calendar.*;
 
 public class UserProfile extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
-    private TextView textViewName, tvBio, tvDOB;
+    private TextView textViewName;
     private Spinner spinnerPreferences;
     private Button editProfileBtn;
-    private TextView editTextdob;
+    private TextView editTextdob, textViewBio;
     private EditText editTextBio;
-    private ImageButton imageButtonPicture;
+    private CircleImageView imageButtonPicture;
     private DatePickerDialog.OnDateSetListener DateSetListener;
     private FirebaseAuth fireBaseAuth;
     private DatabaseReference databaseReference;
@@ -117,24 +119,23 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
         setContentView(R.layout.activity_profile_screen);
 
         textViewName = findViewById(R.id.textViewName);
-        tvBio = findViewById(R.id.tvBio);
-        tvDOB = findViewById(R.id.tvDob);
-        tvDOB.setVisibility(View.INVISIBLE);
-        tvBio.setVisibility(View.INVISIBLE);
+
+
         editProfileBtn = findViewById(R.id.editProfileBtn);
         spinnerPreferences = (Spinner) findViewById(R.id.spinnerPreferences);
         editTextdob = findViewById(R.id.editTextdob);
         editTextBio = findViewById(R.id.editTextbio);
+        textViewBio = findViewById(R.id.textViewbio);
         imageButtonPicture = findViewById(R.id.imageButtonPicture);
         fireBaseAuth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference("Users");
         storage = FirebaseStorage.getInstance();
         storageReference=storage.getReference();
 
-        editTextBio.setEnabled(false);
-        editTextdob.setEnabled(false);
+
+
         spinnerPreferences.setEnabled(false);
-        imageButtonPicture.setAdjustViewBounds(true);
+//        imageButtonPicture.setAdjustViewBounds(true);
 
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -216,7 +217,7 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
                     textViewName.setText(name);
                     spinnerPreferences.setSelection(preferenceOptions.indexOf(preference));
                     editTextdob.setText(dob);
-                    editTextBio.setText(bio);
+                    textViewBio.setText(bio);
                     downloadImage();
                 }
 
@@ -256,9 +257,12 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
 
         if(item.getItemId() == R.id.edit){
             editProfileBtn.setVisibility(View.VISIBLE);
-            editTextBio.setEnabled(true);
-            editTextdob.setEnabled(true);
             spinnerPreferences.setEnabled(true);
+            textViewBio.setVisibility(View.GONE);
+            editTextBio.setText(textViewBio.getText().toString());
+            editTextBio.setVisibility(View.VISIBLE);
+
+
 
             editTextdob.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -281,14 +285,12 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
                     databaseReference.child(uid).child("preference").setValue(selectedPreference);
                     databaseReference.child(uid).child("dob").setValue(dob);
                     databaseReference.child(uid).child("bio").setValue(bio);
-                    tvDOB.setText("DOB updated to: " + dob);
-                    tvBio.setText("Bio updated to: " + bio);
-                    tvDOB.setVisibility(View.VISIBLE);
-                    tvBio.setVisibility(View.VISIBLE);
                     Toast.makeText(UserProfile.this, "Saved Succesfully!!", Toast.LENGTH_SHORT).show();
 
+                    textViewBio.setText(bio);
 
-                    editTextBio.setEnabled(false);
+                    editTextBio.setVisibility(View.GONE);
+                    textViewBio.setVisibility(View.VISIBLE);
                     editTextdob.setEnabled(false);
                     spinnerPreferences.setEnabled(false);
                     editProfileBtn.setVisibility(View.INVISIBLE);
