@@ -214,7 +214,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
         if(date == null && type == null){
             eventList.add(event);
         }else if(date != null && type == null){
-                if((eventStart.after(date) || eventStart.equals(date)) && (eventEnd.before(date)|| eventEnd.equals(date))) {
+                if(eventStart.equals(date)) {
                     eventList.add(event);
                 }
 
@@ -223,7 +223,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
                  eventList.add(event);
                 }
         } else{
-            if((eventStart.after(date) || eventStart.equals(date)) && (eventEnd.before(date)|| eventEnd.equals(date)) && event.getType().equals(type)) {
+            if(eventStart.equals(date) && event.getType().equals(type)) {
                 eventList.add(event);
             }
         }
