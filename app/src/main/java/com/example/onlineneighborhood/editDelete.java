@@ -467,7 +467,9 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
                                       preEvent.getAttendees(), preEvent.getSuburbId());
         Intent resultIntent = new Intent();
         resultIntent.putExtra("MyObject", resultEvent);
-        setResult(1);
+        resultIntent.putExtra("string", "HELLO");
+
+        setResult(1, resultIntent);
         finish();
         return true;
     }

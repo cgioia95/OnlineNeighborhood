@@ -207,6 +207,7 @@ public class EventScreen extends AppCompatActivity {
         Log.d(TAG, "onCreate: "+ mEvent);
 
         //Pre-population
+        Log.d(TAG, "POPULATING WITH EVENT INFO ON CREATE");
         mEventName.setText(mEvent.getName());
         mDescription.setText(mEvent.getDescription());
         mDate.setText(mEvent.getDate());
@@ -457,16 +458,30 @@ public class EventScreen extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "POPULATING WITH EVENT INFO 1");
 
         if (requestCode == 0){
+
+            Log.d(TAG, "POPULATING WITH EVENT INFO 2");
+
             if (resultCode == 1) {
+
+                Log.d(TAG, "POPULATING WITH EVENT INFO 2");
+
                 if(data!=null) {
+
+                    Log.d(TAG, "POPULATING WITH EVENT INFO 3");
+                    Log.d(TAG, data.getStringExtra("string"));
                     Event resultEvent = (Event) data.getSerializableExtra("MyObject");
 
+                    Log.d(TAG, resultEvent.getName());
                     mEventName.setText(resultEvent.getName());
                     mDescription.setText(resultEvent.getDescription());
                     mDate.setText(resultEvent.getDate());
                     mTime.setText(resultEvent.getTime());
+                    
+
+
                 }
             }
         }
