@@ -203,7 +203,7 @@ public class MyEvents extends Fragment implements View.OnClickListener {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                     Suburb suburb = dataSnapshot.getValue(Suburb.class);
-                                    // Accounting for suburbs without existing events
+                                    //Accounting for suburbs without existing events
                                     if (suburb.getEvents() != null) {
                                         ArrayList<Event> events = suburb.getEvents();
                                         for (Event event : events) {
@@ -250,17 +250,21 @@ public class MyEvents extends Fragment implements View.OnClickListener {
         });
     }
 
-    //Buttons to switch between viewing hosting data and attending data
     @Override
     public void onClick(View v) {
 
         switch (v.getId()) {
+
+            //If clicking attending button, fill the recycle view once again, to reflect any new
+            //changes that have been made, and to switch from the previous data shown (hosting)
             case R.id.my_events_attending_button:
                 getAttendingData();
                 attending.setTextColor(getResources().getColor(R.color.white));
                 hosting.setTextColor(getResources().getColor(R.color.offWhite));
                 break;
 
+            //If clicking hosting button, fill the recycle view once again, to reflect any new
+            //changes that have been made, and to switch from the previous data shown (attending)
             case R.id.my_events_hosting_button:
                 getHostingData();
                 attending.setTextColor(getResources().getColor(R.color.offWhite));
