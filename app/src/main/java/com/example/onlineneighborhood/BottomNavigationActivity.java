@@ -48,6 +48,7 @@ import android.widget.Toolbar;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,10 +62,12 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
     public static Context contextOfApplication;
     private Menu menu;
     private ImageView profile;
-    Bundle bundle = new Bundle();
-    String intentSuburb, dateRange, typeFilter, time, uid;
-    Suburb suburb;
+    private String suburbid;
+    String intentSuburb, uid;
+    Suburb suburb, toolbarSub;
     ArrayList<Event> events;
+    String suburbName = "LOADING";
+
 
     // Firebase reference variables
     DatabaseReference databaseEvents, databaseUsers, databaseSuburb;
@@ -80,22 +83,21 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
 
     @Override
     protected void onStart() {
+        databaseEvents = FirebaseDatabase.getInstance().getReference("suburbs").child(suburbid);
 
-        Intent i = getIntent();
-        intentSuburb = i.getStringExtra("SUBURB");
-        dateRange  = i.getStringExtra("DATE");
-        typeFilter  = i.getStringExtra("TYPE");
-        time = i.getStringExtra("TIME");
+        databaseEvents.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                toolbarSub = dataSnapshot.getValue(Suburb.class);
+                getSupportActionBar().setTitle(toolbarSub.getSubName());
 
-        // Set up bundle for future relevant activities
-        bundle.putString("SUBURB", intentSuburb);
-        bundle.putString("DATE",  dateRange);
-        bundle.putString("TYPE", typeFilter);
-        bundle.putString("TIME", time);
+            }
 
-        Log.d("BUNDLEVALUES:", ""+intentSuburb
-                +dateRange+ typeFilter +time);
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
+            }
+        });
         super.onStart();
     }
 
@@ -118,16 +120,15 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
         fireBaseAuth = FirebaseAuth.getInstance();
         storage = FirebaseStorage.getInstance();
         storageReference=storage.getReference();
-
         if (fireBaseAuth.getCurrentUser() != null)
             uid = fireBaseAuth.getCurrentUser().getUid();
-
+        suburbid = ((OnlineNeighborhood) this.getApplication()).getsuburb();
         //Setting toolbar for adding profile icon
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         profile = toolbar.findViewById(R.id.profile);
         downloadImage();
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Online Neighborhood");
+        getSupportActionBar().setTitle(suburbName);
 
         profile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -137,16 +138,6 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
             }
 
         });
-
-        //To load home screen automatically after logging it
-//        Bundle bundle = new Bundle();
-//        bundle.putString("SUBURB", intentSuburb);
-//        bundle.putString("DATE",  dateRange);
-//        bundle.putString("TYPE", typeFilter);
-//        bundle.putString("TIME", time);
-//        HomeFragment home = new HomeFragment();
-//        home.setArguments(bundle);
-//        loadFragment(home);
 
 
     }
@@ -184,11 +175,6 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
 
-        Bundle bundle = new Bundle();
-        bundle.putString("SUBURB", intentSuburb);
-        HomeFragment home = new HomeFragment();
-        home.setArguments(bundle);
-
         Fragment fragment = null;
         switch (menuItem.getItemId()){
 
@@ -209,7 +195,7 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
             case R.id.navigation_home:
                 menuItem.setChecked(true);
                 Log.d("Bottom Navigation", "onNavigationItemSelected: Home");
-                fragment= home;
+                fragment= new HomeFragment();
                 break;
         }
 
@@ -240,6 +226,8 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
                 mMap.clear();
                 for (DataSnapshot suburbSnapshot : dataSnapshot.getChildren()) {
                     Suburb currentSuburb = suburbSnapshot.getValue(Suburb.class);
+                    Log.d("Suburb Name", "onDataChange: " + currentSuburb.getSubName());
+
                     Intent i = getIntent();
                     String intentSuburb = i.getStringExtra("SUBURB");
                     Log.d("SUBURB", "" + suburbSnapshot);

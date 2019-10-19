@@ -37,6 +37,7 @@
         android:layout_marginRight="20dp"
         android:autofillHints="Search Here"
         android:clickable="true"
+        android:contextClickable="true"
         android:orientation="horizontal"
         android:queryHint="Search Here" />
 

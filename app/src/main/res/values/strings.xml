@@ -4,38 +4,31 @@
 
     <string-array name="preferences">
         <item>Sports</item>
-        <item>Gigs</item>
-        <item>Dating</item>
-        <item>Misc.</item>
-    </string-array>
-
-    <string-array name="suburbs">
-        <item>Brunswick</item>
-        <item>Kew</item>
-        <item>Footscray</item>
-        <item>Altona</item>
-        <item>Collingwood</item>
+        <item>Music</item>
+        <item>Video Games</item>
+        <item>Tech</item>
+        <item>Reading</item>
+        <item>Partying</item>
+        <item>Socializing</item>
+        <item>Movies/TV</item>
+        <item>Anything and Everything!</item>
     </string-array>
 
     <string-array name="eventTypes">
         <item>Drinks</item>
+        <item>Casual Meet up</item>
         <item>Birthday</item>
         <item>Active</item>
-        <item>Gig</item>
-        <item>Date</item>
-        <item>Specifically Beers</item>
+        <item>Sports</item>
+        <item>Love</item>
+        <item>Music</item>
+        <item>Cocktail</item>
+        <item>Convention</item>
+        <item>Housewarming</item>
+        <item>Party!!!</item>
         <item>Misc.</item>
     </string-array>
 
-
-    <string-array name="dates">
-        <item>Just Today</item>
-        <item>Next 2 days</item>
-        <item>This Weekend</item>
-        <item>This Week</item>
-        <item>This Month</item>
-        <item>All Time</item>
-    </string-array>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

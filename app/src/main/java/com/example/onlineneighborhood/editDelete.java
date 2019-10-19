@@ -349,7 +349,7 @@ public class editDelete extends AppCompatActivity implements View.OnClickListene
             if (firebaseAuth.getCurrentUser() == null){
                 Toast.makeText(this, "you are not logged in", Toast.LENGTH_LONG).show();
                 finish();
-                startActivity(new Intent(getApplicationContext(), Login.class));
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
             }
 
             //This is just doing a couple of checks to ensure that a address is *actually* sent to firebase

@@ -76,17 +76,19 @@ import java.util.List;
 import java.util.Locale;
 
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 import static androidx.core.graphics.TypefaceCompatUtil.getTempFile;
 import static java.util.Calendar.*;
 
 public class UserProfile extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
-    private TextView textViewName, tvBio, tvDOB;
+    private TextView textViewName;
     private Spinner spinnerPreferences;
     private Button editProfileBtn;
-    private TextView editTextdob;
+    private TextView editTextdob, textViewBio;
     private EditText editTextBio;
-    private ImageButton imageButtonPicture;
+    private CircleImageView imageButtonPicture;
     private DatePickerDialog.OnDateSetListener DateSetListener;
     private FirebaseAuth fireBaseAuth;
     private DatabaseReference databaseReference;
@@ -94,19 +96,10 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
     private StorageReference storageReference;
     private ProgressDialog progressDialog;
     private Bitmap photo;
-
-
     private static final int PICK_IMAGE = 1, CAMERA_REQUEST=2;
     private static final int MY_CAMERA_PERMISSION_CODE = 100;
-//    private static final int EXTERNAL_STORAGE_PERMISSION_CONSTANT = 120;
-//
-//    private static final int REQUEST_PERMISSION_SETTING = 101;
-//    private boolean sentToSettings = false;
-//    private SharedPreferences permissionStatus;
-
-    private static final int  REQUEST_TAKE_PHOTO = 15;
     private static final String TAG = "My Profile";
-    private String uid, currentPhotoPath;
+    private String uid;
     Uri imageuri;
     private List<String> preferenceOptions = Arrays.asList("Sports", "Gigs", "Dating", "Misc.");
 
@@ -117,57 +110,39 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
         setContentView(R.layout.activity_profile_screen);
 
         textViewName = findViewById(R.id.textViewName);
-        tvBio = findViewById(R.id.tvBio);
-        tvDOB = findViewById(R.id.tvDob);
-        tvDOB.setVisibility(View.INVISIBLE);
-        tvBio.setVisibility(View.INVISIBLE);
         editProfileBtn = findViewById(R.id.editProfileBtn);
         spinnerPreferences = (Spinner) findViewById(R.id.spinnerPreferences);
         editTextdob = findViewById(R.id.editTextdob);
         editTextBio = findViewById(R.id.editTextbio);
+        textViewBio = findViewById(R.id.textViewbio);
         imageButtonPicture = findViewById(R.id.imageButtonPicture);
         fireBaseAuth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference("Users");
         storage = FirebaseStorage.getInstance();
         storageReference=storage.getReference();
 
-        editTextBio.setEnabled(false);
-        editTextdob.setEnabled(false);
-        spinnerPreferences.setEnabled(false);
-        imageButtonPicture.setAdjustViewBounds(true);
 
+        spinnerPreferences.setEnabled(false);
+
+
+        //Setting up toolbar
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Log.d("user profile", "onCreate: " + toolbar);
-        getSupportActionBar().setTitle("Online Neighborhood");
+        getSupportActionBar().setTitle("My Profile");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-//        permissionStatus = getSharedPreferences("permissionStatus",MODE_PRIVATE);
-
-
 
 
         if (fireBaseAuth.getCurrentUser() != null)
             uid = fireBaseAuth.getCurrentUser().getUid();
 
-
-
-
-
+        //Display dialog box to choose between camera and gallery
         imageButtonPicture.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-//                if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
-//                {
-//                    requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_PERMISSION_CODE);
-//                }
-//                else
-//                {
-//                    Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-//                    startActivityForResult(cameraIntent, CAMERA_REQUEST);
-//                }
+
                 CharSequence[] items={"Camera", "Gallery"};
                 AlertDialog.Builder builder = new AlertDialog.Builder(UserProfile.this);
                 builder.setTitle("Pick an image from").setItems(items, new DialogInterface.OnClickListener() {
@@ -201,7 +176,7 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
             }
         });
 
-
+        //Fetch User's data from firebase
         databaseReference.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -216,7 +191,7 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
                     textViewName.setText(name);
                     spinnerPreferences.setSelection(preferenceOptions.indexOf(preference));
                     editTextdob.setText(dob);
-                    editTextBio.setText(bio);
+                    textViewBio.setText(bio);
                     downloadImage();
                 }
 
@@ -254,12 +229,13 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
             finish();
         }
 
+        //edit alternates Bio between textView and EditText for better UX
         if(item.getItemId() == R.id.edit){
             editProfileBtn.setVisibility(View.VISIBLE);
-            editTextBio.setEnabled(true);
-            editTextdob.setEnabled(true);
             spinnerPreferences.setEnabled(true);
-
+            textViewBio.setVisibility(View.GONE);
+            editTextBio.setText(textViewBio.getText().toString());
+            editTextBio.setVisibility(View.VISIBLE);
             editTextdob.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -270,6 +246,7 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
 
             });
 
+            //Upload changes to firebase
             editProfileBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -281,14 +258,12 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
                     databaseReference.child(uid).child("preference").setValue(selectedPreference);
                     databaseReference.child(uid).child("dob").setValue(dob);
                     databaseReference.child(uid).child("bio").setValue(bio);
-                    tvDOB.setText("DOB updated to: " + dob);
-                    tvBio.setText("Bio updated to: " + bio);
-                    tvDOB.setVisibility(View.VISIBLE);
-                    tvBio.setVisibility(View.VISIBLE);
                     Toast.makeText(UserProfile.this, "Saved Succesfully!!", Toast.LENGTH_SHORT).show();
 
+                    textViewBio.setText(bio);
 
-                    editTextBio.setEnabled(false);
+                    editTextBio.setVisibility(View.GONE);
+                    textViewBio.setVisibility(View.VISIBLE);
                     editTextdob.setEnabled(false);
                     spinnerPreferences.setEnabled(false);
                     editProfileBtn.setVisibility(View.INVISIBLE);

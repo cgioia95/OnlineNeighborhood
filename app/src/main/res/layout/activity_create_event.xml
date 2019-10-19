@@ -191,9 +191,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="TextView"
-        android:textColor="@color/textSecondary"
+        android:text="Please wait a few moments while we get your location"
         android:textAlignment="center"
+        android:textColor="@color/textSecondary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
