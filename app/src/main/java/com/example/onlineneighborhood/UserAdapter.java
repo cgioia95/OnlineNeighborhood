@@ -27,25 +27,30 @@ import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+
+
+// Class for listing and displaying users who are attending/hosting events
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
 
     private static final String TAG = "User Adapter";
 
+    // declare simple variables
     private static ArrayList<UserInformation> userList;
     private static Context mContext;
     private onUserClickListener mListener;
 
-
+    // Click listener that brings us to the user's profile page
     public interface onUserClickListener {
         void onEventClick(int position);
     }
 
-
+    // Method to set this listener
     public void setOnUserClickListener(onUserClickListener listener) {
         mListener = listener;
     }
 
 
+    // The actual view of the user we see
     public static class UserViewHolder extends RecyclerView.ViewHolder {
 
         public TextView mUserName;
@@ -55,9 +60,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         private DatabaseReference databaseReference;
 
 
+
         public UserViewHolder(@NonNull View itemView, final onUserClickListener listener) {
             super(itemView);
 
+            // Bind variables and get database references
             mUserName = itemView.findViewById(R.id.userNameU);
 
 
@@ -86,7 +93,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         }
 
 
-
+        // Retrieves the user's image from firebase data storage
+        // Returns a simple default image if unavailable
         protected void downloadImage(String uid) {
 
             Log.d(TAG, "Attempting to download image of  user with id: " + uid);
@@ -138,7 +146,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     }
 
 
-
+    // Binds the image/text of the user to a predefined layout
     @NonNull
     @Override
     public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -149,6 +157,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
     }
 
+    // Retrieve user's information and binds it
     @Override
     public void onBindViewHolder(@NonNull final UserViewHolder holder, int position) {
 
