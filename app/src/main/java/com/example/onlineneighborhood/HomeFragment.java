@@ -43,9 +43,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
 
 
 
-    TextView dateFilterActive, typeFilterActive;
-    ImageView  addEvent, dateFilter, typeFilter;
-    Button clearFilter;
+    TextView dateFilterActive, dateFilter, typeFilterActive, typeFilter, clearFilter;
+    ImageView  addEvent;
     String suburb;
     static String type;
     private static Callbacks mCallbacks;

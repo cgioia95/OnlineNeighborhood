@@ -17,7 +17,7 @@
 
     <item
         android:id="@+id/navigation_events"
-        android:icon="@drawable/ic_calendar_16"
+        android:icon="@drawable/ic_my_events_24dp"
         android:title="My Events"
         />
 
