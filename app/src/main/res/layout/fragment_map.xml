@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/filterSection"
-        android:paddingVertical="18dp"
+        android:paddingVertical="12dp"
         android:background="@drawable/bottom_shadow">
         <TextView
             android:id="@+id/dateButton"
