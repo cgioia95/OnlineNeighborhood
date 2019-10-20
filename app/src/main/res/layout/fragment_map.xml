@@ -15,19 +15,24 @@
 
     </FrameLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
+        android:id="@+id/filterSection"
+        android:paddingVertical="18dp"
+        android:background="@drawable/bottom_shadow">
+        <TextView
             android:id="@+id/dateButton"
             android:layout_width="wrap_content"
+            android:drawableLeft="@drawable/ic_calendar_white"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:text="SET DATE" />
+            android:drawablePadding="8dip"
+            android:textSize="14dp"
+            android:layout_marginLeft="20dp"
+            android:textColor="@color/white"
+            android:text="Date"/>
+    </RelativeLayout>
 
-    </LinearLayout>
 
     <Button
         android:id="@+id/todayFilterButton"

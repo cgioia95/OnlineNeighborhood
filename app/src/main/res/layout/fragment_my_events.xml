@@ -21,6 +21,7 @@
             android:textColor="@color/white"
             android:layout_height="40dp"
             android:layout_weight="1"
+            android:textSize="14sp"
             android:gravity="center"
             android:background="@color/colorPrimary"
             android:text="@string/my_events_hosting" />
@@ -30,6 +31,7 @@
             android:layout_width="wrap_content"
             android:textColor="@color/offWhite"
             android:layout_height="40dp"
+            android:textSize="14sp"
             android:layout_weight="1"
             android:background="@color/colorPrimary"
             android:gravity="center"

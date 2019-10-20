@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -72,7 +73,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     static ArrayList<Marker> defaultMarkers;
 
 
-    Button  todayFilterButton, dateButton;
+    Button  todayFilterButton;
+    TextView dateButton;
     EditText editTextDays;
 
     Date todayDate;
