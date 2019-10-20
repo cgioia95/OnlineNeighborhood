@@ -97,18 +97,7 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
 
 
         spinnerPreferences.setEnabled(false);
-
-        //Setting up the spinner with different types of event
-        String[] spinner_array = getApplicationContext().getResources().getStringArray(R.array.preferences);
-
-        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(
-                this,R.layout.spinner_item,spinner_array
-        );
-        spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item);
-        spinnerPreferences.setAdapter(spinnerArrayAdapter);
-
-
-
+        
         //Setting up toolbar
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

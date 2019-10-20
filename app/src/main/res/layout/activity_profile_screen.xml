@@ -131,6 +131,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:backgroundTint="@color/colorAccent"
+                    android:entries="@array/preferences"
                     android:theme="@style/ThemeOverlay.AppCompat.Light"
 
                     />

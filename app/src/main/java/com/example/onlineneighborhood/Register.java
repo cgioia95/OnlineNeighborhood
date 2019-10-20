@@ -8,12 +8,11 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,11 +21,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
-import java.io.Console;
 
 import static java.util.Calendar.DAY_OF_MONTH;
 import static java.util.Calendar.MONTH;
@@ -37,12 +33,12 @@ import static java.util.Calendar.getInstance;
 public class Register extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener {
 
     // Declare all simple Variables
-    private Button buttonRegister;
+    private Button buttonRegister, dateOfBirth;
     private EditText editTextEmail;
     private EditText editTextPassword;
     private EditText editTextName, editBio;
     private Spinner spinnerPreferences;
-    private TextView textViewSignIn, editDob;
+    private TextView textViewSignIn;
 
     // Simple loading screen while authentication is being processed
     private ProgressDialog progressDialog;
@@ -70,14 +66,24 @@ public class Register extends AppCompatActivity implements View.OnClickListener,
         editTextPassword = (EditText) findViewById(R.id.editTextPassword);
         editTextName = (EditText) findViewById(R.id.editTextName);
         editBio = (EditText) findViewById(R.id.etBio);
-        editDob = (TextView) findViewById(R.id.etDOB);
+        dateOfBirth = findViewById(R.id.dateOfBirth);
         spinnerPreferences = (Spinner) findViewById(R.id.spinnerPreferences);
         textViewSignIn = (TextView) findViewById(R.id.textViewSignIn);
+
+        //Setting up the spinner with different types of event
+        String[] spinner_array = getApplicationContext().getResources().getStringArray(R.array.preferences);
+
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(
+                this,R.layout.spinner_item,spinner_array
+        );
+        spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item);
+        spinnerPreferences.setAdapter(spinnerArrayAdapter);
+
 
         // Assign Click Listeners to Register Button and Link to Sign In Button
         buttonRegister.setOnClickListener(this);
         textViewSignIn.setOnClickListener(this);
-        editDob.setOnClickListener(this);
+        dateOfBirth.setOnClickListener(this);
     }
 
     // Parses editText inputs, registers the user with FireBase Authentication
@@ -91,7 +97,7 @@ public class Register extends AppCompatActivity implements View.OnClickListener,
         final String name = editTextName.getText().toString().trim();
         final String preference = spinnerPreferences.getSelectedItem().toString();
         final String bio = editBio.getText().toString().trim();
-        final String dob = editDob.getText().toString().trim();
+        final String dob = dateOfBirth.getText().toString().trim();
 
         if (TextUtils.isEmpty(email)){
             Toast.makeText(this, "Please enter your email", Toast.LENGTH_SHORT).show();
@@ -187,7 +193,7 @@ public class Register extends AppCompatActivity implements View.OnClickListener,
     public void onDateSet(DatePicker datePicker, int year, int month, int dayOfMonth) {
         month++;
         String date = dayOfMonth +"/" + month + "/" + year;
-        editDob.setText(date);
+        dateOfBirth.setText(date);
     }
 
     // Assigning functions to the two buttons
@@ -202,7 +208,7 @@ public class Register extends AppCompatActivity implements View.OnClickListener,
             startActivity(new Intent(this, ChooseSuburb.class));
         }
 
-        if(view == editDob){
+        if(view == dateOfBirth){
 
             showDatePickerDialog();
         }

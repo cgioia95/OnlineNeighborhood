@@ -11,9 +11,9 @@
         android:id="@+id/tvChoose"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         android:text="Choose a suburb!"
-        android:textColor="@color/colorPrimary"
+        android:textColor="@color/colorAccent"
         android:textAlignment="center"
         android:textSize="30sp"
         android:textStyle="bold" />
@@ -22,8 +22,9 @@
         android:id="@+id/textView9"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
+android:textColor="@color/textSecondary"
         android:layout_marginTop="8dp"
+        android:layout_marginHorizontal="30dp"
         android:text="Click on a suburb from the list below or search for your favourite"
         android:textAlignment="center" />
 
