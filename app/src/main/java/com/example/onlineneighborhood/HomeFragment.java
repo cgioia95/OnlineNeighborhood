@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageView;
@@ -270,8 +271,18 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
             LayoutInflater inflater = getActivity().getLayoutInflater();
             View view = inflater.inflate(R.layout.layout_type_dialog, null);
 
+
+           //populate the spinner with arrayitems
             typeSpinner = view.findViewById(R.id.typeFilterSpinner);
-            builder.setTitle("Choose A type")
+            String[] spinner_array = getActivity().getResources().getStringArray(R.array.eventTypes);
+            ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(
+                    getActivity(),R.layout.spinner_item,spinner_array
+            );
+            spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item);
+            typeSpinner.setAdapter(spinnerArrayAdapter);
+
+
+            builder.setTitle("Choose a type type of event")
                     .setView(view)
                     .setMessage("What kind of event are you looking for?")
                     .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
