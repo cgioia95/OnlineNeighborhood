@@ -8,63 +8,54 @@
     >
 
     <RelativeLayout
+        android:id="@+id/filterSection"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/filterSection"
         android:background="@drawable/bottom_shadow">
+
         <TextView
+            android:layout_centerVertical="true"
             android:id="@+id/dateFilterHome"
             android:layout_width="wrap_content"
-            android:drawableLeft="@drawable/ic_calendar_white"
             android:layout_height="wrap_content"
-            android:drawablePadding="8dip"
-            android:layout_marginTop="18dp"
-            android:textSize="14sp"
             android:layout_marginLeft="20dp"
+            android:layout_marginTop="18dp"
+            android:drawableLeft="@drawable/ic_calendar_white"
+            android:drawablePadding="8dip"
+            android:text="Date"
             android:textColor="@color/white"
-            android:text="Date"/>
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/typeFilter"
+            android:layout_centerVertical="true"
             android:layout_width="wrap_content"
-            android:drawableLeft="@drawable/ic_filter_list"
-            android:layout_marginLeft="24dp"
-            android:drawablePadding="8dip"
-            android:textSize="14sp"
-            android:layout_alignBaseline="@id/dateFilterHome"
             android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/dateFilterHome"
+            android:layout_marginLeft="24dp"
             android:layout_marginTop="8dp"
-            android:textColor="@color/white"
             android:layout_toRightOf="@id/dateFilterHome"
+            android:drawableLeft="@drawable/ic_filter_list"
+            android:drawablePadding="8dip"
             android:text="Type"
-            />
+            android:textColor="@color/white"
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/clearFilter"
+            android:layout_centerVertical="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:drawablePadding="8dip"
-            android:textSize="14sp"
-            android:drawableLeft="@drawable/ic_cancel_24dp"
-            android:layout_marginTop="8dp"
-            android:layout_alignParentEnd="true"
             android:layout_alignBaseline="@id/dateFilterHome"
-            android:layout_marginRight="14dp"
-            android:text="Clear" />
-        <TextView
-            android:id="@+id/dateFilterActive"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/dateFilterHome"
-            android:text="@string/date" />
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="20dp"
+            android:drawableLeft="@drawable/ic_cancel_24dp"
+            android:drawablePadding="8dip"
+            android:text="Clear"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
 
-        <TextView
-            android:id="@+id/typeFilterActive"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/typeFilter"
-            android:text="type" />
     </RelativeLayout>
 
 

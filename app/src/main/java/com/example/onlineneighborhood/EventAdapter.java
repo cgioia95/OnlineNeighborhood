@@ -6,7 +6,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -26,7 +25,6 @@ import com.squareup.picasso.Picasso;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
 import java.util.Calendar;
 import android.icu.text.SimpleDateFormat;
 
@@ -59,7 +57,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
     public static class EventViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView mEvent, mUserName, mEventTime, mEventAddress, mEventAttending, mEventDate;
+        public TextView mEvent, mUserName, mEventTime, mEventAddress, mEventAttending, mEventDate, mEventType;
         public CircleImageView hostPic;
         private FirebaseStorage storage;
         private StorageReference storageReference;
@@ -70,12 +68,13 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
             //Retrieve relevant views to be populated for an event; set up Firebase references
             mEvent = itemView.findViewById(R.id.eventName);
+            mEventType = itemView.findViewById(R.id.eventType);
             mUserName = itemView.findViewById(R.id.userName);
             mEventTime = itemView.findViewById(R.id.eventTime);
             mEventDate = itemView.findViewById(R.id.eventDate);
             mEventAddress = itemView.findViewById(R.id.eventAddress);
             mEventAttending = itemView.findViewById(R.id.eventAttending);
-            hostPic = itemView.findViewById(R.id.imageView);
+            hostPic = itemView.findViewById(R.id.eventProfileImage);
             storage = FirebaseStorage.getInstance();
             databaseReference = FirebaseDatabase.getInstance().getReference("Users");
             storageReference=storage.getReference();
@@ -190,6 +189,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         holder.getUsername(currentItem.getHost().getUid());
         holder.mEventTime.setText(currentItem.getTime());
         holder.mEventAddress.setText(currentItem.getAddress());
+        holder.mEventType.setText(currentItem.getType());
 
         //Change the date format to display the date and day of the week
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");

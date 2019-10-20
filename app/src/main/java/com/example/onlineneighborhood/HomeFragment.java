@@ -71,11 +71,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
         dateFilter = mView.findViewById(R.id.dateFilterHome);
         typeFilter = mView.findViewById(R.id.typeFilter);
         clearFilter = mView.findViewById(R.id.clearFilter);
-        dateFilterActive = mView.findViewById(R.id.dateFilterActive);
-        typeFilterActive = mView.findViewById(R.id.typeFilterActive);
-
-        dateFilterActive.setVisibility(View.INVISIBLE);
-        typeFilterActive.setVisibility(View.INVISIBLE);
 
         suburb = ((OnlineNeighborhood) getActivity().getApplication()).getsuburb();
         addEvent.setOnClickListener(this);
@@ -160,17 +155,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
         });
 
 
-        if(type != null){
-            typeFilterActive.setText("Type Filter: " + type);
-            typeFilterActive.setVisibility(View.VISIBLE);
-        }
-
         if(calenderDate != null){
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
             String dateTime = dateFormat.format(calenderDate);
-            dateFilterActive.setText("Date Filter: " + dateTime);
-            dateFilterActive.setVisibility(View.VISIBLE);
         }
     }
 

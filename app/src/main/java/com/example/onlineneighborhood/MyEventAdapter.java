@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -50,7 +49,7 @@ public class MyEventAdapter extends RecyclerView.Adapter<MyEventAdapter.EventVie
 
     public static class EventViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView mEvent, mEventAttending, mUserName, mEventAddress, mEventTime, mEventDate;
+        public TextView mEvent, mEventAttending, mUserName, mEventAddress, mEventTime, mEventDate, mEventType;
         public CircleImageView hostPic;
         private FirebaseStorage storage;
         private StorageReference storageReference;
@@ -63,10 +62,11 @@ public class MyEventAdapter extends RecyclerView.Adapter<MyEventAdapter.EventVie
             mEvent = itemView.findViewById(R.id.eventName);
             mUserName = itemView.findViewById(R.id.userName);
             mEventTime = itemView.findViewById(R.id.eventTime);
+            mEventType = itemView.findViewById(R.id.eventType);
             mEventDate= itemView.findViewById(R.id.eventDate);
             mEventAddress = itemView.findViewById(R.id.eventAddress);
             mEventAttending = itemView.findViewById(R.id.eventAttending);
-            hostPic = itemView.findViewById(R.id.imageView);
+            hostPic = itemView.findViewById(R.id.eventProfileImage);
             storage = FirebaseStorage.getInstance();
             databaseReference = FirebaseDatabase.getInstance().getReference("Users");
             storageReference=storage.getReference();
@@ -159,6 +159,7 @@ public class MyEventAdapter extends RecyclerView.Adapter<MyEventAdapter.EventVie
         holder.getUsername(currentItem.getHost().getUid());
         holder.mEventTime.setText(currentItem.getTime());
         holder.mEventAddress.setText(currentItem.getAddress());
+        holder.mEventType.setText(currentItem.getType());
         holder.downloadImage(currentItem.getHost().getUid());
 
         //Change the date format to display the date and day of the week
