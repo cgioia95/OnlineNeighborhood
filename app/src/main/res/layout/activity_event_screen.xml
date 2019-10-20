@@ -12,10 +12,10 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:id="@+id/eventContainer"
+        android:id="@+id/eventWrapper"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="30dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="74dp"
 
 
 >
@@ -27,39 +27,50 @@
             android:layout_marginRight="24dp" />
 
 
-
-        <TextView
-            android:id="@+id/eventName"
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/hostImage"
-            android:textColor="@color/textPrimary"
-            android:text="EventName"
             android:layout_centerVertical="true"
-            android:textSize="20sp" />
+            android:layout_marginLeft="8dp"
+
+            android:layout_toRightOf="@+id/hostImage">
+            <TextView
+                android:id="@+id/eventName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/textPrimary"
+                android:text="EventName"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/eventDesc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/eventName"
+                android:layout_marginTop="4dp"
+                android:text="Description"
+                android:textColor="@color/textSecondary"
+                android:textSize="14sp" />
+
+        </RelativeLayout>
+
+
+
+
 
 
     </RelativeLayout>
 
-    <TextView
-        android:id="@+id/eventDesc"
-        android:layout_width="wrap_content"
-        android:layout_alignStart="@id/eventContainer"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/eventContainer"
-        android:layout_marginTop="10dp"
-        android:text="Description"
-        android:textColor="@color/textSecondary"
-        android:textSize="14sp" />
 
 
     <TextView
         android:id="@+id/whenText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/eventDesc"
+        android:layout_below="@+id/eventWrapper"
         android:text="When and where"
-        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textSize="14sp"
         android:layout_marginLeft="30dp"
         android:layout_marginTop="16dp"
         android:textColor="@color/textPrimary"/>
@@ -71,9 +82,9 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/whenText"
         android:layout_gravity="center"
-        android:layout_alignStart="@id/eventContainer"
+        android:layout_alignStart="@id/eventWrapper"
         android:drawableLeft="@drawable/location_icon_18dp"
-        android:textColor="@color/textSecondary"
+        android:textColor="@color/colorPrimary"
         android:drawablePadding="4dip"
         android:text="216 Kerr Street"
         android:maxLines="1"
@@ -83,14 +94,14 @@
     <TextView
         android:id="@+id/eventTime"
         android:drawableLeft="@drawable/ic_calendar_16"
-        android:layout_alignStart="@id/eventContainer"
+        android:layout_alignStart="@id/eventWrapper"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/eventAddress"
         android:layout_marginTop="12dp"
         android:drawablePadding="6dip"
         android:text="EventTime"
-        android:textColor="@color/textSecondary"
+        android:textColor="@color/colorPrimary"
         android:textSize="12sp" />
 
     <TextView
@@ -102,7 +113,7 @@
         android:layout_marginLeft="10dp"
         android:layout_toRightOf="@id/eventTime"
         android:text="Event Date"
-        android:textColor="@color/textSecondary"
+        android:textColor="@color/colorPrimary"
         android:textSize="12sp" />
     <TextView
         android:id="@+id/attendingText"
@@ -110,10 +121,12 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/eventDate"
         android:text="Attending"
-        android:textSize="16sp"
+        android:textSize="14sp"
+        android:textStyle="bold"
         android:layout_marginLeft="30dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="18dp"
         android:textColor="@color/textPrimary"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewUsers"
         android:layout_marginLeft="30dp"
