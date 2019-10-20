@@ -30,8 +30,11 @@
 
             <TextView
                 android:id="@+id/userName"
-                android:layout_width="wrap_content"
+                android:layout_width="50dp"
                 android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:gravity="center"
                 android:textSize="11sp"
                 android:layout_below="@id/eventProfileImage"
                 android:layout_centerHorizontal="true"
