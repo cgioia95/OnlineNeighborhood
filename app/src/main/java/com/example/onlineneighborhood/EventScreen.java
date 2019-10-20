@@ -38,20 +38,22 @@ public class EventScreen extends AppCompatActivity {
     private static final String TAG2 = "EventScreenList";
 
 
+    // Declare simple variables
+
     public TextView mEventName, mDescription, mTime, mDate, mEventAdress, attendingTextView;
     private StorageReference storageReference;
     public CircleImageView hostPic;
     public Button attendBtn, editBtn, deleteBtn;
+    public String thisUserString;
+    public UserInformation thisUserInformation, currentUser;
+    public ArrayList<UserInformation> attendees;
+    public boolean attending;
 
     //Firebase variables
     FirebaseAuth firebaseAuth;
     DatabaseReference databaseUsers, databaseSuburb, databaseEvent, databaseUser;
     private FirebaseStorage storage;
 
-    public String thisUserString;
-    public UserInformation thisUserInformation, currentUser;
-    public ArrayList<UserInformation> attendees;
-    public boolean attending;
 
     //Setting up recycler-view and adapter for displaying events
     private RecyclerView mRecyclerView;
@@ -63,9 +65,7 @@ public class EventScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_screen);
-        Log.d(TAG, "CREATE");
         Intent i = getIntent();
-//      final String intentSuburb = ((OnlineNeighborhood) this.getApplication()).getsuburb();
 
         firebaseAuth = FirebaseAuth.getInstance();
         databaseUsers = FirebaseDatabase.getInstance().getReference("Users");
@@ -100,6 +100,7 @@ public class EventScreen extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
+        // Retrieves reference to our user information
         databaseUsers.child(thisUserString).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -123,9 +124,13 @@ public class EventScreen extends AppCompatActivity {
             }
         });
 
+
         thisUserInformation = new UserInformation(thisUserString);
         databaseSuburb =  FirebaseDatabase.getInstance().getReference("suburbs").child(intentSuburb);
 
+        // Cycle through all the events in our suburb, retrieve the event we're inspecting
+        // Retrieve all the attendees to this event
+        // List these attendees on the event screen
         databaseSuburb.child("events").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -140,11 +145,9 @@ public class EventScreen extends AppCompatActivity {
                         if (attendees != null) {
 
                             final int size = attendees.size();
-                            Log.d(TAG2, "SIZE IS " + Integer.toString(size) );
 
                             try{
 
-                                Log.d("TEST" , "Attempting Recycle View ");
                                 mRecyclerView = findViewById(R.id.recyclerViewUsers);
                                 mLayoutManager = new LinearLayoutManager( getApplicationContext(),
                                         LinearLayoutManager.HORIZONTAL, false);
@@ -159,7 +162,6 @@ public class EventScreen extends AppCompatActivity {
                                     @Override
                                     public void onEventClick(int position) {
                                         UserInformation attendee = attendees.get(position);
-                                        Log.d("ONEVENTCLICK" , attendee.getUid());
                                         Intent i = new Intent( getApplicationContext(), nonUserProfile.class);
                                         i.putExtra("UID", attendee.getUid());
                                         startActivity(i);
@@ -168,30 +170,27 @@ public class EventScreen extends AppCompatActivity {
 
                                 });
 
-                                Log.d("TEST" , "Finishing Recycle View ");
 
                             }catch (NullPointerException e){
                                 e.printStackTrace();
                             }
 
+                            // Check if we're attending the event or not
                             for (UserInformation attendee: attendees) {
                                 if (attendee.getUid().equals(thisUserString)) {
-                                    Log.d(TAG, "ALREADY ATTENDING");
-                                    attending = true;
+                                     attending = true;
                                      break;
                                 }
                             }
                         }
 
+                        // Change the attend/unattend button based on if attending or not
                         if (attending == true){
                             attendBtn.setText("UNATTEND");
-                            //attendingTextView.setText("ATTENDING");
                         } else {
                             attendBtn.setText("ATTEND");
-                            //attendingTextView.setText("UNATTENDING");
                         }
                         Log.d(TAG, eventSnapshot.toString());
-                        Log.d(TAG, "MATCH");
                     }
                 }
             }
@@ -209,13 +208,17 @@ public class EventScreen extends AppCompatActivity {
         Log.d(TAG, "onCreate: "+ mEvent);
 
         //Pre-population
+        Log.d(TAG, "POPULATING WITH EVENT INFO ON CREATE");
         mEventName.setText(mEvent.getName());
         mEventAdress.setText(mEvent.getAddress());
         mDescription.setText(mEvent.getDescription());
         mDate.setText(mEvent.getDate());
         mTime.setText(mEvent.getTime());
 
+        // Get host's profile pic
         downloadImage(mEvent.getHost().getUid());
+
+        // Hosts profile pic takes us to their profile screen to see more info abot htem
         hostPic.setOnClickListener(new View.OnClickListener(){
 
             @Override
@@ -229,6 +232,7 @@ public class EventScreen extends AppCompatActivity {
 
         });
 
+        // Get the events host id
         String host = mEvent.getHost().getUid();
 
         //Logic to run if host is accessing the event page
@@ -245,6 +249,8 @@ public class EventScreen extends AppCompatActivity {
             deleteBtn.setVisibility(View.INVISIBLE);
         }
 
+        // set on click listener for the edit button
+        // Starts the edit activity and awaits the resulting changes
         editBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -254,6 +260,8 @@ public class EventScreen extends AppCompatActivity {
                 startActivityForResult(intent, 0);
             }
         });
+
+
 
         deleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -460,16 +468,29 @@ public class EventScreen extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "POPULATING WITH EVENT INFO 1");
 
         if (requestCode == 0){
+
+            Log.d(TAG, "POPULATING WITH EVENT INFO 2");
+
             if (resultCode == 1) {
+
+                Log.d(TAG, "POPULATING WITH EVENT INFO 2");
+
                 if(data!=null) {
+
+                    Log.d(TAG, "POPULATING WITH EVENT INFO 3");
                     Event resultEvent = (Event) data.getSerializableExtra("MyObject");
 
+                    Log.d(TAG, resultEvent.getName());
                     mEventName.setText(resultEvent.getName());
                     mDescription.setText(resultEvent.getDescription());
                     mDate.setText(resultEvent.getDate());
                     mTime.setText(resultEvent.getTime());
+
+
+
                 }
             }
         }

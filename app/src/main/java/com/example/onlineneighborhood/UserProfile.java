@@ -4,49 +4,34 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.FileProvider;
 
 import android.Manifest;
 
 import java.io.ByteArrayOutputStream;
-import java.util.*;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Parcelable;
 import android.provider.MediaStore;
-import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -55,30 +40,19 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-import static androidx.core.graphics.TypefaceCompatUtil.getTempFile;
 import static java.util.Calendar.*;
 
 public class UserProfile extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
@@ -109,10 +83,10 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_screen);
 
-        textViewName = findViewById(R.id.textViewName);
+        textViewName = findViewById(R.id.userName);
         editProfileBtn = findViewById(R.id.editProfileBtn);
         spinnerPreferences = (Spinner) findViewById(R.id.spinnerPreferences);
-        editTextdob = findViewById(R.id.editTextdob);
+        editTextdob = findViewById(R.id.editTextDob);
         editTextBio = findViewById(R.id.editTextbio);
         textViewBio = findViewById(R.id.textViewbio);
         imageButtonPicture = findViewById(R.id.imageButtonPicture);
@@ -123,6 +97,16 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
 
 
         spinnerPreferences.setEnabled(false);
+
+        //Setting up the spinner with different types of event
+        String[] spinner_array = getApplicationContext().getResources().getStringArray(R.array.preferences);
+
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(
+                this,R.layout.spinner_item,spinner_array
+        );
+        spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item);
+        spinnerPreferences.setAdapter(spinnerArrayAdapter);
+
 
 
         //Setting up toolbar

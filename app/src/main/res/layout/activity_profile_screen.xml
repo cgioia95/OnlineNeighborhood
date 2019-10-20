@@ -14,110 +14,143 @@
             android:id="@+id/toolbar"
             layout="@layout/profile_toolbar" />
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/imageButtonPicture"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="40dp"
-            android:layout_marginRight="20dp"
-            android:contentDescription="@string/picture_here"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:srcCompat="@tools:sample/avatars" />
-
-        <TextView
-            android:id="@+id/textViewName"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="20dp"
-            android:text="Name"
-            android:textAlignment="center"
-            app:layout_constraintEnd_toEndOf="@+id/imageButtonPicture"
-            app:layout_constraintTop_toBottomOf="@+id/imageButtonPicture" />
+            android:layout_marginHorizontal="30dp"
+            >
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/profileWrapper"
+                >
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/imageButtonPicture"
+                    android:layout_marginTop="20dp"
+                    android:layout_width="88dp"
+                    android:layout_height="88dp"
+                    android:contentDescription="@string/picture_here"
+                    tools:srcCompat="@tools:sample/avatars" />
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/imageButtonPicture"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="20dp">
+                    <TextView
+                        android:id="@+id/userName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:text="Name"
+                        android:textAlignment="center"
+                        android:textSize="20sp"
+                        android:gravity="center"
+                        android:textColor="@color/colorPrimary"
+                        />
+
+                    <TextView
+                        android:id="@+id/textViewbio"
+                        android:textColor="@color/textSecondary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_below="@id/userName"
+                        android:text="Bio text"
+                        android:importantForAutofill="no"
+                        android:inputType="textMultiLine" />
+
+                    <EditText
+                        android:id="@+id/editTextbio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:hint="Bio Update"
+                        android:textSize="14sp"
+                        android:importantForAutofill="no"
+                        android:inputType="textMultiLine"
+                        android:visibility="gone"
+                        android:layout_centerHorizontal="true"
+                        android:layout_below="@id/userName"
+                        />
+
+                </RelativeLayout>
 
 
-        <TextView
-            android:id="@+id/editTextdob"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginRight="20dp"
-            android:ems="10"
-            android:hint="DOB"
-            android:inputType="textPersonName"
-            app:layout_constraintEnd_toEndOf="@+id/editTextbio"
-            app:layout_constraintStart_toStartOf="@+id/editTextbio"
-            app:layout_constraintTop_toBottomOf="@+id/textViewName"
-            android:importantForAutofill="no" />
 
-        <TextView
-            android:id="@+id/textViewbio"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:ems="10"
-            android:gravity="start|top"
-            android:importantForAutofill="no"
-            android:inputType="textMultiLine"
-            app:layout_constraintBottom_toTopOf="@+id/editProfileBtn"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/spinnerPreferences" />
+            </RelativeLayout>
 
-        <EditText
-            android:id="@+id/editTextbio"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:ems="10"
-            android:gravity="start|top"
-            android:hint="Bio Update"
-            android:importantForAutofill="no"
-            android:inputType="textMultiLine"
-            android:visibility="gone"
-            app:layout_constraintBottom_toTopOf="@+id/editProfileBtn"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/spinnerPreferences" />
 
-        <Spinner
-            android:id="@+id/spinnerPreferences"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginBottom="59dp"
-            android:entries="@array/preferences"
-            app:layout_constraintBottom_toTopOf="@+id/editTextbio"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editTextdob" />
+            <TextView
+                android:id="@+id/birthdayHeader"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="26dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/profileWrapper"
+                android:text="Birthdate"
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp"
+                />
 
-        <Button
-            android:id="@+id/editProfileBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:text="SAVE CHANGES"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/imageButtonPicture"
-            app:layout_constraintStart_toStartOf="@+id/imageButtonPicture"
-            app:layout_constraintTop_toBottomOf="@+id/editTextbio" />
+            <TextView
+                android:id="@+id/editTextDob"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/birthdayHeader"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/textSecondary"
+                android:ems="10"
+                android:hint="DOB"
+                android:inputType="textPersonName"
+                android:importantForAutofill="no" />
+
+
+            <TextView
+                android:id="@+id/preferencesHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="26dp"
+                android:layout_below="@+id/editTextDob"
+                android:text="Interest"
+                android:textColor="@color/textPrimary"
+                android:textSize="16sp"
+                />
+
+
+            <RelativeLayout
+                android:id="@+id/preferencesWrapper"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/spinner_bg"
+                android:layout_below="@id/preferencesHeader">
+                <Spinner
+                    android:id="@+id/spinnerPreferences"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:backgroundTint="@color/colorAccent"
+                    android:theme="@style/ThemeOverlay.AppCompat.Light"
+
+                    />
+            </RelativeLayout>
+
+            <Button
+                android:id="@+id/editProfileBtn"
+                android:layout_marginTop="24dp"
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:background="@drawable/pink_btn_background"
+                android:textColor="@color/white"
+                android:layout_centerHorizontal="true"
+                android:text="SAVE"
+                android:visibility="gone"
+                android:paddingHorizontal="8dp"
+                android:layout_below="@id/preferencesWrapper" />
+
+
+        </RelativeLayout>
 
 
     </LinearLayout>

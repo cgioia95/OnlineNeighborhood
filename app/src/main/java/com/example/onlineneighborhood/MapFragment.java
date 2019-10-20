@@ -54,35 +54,41 @@ import static java.util.Locale.getDefault;
  * A simple {@link Fragment} subclass.
  */
 public class MapFragment extends Fragment implements OnMapReadyCallback {
-    private GoogleMap mMap;
 
+    // Google Maps Objects
+    private GoogleMap mMap;
     SupportMapFragment mapFragment;
 
-    String suburbName;
 
+    // Variables for accessing suburb we're currently in
+    String suburbName;
     String currentSuburbName;
     Suburb suburb;
+
+    // List of event's we're displaying
     ArrayList<Event> events;
 
+    // Default filter type
     static String filterType = "NO_FILTER";
 
+    // FireBase Database References
     DatabaseReference databaseEvents;
     DatabaseReference databaseUsers;
     DatabaseReference databaseSuburb;
 
+    // Default list of markers
     static ArrayList<Marker> defaultMarkers;
 
-
+    // Declare the buttons and
     Button  todayFilterButton;
     TextView dateButton;
-    EditText editTextDays;
 
+    // Declare the dates used
     Date todayDate;
-    Date newDate;
     static Date calenderDate;
 
 
-
+    // HashMaps the link markers to events, and marker's ids to markers
     static HashMap<String, Event> markerToEvent = new HashMap<String, Event>();
     static HashMap<String, Marker> markerIDtoMarker = new HashMap<String, Marker>();
 
@@ -96,27 +102,29 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-
+        // Retrieve the global suburb variable
         suburbName = ((OnlineNeighborhood) getActivity().getApplication()).getsuburb();
 
         // Inflate the layout for this fragment
         View v =  inflater.inflate(R.layout.fragment_map, container, false);
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
 
+        // Accessing all events, user information and our specific suburb
         databaseEvents = FirebaseDatabase.getInstance().getReference("events");
         databaseUsers = FirebaseDatabase.getInstance().getReference("Users");
         databaseSuburb =  FirebaseDatabase.getInstance().getReference("suburbs").child(suburbName);
 
+        // Retrieve today's date
         todayDate = new Date();
         int year = todayDate.getYear();
         int month = todayDate.getMonth();
         int date = todayDate.getDate();
         todayDate = new Date(year, month, date);
 
+        // Initialize the markers list
         defaultMarkers = new ArrayList<Marker>();
 
-        Log.d("MAGFRAGMENT",""+ suburbName);
-
+        // Ensure mapFragment is not null
         if (mapFragment == null){
             FragmentManager fm = getFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();
@@ -126,7 +134,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
 
 
-
+        // Retrieve the suburb name, based on the suburbID
         databaseSuburb.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -150,6 +158,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(final GoogleMap googleMap) {
 
+        // Bind our buttons
+
         todayFilterButton = getView().findViewById(R.id.todayFilterButton);
 
         dateButton = getView().findViewById(R.id.dateButton);
@@ -157,30 +167,27 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
 
 
-
+        // Set OnClick Listener to todayFilter
         todayFilterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
+                // Set filter type to TODAY
                 filterType = "TODAY_FILTER";
 
-                Log.d( "TODAYDATE" , todayDate.toString());
-
+                // Cycle through the markerToEvent map
+                // Test the events to ensure they're on today's date
                 for (HashMap.Entry<String,Event> entry : markerToEvent.entrySet()) {
-
-                    Log.d("MAPTEST" , entry.getValue().getName());
-                    Log.d("MAPTEST" , entry.getValue().getDate());
 
                     String stringDate = entry.getValue().getDate();
 
+                    // If today's date, set marker to visible, otherwise invisible
                     try {
                         Date testedDate =new SimpleDateFormat("dd/MM/yyyy").parse(stringDate);
-                        Log.d("TESTED DATE" , testedDate.toString());
 
                         if (todayDate.compareTo(testedDate) != 0){
 
                             markerIDtoMarker.get(entry.getKey()).setVisible(false);
-                            Log.d("MATCHTEST" , "MATCH");
                         }
 
                         if (todayDate.compareTo(testedDate) == 0 ){
@@ -198,6 +205,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
+        // Opens up the Date Picker fragment for filtering over a specific day
         dateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -212,19 +220,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
 
 
-        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-            @Override
-            public void onInfoWindowClick(Marker marker) {
-                Log.d("THISISMYTAG", marker.getTitle());
-            }
-        });
-
-        Log.d("SUBURB", "SUBURB IS " + suburbName);
+        // Default location set to Melbourne
 
         LatLng MELBOURNE = new LatLng(-37.814, 144.96332);
 
+        // Retrieve the coordinates of the suburb we're in
         LatLng SUBURB = getSuburbLocat();
 
+        // On startup, zoom to the suburb we're in
         if (SUBURB != null){
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(SUBURB, 13));
         }
@@ -236,25 +239,25 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
 
 
-
+        // Running constantly to test what event's are in our inspected suburgb
         databaseSuburb.addValueEventListener(new ValueEventListener() {
 
 
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
+                // Every time there's a change, clear the map and start from fresh
                 mMap.clear();
 
+                // Retrieve today's date
                 Date todayDate = new Date();
                 int year = todayDate.getYear();
                 int month = todayDate.getMonth();
                 int date = todayDate.getDate();
                 todayDate = new Date(year, month, date);
 
-                Log.d("SNAPSHOT" , dataSnapshot.toString());
 
-                Log.d("SNAPSHOT" , String.valueOf(dataSnapshot.child("events")));
-
+                // Retrieve all the events in the suburb
                 Suburb suburb = dataSnapshot.getValue(Suburb.class);
 
                             if ((events = suburb.getEvents()) != null){
@@ -269,14 +272,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                                         String stringDate = event.getDate();
 
 
-                                        Log.d("MAPTEST", title);
-                                        Log.d("MAPTEST", address);
-
                                         Geocoder geocoder;
                                         if(getActivity() != null) {
                                             geocoder = new Geocoder(getActivity(), getDefault());
 
-
+                                            // Convert address to coordiantes
                                             List<Address> addresses = null;
                                             try {
                                                 addresses = geocoder.getFromLocationName(address, 1);
@@ -289,6 +289,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
                                             LatLng locat = new LatLng(latitude, longitude);
 
+                                            // Places markers on the map basedd on the current filter type
+                                            // Never allows past events to be marked
                                             try {
                                                 Date testedDate = new SimpleDateFormat("dd/MM/yyyy").parse(stringDate);
                                                 Log.d("TESTED DATE", testedDate.toString());
@@ -333,7 +335,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                                                 e.printStackTrace();
                                             }
 
-
+                                            // Sets onClickListener to marker's info window, sending them to the
+                                            // event screen
                                             mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
                                                 @Override
                                                 public void onInfoWindowClick(Marker marker) {
@@ -349,7 +352,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                                             });
 
 
-                                            Log.d("MAPTEST", "LONG: " + Double.toString(longitude) + " LAT: " + Double.toString(latitude));
                                         }
                                     }
                                 }
@@ -366,9 +368,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
 
 
+    }
 
-                }
-
+    // Get coordiantes of the suburb we're in
     public LatLng getSuburbLocat() {
 
         Geocoder coder = new Geocoder(getContext());
@@ -384,7 +386,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
             Address location = address.get(0);
 
-            Log.d("LOCATION" , location.toString());
             LatLan= new LatLng(location.getLatitude(), location.getLongitude() );
 
         } catch (IOException ex) {
@@ -396,7 +397,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
 
-    // NEED TO REFERENCE THIS
+    // DatePiker fragment that pops up when selecting a date
     public static class SelectDateFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 
         @Override
@@ -414,18 +415,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         public Date populateSetDate(int year, int month, int day) {
 
             calenderDate = new Date(year - 1900, month - 1, day);
-            Log.d("CALENDER DATE POPULATE" , calenderDate.toString());
+
+            // If calender date chosen, set filter to calender filtering
 
             if (calenderDate != null){
 
                 filterType = "CALENDER_FILTER";
 
-                Log.d("CALENDER FILTER BUTTON", calenderDate.toString());
-
                 for (Marker marker: defaultMarkers){
                     marker.setVisible(true);
                 }
 
+                // Cycles through all events, if not the date selected, set to invisible
                 for (HashMap.Entry<String,Event> entry : markerToEvent.entrySet()) {
 
 
