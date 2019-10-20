@@ -12,7 +12,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="Choose A Suburb"
+        android:text="Choose a suburb!"
+        android:textColor="@color/colorPrimary"
         android:textAlignment="center"
         android:textSize="30sp"
         android:textStyle="bold" />
@@ -21,10 +22,8 @@
         android:id="@+id/textView9"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="10dp"
+
+        android:layout_marginTop="8dp"
         android:text="Click on a suburb from the list below or search for your favourite"
         android:textAlignment="center" />
 
