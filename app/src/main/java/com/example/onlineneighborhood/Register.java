@@ -113,6 +113,15 @@ public class Register extends AppCompatActivity implements View.OnClickListener,
             return;
         }
 
+        if (password.length() < 6){
+
+            // password  is not long enough
+            Toast.makeText(this, "Password not long enough, need 6 characters", Toast.LENGTH_SHORT).show();
+            // Stopping this function executive further
+            return;
+
+        }
+
         if (TextUtils.isEmpty(name)){
             // password  is empty
             Toast.makeText(this, "Please enter your name", Toast.LENGTH_SHORT).show();
