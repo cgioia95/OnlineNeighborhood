@@ -96,7 +96,7 @@ public class EventScreen extends AppCompatActivity {
         //Setting toolbar for adding profile icon
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Online Neighborhood");
+        getSupportActionBar().setTitle("Togather");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
