@@ -38,7 +38,7 @@
             android:name=".EventScreen"
             android:parentActivityName=".BottomNavigationActivity" />
         <activity
-            android:name=".nonUserProfile"
+            android:name=".attendeeProfile"
             android:label="otherProfile" />
         <activity
             android:name=".createEvent"
@@ -55,7 +55,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name=".Login" />
         <activity android:name=".Register" />
         <activity
             android:name=".UserProfile"

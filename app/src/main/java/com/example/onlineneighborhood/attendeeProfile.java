@@ -32,7 +32,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 /*
 This class is displayed when a user clicks on a user profile which is not their own
  */
-public class nonUserProfile extends AppCompatActivity {
+public class attendeeProfile extends AppCompatActivity {
 
     private TextView textViewName;
     private TextView dateOfBirth, bio, Preferences;
