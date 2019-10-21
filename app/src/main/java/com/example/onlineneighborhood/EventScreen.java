@@ -96,7 +96,7 @@ public class EventScreen extends AppCompatActivity {
         //Setting toolbar for adding profile icon
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Online Neighborhood");
+        getSupportActionBar().setTitle("Togather");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
@@ -162,7 +162,7 @@ public class EventScreen extends AppCompatActivity {
                                     @Override
                                     public void onEventClick(int position) {
                                         UserInformation attendee = attendees.get(position);
-                                        Intent i = new Intent( getApplicationContext(), nonUserProfile.class);
+                                        Intent i = new Intent( getApplicationContext(), attendeeProfile.class);
                                         i.putExtra("UID", attendee.getUid());
                                         startActivity(i);
                                     }
@@ -223,7 +223,7 @@ public class EventScreen extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(getApplicationContext(), nonUserProfile.class);
+                Intent i = new Intent(getApplicationContext(), attendeeProfile.class);
                 i.putExtra("UID", mEvent.getHost().getUid());
                 i.putExtra("MyObject", mEvent);
                 i.putExtra("SUBURB", intentSuburb);

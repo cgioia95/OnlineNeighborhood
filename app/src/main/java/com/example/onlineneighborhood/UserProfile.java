@@ -75,7 +75,7 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
     private static final String TAG = "My Profile";
     private String uid;
     Uri imageuri;
-    private List<String> preferenceOptions = Arrays.asList("Sports", "Gigs", "Dating", "Misc.");
+    private List<String> spinner_array;
 
 
     @Override
@@ -97,6 +97,14 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
 
 
         spinnerPreferences.setEnabled(false);
+        //Setting up the spinner with different types of event
+        spinner_array = Arrays.asList(getApplicationContext().getResources().getStringArray(R.array.preferences));
+
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(
+                this,R.layout.spinner_item,spinner_array
+        );
+        spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item);
+        spinnerPreferences.setAdapter(spinnerArrayAdapter);
 
         //Setting up toolbar
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
@@ -108,6 +116,14 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
 
         if (fireBaseAuth.getCurrentUser() != null)
             uid = fireBaseAuth.getCurrentUser().getUid();
+
+        if(uid == null){
+            fireBaseAuth.signOut();
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+            finish();
+
+        }
 
         //Display dialog box to choose between camera and gallery
         imageButtonPicture.setOnClickListener(new View.OnClickListener()
@@ -156,13 +172,25 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
                 Log.d("On DATA CHANGE ", "IN");
                 Log.d("On DATA CHANGE", "Snapshot" + dataSnapshot);
                 if (dataSnapshot.getValue() != null) {
-                    String name = dataSnapshot.child("name").getValue().toString();
-                    String preference = dataSnapshot.child("preference").getValue().toString();
+                    String name, preference, bio;
+                    Log.d(TAG, "onDataChange: " + dataSnapshot.child("name"));
+                    if (dataSnapshot.child("name").getValue() != null)
+                         name = dataSnapshot.child("name").getValue().toString();
+                    else
+                        name = "";
+                    if (dataSnapshot.child("preference").getValue() != null)
+                        preference = dataSnapshot.child("preference").getValue().toString();
+                    else
+                        preference = "";
+                    if (dataSnapshot.child("bio").getValue() != null)
+                        bio = dataSnapshot.child("bio").getValue().toString();
+                    else
+                        bio = "";
+
                     String dob = dataSnapshot.child("dob").getValue().toString();
-                    String bio = dataSnapshot.child("bio").getValue().toString();
 
                     textViewName.setText(name);
-                    spinnerPreferences.setSelection(preferenceOptions.indexOf(preference));
+                    spinnerPreferences.setSelection(spinner_array.indexOf(preference));
                     editTextdob.setText(dob);
                     textViewBio.setText(bio);
                     downloadImage();
