@@ -194,11 +194,18 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Seri
     //basic method which does simple checks against the selected filters and sees if the event elements match the filters
     public void filterApplied(Date date, String type, Event event) throws ParseException {
         String eventStartDate = event.getDate() + " " + event.getTime();
-        String eventEndDate = event.getEndDate() + " " + event.getEndTime();
         Date eventStart = new SimpleDateFormat("dd/MM/yyyy").parse(eventStartDate);
-        Date eventEnd = new SimpleDateFormat("dd/MM/yyyy").parse(eventEndDate);
+        Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH);
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        String currDate = day+"/"+(month+1)+"/"+year;
+        Date currentDate = new SimpleDateFormat("dd/MM/yyyy").parse(currDate);
         if(date == null && type == null){
-            eventList.add(event);
+            Log.d("CURR DATE", ""+currentDate+eventStart);
+            if(currentDate.equals(eventStart) || currentDate.before(eventStart)){
+                eventList.add(event);
+            }
         }else if(date != null && type == null){
                 if(eventStart.equals(date)) {
                     eventList.add(event);
