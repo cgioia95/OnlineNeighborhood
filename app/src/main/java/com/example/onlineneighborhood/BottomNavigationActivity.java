@@ -83,6 +83,12 @@ public class BottomNavigationActivity extends AppCompatActivity implements Botto
 
     @Override
     protected void onStart() {
+        if(((OnlineNeighborhood) this.getApplication()).getPicChange() == 1){
+            downloadImage();
+            ((OnlineNeighborhood) this.getApplication()).setPicChange(0);
+
+        }
+
         databaseEvents = FirebaseDatabase.getInstance().getReference("suburbs").child(suburbid);
 
         databaseEvents.addListenerForSingleValueEvent(new ValueEventListener() {

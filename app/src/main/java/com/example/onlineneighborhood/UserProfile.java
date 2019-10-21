@@ -400,6 +400,8 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
                             progressDialog.setMessage("Uploaded "+(int)progress+"%");
                         }
                     });
+            ((OnlineNeighborhood) this.getApplication()).setPicChange(1);
+
         }
     }
 
