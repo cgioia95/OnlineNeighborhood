@@ -75,7 +75,7 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
     private static final String TAG = "My Profile";
     private String uid;
     Uri imageuri;
-    private List<String> preferenceOptions = Arrays.asList("Sports", "Gigs", "Dating", "Misc.");
+    private List<String> spinner_array;
 
 
     @Override
@@ -97,6 +97,14 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
 
 
         spinnerPreferences.setEnabled(false);
+        //Setting up the spinner with different types of event
+        spinner_array = Arrays.asList(getApplicationContext().getResources().getStringArray(R.array.preferences));
+
+        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(
+                this,R.layout.spinner_item,spinner_array
+        );
+        spinnerArrayAdapter.setDropDownViewResource(R.layout.spinner_item);
+        spinnerPreferences.setAdapter(spinnerArrayAdapter);
 
         //Setting up toolbar
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
@@ -162,7 +170,7 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
                     String bio = dataSnapshot.child("bio").getValue().toString();
 
                     textViewName.setText(name);
-                    spinnerPreferences.setSelection(preferenceOptions.indexOf(preference));
+                    spinnerPreferences.setSelection(spinner_array.indexOf(preference));
                     editTextdob.setText(dob);
                     textViewBio.setText(bio);
                     downloadImage();
