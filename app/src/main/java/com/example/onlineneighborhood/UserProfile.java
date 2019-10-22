@@ -125,45 +125,7 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
 
         }
 
-        //Display dialog box to choose between camera and gallery
-        imageButtonPicture.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
 
-                CharSequence[] items={"Camera", "Gallery"};
-                AlertDialog.Builder builder = new AlertDialog.Builder(UserProfile.this);
-                builder.setTitle("Pick an image from").setItems(items, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                       if (i==0){
-                           if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
-                           {
-                               requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_PERMISSION_CODE);
-                           }
-                           else
-                           {
-                               Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                               startActivityForResult(cameraIntent, CAMERA_REQUEST);
-                           }
-
-                       }
-                       if (i==1){
-                           Intent gallery = new Intent();
-                            gallery.setType("image/*");
-                            gallery.setAction(Intent.ACTION_GET_CONTENT);
-
-                            startActivityForResult(Intent.createChooser(gallery, "Select Picture"), PICK_IMAGE);
-
-
-                       }
-                    }
-                });
-                AlertDialog dialog = builder.create();
-                dialog.show();
-            }
-        });
 
         //Fetch User's data from firebase
         databaseReference.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -245,6 +207,46 @@ public class UserProfile extends AppCompatActivity implements DatePickerDialog.O
 
                 }
 
+            });
+
+            //Display dialog box to choose between camera and gallery
+            imageButtonPicture.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+
+                    CharSequence[] items={"Camera", "Gallery"};
+                    AlertDialog.Builder builder = new AlertDialog.Builder(UserProfile.this);
+                    builder.setTitle("Pick an image from").setItems(items, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            if (i==0){
+                                if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+                                {
+                                    requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_PERMISSION_CODE);
+                                }
+                                else
+                                {
+                                    Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                                    startActivityForResult(cameraIntent, CAMERA_REQUEST);
+                                }
+
+                            }
+                            if (i==1){
+                                Intent gallery = new Intent();
+                                gallery.setType("image/*");
+                                gallery.setAction(Intent.ACTION_GET_CONTENT);
+
+                                startActivityForResult(Intent.createChooser(gallery, "Select Picture"), PICK_IMAGE);
+
+
+                            }
+                        }
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                }
             });
 
             //Upload changes to firebase
