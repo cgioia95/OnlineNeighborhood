@@ -15,7 +15,13 @@ Users can then hop on the app and filter events in an easy-to-use list, or visua
 
 ## Installation and Setup Instructions
 
+Locally, the application is easy to run in [Android Studio](https://developer.android.com/studio).
 
+Once in Android Studio, follow [these](https://www.tvisha.com/blog/how-to-import-a-project-in-android-studio) steps to import, run and export for deployment usage. 
+
+The backend is driven by Firebase Auth & Realtime Database. Once these two services are manually created, their respective details must be entered into `/app/google-services.json`. 
+
+NOTE: Currently listed config information is deprecated and all services associated with them are shutdown. They are just there for reference of what end-state should look like.
 
 ## Reflection
 
