@@ -4,7 +4,7 @@
 
 OnlineNeighborhood came out of a Unversity Project to devise a completely new app idea and fully implement it as a team. 
 
-The core idea is to allow users to post events publically or privately, adding attributes to them that may be of interest (e.g. a sporting event, study session, etc). 
+The core idea is to allow users to post events publicly or privately, adding attributes to them that may be of interest (e.g. a sporting event, study session, etc). 
 
 Users can then hop on the app and filter events in an easy-to-use list, or visualise them on a map. The map helps for users looking to attend events more local to them, and eventually foster a sense of community through the app.
 
@@ -19,7 +19,7 @@ Locally, the application is easy to run in [Android Studio](https://developer.an
 
 Once in Android Studio, follow [these](https://www.tvisha.com/blog/how-to-import-a-project-in-android-studio) steps to import, run and export for deployment usage. 
 
-The backend is driven by Firebase Auth & Realtime Database. Once these two services are manually created, their respective details must be entered into `/app/google-services.json`. 
+The backend is driven by Firebase Auth & Realtime Database. Once these two services are manually created (easily spun up the Firebase Console) their respective details must be entered into `/app/google-services.json`. 
 
 NOTE: Currently listed config information is deprecated and all services associated with them are shutdown. They are just there for reference of what end-state should look like.
 
